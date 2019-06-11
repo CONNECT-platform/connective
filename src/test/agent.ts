@@ -27,6 +27,19 @@ describe('Agent', () => {
 
       a.input('b').receive('yo');
     });
+
+    it('should return an input that can be connected to outputs.', done => {
+      let a = new Agent();
+      let b = new Agent();
+
+      a.input('x').connect(b.output('y'));
+      a.input('x').observable.subscribe(data => {
+        data.should.equal('hey');
+        done();
+      });
+
+      b.output('y').send('hey');
+    });
   });
 
   describe('.output()', () => {
@@ -49,6 +62,19 @@ describe('Agent', () => {
       a.output('b').observable.subscribe(() => done());
 
       a.output('b').send('yo');
+    });
+
+    it('should return an output that can be connected to inputs.', done => {
+      let a = new Agent();
+      let b = new Agent();
+
+      a.output('x').connect(b.input('y'));
+      b.input('y').observable.subscribe(data => {
+        data.should.equal('fellas');
+        done();
+      });
+
+      a.output('x').send('fellas');
     });
   });
 });

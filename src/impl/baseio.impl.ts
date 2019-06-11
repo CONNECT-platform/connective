@@ -2,7 +2,7 @@ import { Subject } from 'rxjs';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
-import { Event } from '../types/event';
+import { Event } from '../types/event.type';
 
 
 export class _BaseIOImpl {
