@@ -21,8 +21,10 @@ export class _BaseIOImpl {
   get observable() {
     if (!this._observable)
       this._observable = this._sub
-        .pipe(filter(event => event.tag == this._tag))
-        .pipe(map(event => (event as any).data));
+        .pipe(
+          filter(event => event.tag == this._tag),
+          map(event => (event as any).data),
+        );
     return this._observable;
   }
 }
