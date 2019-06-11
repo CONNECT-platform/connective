@@ -2,5 +2,6 @@
 .npmignore
 test.ts
 tsconfig.json
+logo.svg
 src/
 node_modules/
