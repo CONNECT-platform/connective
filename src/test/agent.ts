@@ -40,6 +40,19 @@ describe('Agent', () => {
 
       b.output('y').send('hey');
     });
+
+    it('should return an input that instantly receives the latest value of a connected output.', done => {
+      let a = new Agent();
+      let b = new Agent();
+
+      b.output('x').send(42);
+      a.input('y').observable.subscribe(data => {
+        data.should.equal(42);
+        done();
+      });
+
+      a.input('y').connect(b.output('x'));
+    });
   });
 
   describe('.output()', () => {
@@ -120,6 +133,15 @@ describe('Agent', () => {
       a.control.connect(b.signal('ummm'));
       a.control.observable.subscribe(() => done());
       b.signal('ummm').send();
+    });
+
+    it('should return a control that instantly activates when connected to an already activated signal.', done => {
+      let a = new Agent();
+      let b = new Agent();
+
+      b.signal('yolo').send();
+      a.control.observable.subscribe(() => done());
+      a.control.connect(b.signal('yolo'));
     });
   });
 });

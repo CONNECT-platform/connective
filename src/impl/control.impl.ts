@@ -7,7 +7,7 @@ export class _ControlImpl implements Control {
 
   constructor(
     private _ctrlsub: Subject<void>,
-    private _callback?: (_sub: Subscription) => void,
+    private _callback?: (sub: Subscription, pin: Signal) => void,
   ) {}
 
   receive() {
@@ -16,7 +16,7 @@ export class _ControlImpl implements Control {
 
   connect(signal: Signal): Subscription {
     let _sub = signal.connect(this);
-    if (this._callback) this._callback(_sub);
+    if (this._callback) this._callback(_sub, signal);
 
     return _sub;
   }

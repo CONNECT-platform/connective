@@ -11,7 +11,7 @@ export class _SignalImpl extends _BaseIOImpl implements Signal {
   constructor(
     _signalsub: Subject<Event>,
     _tag: string,
-    private _callback?: (_sub: Subscription) => void,
+    private _callback?: (sub: Subscription, pin: Control) => void,
   ) {
     super(_signalsub, _tag);
   }
@@ -22,7 +22,7 @@ export class _SignalImpl extends _BaseIOImpl implements Signal {
 
   connect(control: Control): Subscription {
     let _sub = this.observable.subscribe(() => control.receive());
-    if (this._callback) this._callback(_sub);
+    if (this._callback) this._callback(_sub, control);
 
     return _sub;
   }
