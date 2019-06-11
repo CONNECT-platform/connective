@@ -7,7 +7,7 @@ describe('Agent', () => {
   it('should load.', () => {});
 
   describe('.input()', () => {
-    it('should return an input that will send the data sent to `receive()` to its observable.', done => {
+    it('should return an input that will send the data sent to `.receive()` to its observable.', done => {
       let a = new Agent();
 
       let i = a.input('hellow');
@@ -43,7 +43,7 @@ describe('Agent', () => {
   });
 
   describe('.output()', () => {
-    it('should return an output that will send the data sent to `send()` to its observable.', done => {
+    it('should return an output that will send the data sent to `.send()` to its observable.', done => {
       let a = new Agent();
 
       let o = a.output('hellow');
@@ -75,6 +75,51 @@ describe('Agent', () => {
       });
 
       a.output('x').send('fellas');
+    });
+  });
+
+  describe('.signal()', () => {
+    it('should return a signal that will send events to its observable on `.send()` being called.', done => {
+      let a = new Agent();
+      let s = a.signal('wow');
+      s.observable.subscribe(() => done());
+      s.send();
+    });
+
+    it('should return a signal whose observable only picks event sent to its tag.', done => {
+      let a = new Agent();
+
+      a.signal('a').observable.subscribe(() => { throw new Error('should not have happened!'); });
+      a.signal('b').observable.subscribe(() => done());
+
+      a.signal('b').send();
+    });
+
+    it('should return a signal that can be connected to controls.', done => {
+      let a = new Agent();
+      let b = new Agent();
+
+      a.signal('XXX').connect(b.control);
+      b.control.observable.subscribe(() => done());
+      a.signal('XXX').send();
+    });
+  });
+
+  describe('.control()', () => {
+    it('should return a control that will send events to its observable on `.receive()` being called', done => {
+      let a = new Agent();
+      let c = a.control;
+      c.observable.subscribe(() => done());
+      c.receive();
+    });
+
+    it('should return a control that can be connected to signals.', done => {
+      let a = new Agent();
+      let b = new Agent();
+
+      a.control.connect(b.signal('ummm'));
+      a.control.observable.subscribe(() => done());
+      b.signal('ummm').send();
     });
   });
 });

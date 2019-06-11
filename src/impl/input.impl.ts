@@ -11,7 +11,7 @@ export class _InputImpl extends _BaseIOImpl implements Input {
   constructor(
     _insub: Subject<Event>,
     _tag: string,
-    private _ref: Subscription,
+    private _callback?: (_sub: Subscription) => void,
   ) {
     super(_insub, _tag);
   }
@@ -22,8 +22,8 @@ export class _InputImpl extends _BaseIOImpl implements Input {
 
   connect(output: Output): Subscription {
     let _sub = output.connect(this);
-    this._ref.add(_sub);
-    
+    if (this._callback) this._callback(_sub);
+
     return _sub;
   }
 }
