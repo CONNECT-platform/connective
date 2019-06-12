@@ -1,4 +1,4 @@
 describe('connective', () => {
   it('must load properly.', () => {});
-  require('./agent');
+  require('../pin/test');
 });
