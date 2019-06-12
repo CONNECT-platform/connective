@@ -23,7 +23,7 @@ export class Switch extends Agent {
     let _case = this.cases[label as any];
 
     if (typeof _case === 'function') {
-      if (_case.length == 1)
+      if (_case.length <= 1)
         return lazy(() => this.target.observable.pipe(filter(_case)));
       else
         return lazy(() => this.target.observable.pipe(

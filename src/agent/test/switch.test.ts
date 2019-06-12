@@ -63,4 +63,17 @@ describe('Switch', () => {
     });
     a.send(3);
   });
+
+  it.only('should activate as many outputs as they match.', () => {
+    let a = new Source();
+    let b = new Switch([1, () => true]);
+    let calls = 0;
+
+    b.target.from(a);
+    b.case(0).observable.subscribe(() => calls++);
+    b.case(1).observable.subscribe(() => calls++);
+
+    a.send(1);
+    calls.should.equal(2);
+  });
 });
