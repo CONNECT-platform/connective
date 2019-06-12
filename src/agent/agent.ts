@@ -22,6 +22,12 @@ export class Agent {
   public get inputs(): PinMap { return this._inputs; }
   public get outputs(): PinMap { return this._outputs; }
 
+  public clear(): this {
+    this._inputs.clear();
+    this._outputs.clear();
+    return this;
+  }
+
   protected checkInput(label: string) {
     if (!this.signature.inputs.includes(label))
       throw new InputNotInSignatureError(label, this.signature);
