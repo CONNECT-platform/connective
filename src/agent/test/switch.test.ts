@@ -4,7 +4,7 @@ import { Source } from '../../pin/source';
 import { Switch } from '../switch';
 
 
-describe.only('Switch', () => {
+describe('Switch', () => {
   it('should activate output based on which given `case` matched the given `value`.', () => {
     let a = new Source();
     let s = new Switch([1, 'hellow', false]);
