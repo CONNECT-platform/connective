@@ -17,7 +17,7 @@ describe('wrap()', () => {
   });
 
   it('should return a `PinLike` that cannot be connected to.', () => {
-    expect(() => wrap(of(42)).from(new Pin())).to.throw;
+    expect(() => wrap(of(42)).from(new Pin())).to.throw();
   });
 
   it('should return a `PinLike` that can connect to other pins.', () => {

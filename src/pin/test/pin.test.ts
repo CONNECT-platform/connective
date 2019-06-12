@@ -42,7 +42,7 @@ describe('Pin', () => {
     it('should throw an error when is invoked after the pin\'s observable was accessed.', () => {
       let a = new Source(); let b = new Pin();
       b.observable;
-      expect(() => {b.from(a)}).to.throw;
+      expect(() => {b.from(a)}).to.throw();
     });
   });
 
@@ -71,11 +71,17 @@ describe('Pin', () => {
 
   describe('.clear()', () => {
     it('should clear the pin.', () => {
-      let a = new Source(); let b = new Pin().from(a);
-      b.observable.subscribe(() => { throw new Error('should not have happened.')});
-      expect(() => a.send()).to.throw;
-      b.clear();
-      expect(() => a.send()).not.to.throw;
+      let a = new Source(); let b = new Pin().from(a); let called = false;
+      let sub = b.observable.subscribe(() => called = true);
+
+      a.send();
+      called.should.be.true;
+
+      called = false; sub.unsubscribe();
+      b.clear(); b.observable.subscribe(() => called = true);
+
+      a.send();
+      called.should.be.false;
     });
   });
 

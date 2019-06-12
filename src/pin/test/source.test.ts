@@ -53,11 +53,17 @@ describe('Source', () => {
 
   describe('.clear()', () => {
     it('should clear the incoming connections.', () => {
-      let a = new Source(); let b = new Source().from(a);
-      b.observable.subscribe(() => { throw Error('this should not happen.'); });
-      expect(() => { a.send() }).to.throw;
-      b.clear();
-      expect(() => { a.send() }).not.to.throw;
+      let a = new Source(); let b = new Source().from(a); let called = false;
+      let sub = b.observable.subscribe(() => { called = true });
+
+      a.send();
+      called.should.be.true;
+
+      sub.unsubscribe(); b.clear(); called = false;
+      b.observable.subscribe(() => { called = true });
+
+      a.send();
+      called.should.be.false;
     });
   });
 });
