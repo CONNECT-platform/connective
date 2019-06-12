@@ -64,4 +64,21 @@ describe('Pin', () => {
       expect(() => a.send()).not.to.throw;
     });
   });
+
+  describe('.locked', () => {
+    it('should be false before `.observable` is accessed and true afterwards.', () => {
+      let a = new Pin();
+      a.locked.should.be.false;
+      a.observable;
+      a.locked.should.be.true;
+    });
+
+    it('should lock all pins that are connected to this pin.', () => {
+      let a = new Pin(); let b = new Pin(); let c = new Pin().from(a).from(b);
+      a.locked.should.be.false; b.locked.should.be.false;
+
+      c.observable;
+      a.locked.should.be.true; b.locked.should.be.true;
+    });
+  });
 });

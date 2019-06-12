@@ -1,6 +1,7 @@
 import { should, expect } from 'chai'; should();
 
 import { Source } from '../source';
+import { Pin } from '../pin';
 
 
 describe('Source', () => {
@@ -33,6 +34,12 @@ describe('Source', () => {
       c.observable.subscribe(n => _ += n);
       a.send(1); b.send(2); a.send(3);
       _.should.equal(6);
+    });
+
+    it('should not lock pins.', () => {
+      let a = new Pin();
+      new Source().from(a);
+      a.locked.should.be.false;
     });
   });
 
