@@ -51,19 +51,40 @@ describe('Source', () => {
     });
   });
 
-  describe('.clear()', () => {
+  describe.only('.clear()', () => {
     it('should clear the incoming connections.', () => {
       let a = new Source(); let b = new Source().from(a); let called = false;
-      let sub = b.observable.subscribe(() => { called = true });
+      b.observable.subscribe(() => called = true);
 
       a.send();
       called.should.be.true;
 
-      sub.unsubscribe(); b.clear(); called = false;
-      b.observable.subscribe(() => { called = true });
+      b.clear(); called = false;
 
       a.send();
       called.should.be.false;
+    });
+
+    it('should clear outgoing connections as well.', () => {
+      let a = new Source(); let b = new Source().from(a); let called = false;
+      b.observable.subscribe(() => called = true);
+
+      a.send();
+      called.should.be.true;
+
+      a.clear(); called = false;
+
+      a.send();
+      called.should.be.false;
+    });
+
+    it('should be usable after being cleared.', () => {
+      let a = new Source(); let b = new Source().from(a); let called = false;
+
+      a.clear().to(b);
+      b.observable.subscribe(() => called = true);
+      a.send();
+      called.should.be.true;
     });
   });
 });

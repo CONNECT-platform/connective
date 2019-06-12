@@ -18,6 +18,9 @@ export class Source extends Connectible {
       this._subs = undefined;
     }
 
+    this._subject.complete();
+    this._subject = new Subject<any>();
+
     return super.clear();
   }
 
