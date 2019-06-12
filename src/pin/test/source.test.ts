@@ -51,7 +51,7 @@ describe('Source', () => {
     });
   });
 
-  describe.only('.clear()', () => {
+  describe('.clear()', () => {
     it('should clear the incoming connections.', () => {
       let a = new Source(); let b = new Source().from(a); let called = false;
       b.observable.subscribe(() => called = true);
