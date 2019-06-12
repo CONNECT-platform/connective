@@ -1,17 +1,17 @@
 import { Observable } from 'rxjs';
 
-import { PinLockedError } from './errors/pinlocked.error';
-import { AbstractPin } from './pin.interface';
+import { PinLockedError } from './errors/locked.error';
+import { PinLike } from './pin-like';
 
 
-class Wrapper implements AbstractPin {
+class Wrapper implements PinLike {
   constructor(readonly observable: Observable<any>) {}
 
-  from(pin: AbstractPin): this {
+  from(_: PinLike): this {
     throw new PinLockedError();
   }
 
-  to(pin: AbstractPin) {
+  to(pin: PinLike) {
     pin.from(this);
     return this;
   }

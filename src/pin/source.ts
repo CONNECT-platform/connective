@@ -1,50 +1,39 @@
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, Observable } from 'rxjs';
 
-import { AbstractPin } from './pin.interface';
+import { PinLike } from './pin-like';
+import { Connectible } from './connectible';
 
 
-export class Source implements AbstractPin {
+export class Source extends Connectible {
   private _subject = new Subject<any>();
   private _subs: Subscription | undefined;
-  private _inbound: AbstractPin[] = [];
 
   public send(data?: any) {
     this._subject.next(data);
   }
 
-  public from(pin: AbstractPin) {
-    this._inbound.push(pin);
-    return this;
-  }
-
-  private _from(pin: AbstractPin) {
-    if (!this._subs) this._subs = new Subscription();
-    this._subs.add(pin.observable.subscribe(this._subject));
-  }
-
-  private _resolveInbound() {
-    this._inbound.forEach(pin => this._from(pin));
-    this._inbound = [];
-  }
-
-  public to(pin: AbstractPin) {
-    pin.from(this);
-    return this;
-  }
-
   clear() {
     if (this._subs) {
-      this._inbound = [];
       this._subs.unsubscribe();
       this._subs = undefined;
     }
 
-    return this;
+    return super.clear();
   }
 
-  public get observable() {
-    if (this._inbound.length > 0)
-      this._resolveInbound();
-    return this._subject
+  protected resolveInbound(inbound: PinLike[]) {
+    inbound.forEach(pin => {
+      if (!this._subs)
+        this._subs = new Subscription();
+      this._subs.add(pin.observable.subscribe(this._subject));
+    });
+
+    inbound.length = 0;
+    return this._subject;
+  }
+
+  protected isLocked() { return false; }
+  protected shouldResolveInbound(inbound: PinLike[], observable: Observable<any> | undefined) {
+    return inbound.length > 0 || !observable;
   }
 }

@@ -7,7 +7,7 @@ import { Pin } from '../pin';
 
 
 describe('wrap()', () => {
-  it('should return an `AbstractPin` wrapping a given observable.', done => {
+  it('should return a `PinLike` wrapping a given observable.', done => {
     let p = wrap(of('hellow'));
 
     p.observable.subscribe(data => {
@@ -16,11 +16,11 @@ describe('wrap()', () => {
     });
   });
 
-  it('should return an `AbstractPin` that cannot be connected to.', () => {
+  it('should return a `PinLike` that cannot be connected to.', () => {
     expect(() => wrap(of(42)).from(new Pin())).to.throw;
   });
 
-  it('should return an `AbstractPin` that can connect to other pins.', () => {
+  it('should return a `PinLike` that can connect to other pins.', () => {
     let _ : number[] = [];
     new Pin()
       .from(wrap(of(1)))

@@ -53,6 +53,20 @@ describe('Pin', () => {
       b.observable.subscribe(() => done());
       a.send();
     });
+
+    it('should send data to multiple other pins.', () => {
+      let a = new Source(); let b = new Pin().from(a);
+      let x = false; new Pin().from(b).observable.subscribe(() => x = true);
+      let y = false; new Pin().from(b).observable.subscribe(() => y = true);
+
+      x.should.be.false;
+      y.should.be.false;
+
+      a.send();
+
+      x.should.be.true;
+      y.should.be.true;
+    });
   });
 
   describe('.clear()', () => {
