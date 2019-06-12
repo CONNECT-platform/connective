@@ -1,4 +1,4 @@
-import { should, expect } from 'chai'; should();
+import { should } from 'chai'; should();
 
 import { Source } from '../source';
 import { Pin } from '../pin';
