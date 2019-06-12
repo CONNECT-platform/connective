@@ -3,9 +3,11 @@
 </p>
 <br><br>
 
+# CONNECTIVE
+
 **CONNECTIVE** aims to facilitate large-scale [_Reactive_](http://reactivex.io) projects, i.e. projects based on asynchronous interactions between streams of data. It is a library on top of [rxjs](https://github.com/ReactiveX/rxjs), facilitating creation and composition of complex graph flows of observables and data/event streams. It introduces much easier flow design and agent-based programming concepts (like `Agent`s) to avail a much more intuitive interface for proper reactive programming that can scale.
 
-## Does This Apply To What I Am Doing?
+### Does This Apply To What I Am Doing Right Now?
 
 Most probably yes. A LOT of codes people do now-a-days are either web services (backend services), which are asynchronous in nature, or front-end, which are simultaenously multi-agent asynchronous projects. Lots of other applications (such as IoT) also fall in the radar of being asynchronous/multi-agent based in nature. 
 
