@@ -1,7 +1,4 @@
-<p align="center">  
-  <img src="logo.svg?sanitize=true" width="360px"/>
-</p>
-<br><br>
+<img src="logo.svg?sanitize=true" width="200px"/>
 
 # CONNECTIVE
 
