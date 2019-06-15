@@ -26,6 +26,10 @@ export class PinMap {
     return Object.values(this._pins);
   }
 
+  public get entries(): [string, PinLike][] {
+    return Object.entries(this._pins);
+  }
+
   public clear(): this {
     this.pins.forEach(pin => pin.clear());
     this._pins = {};

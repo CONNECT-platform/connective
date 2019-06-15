@@ -7,7 +7,7 @@ import { Switch } from '../switch';
 describe('Switch', () => {
   it('should activate output based on which given `case` matched the given `value`.', () => {
     let a = new Source();
-    let s = new Switch([1, 'hellow', false]);
+    let s = new Switch(1, 'hellow', false);
 
     s.target.from(a);
 
@@ -25,10 +25,10 @@ describe('Switch', () => {
 
   it('should check with `cases` that are functions by calling them on the given data.', () => {
     let a = new Source();
-    let b = new Switch([
+    let b = new Switch(
       (n: number) => n % 2 == 0,
       (n: number) => n % 2 == 1,
-    ]);
+    );
 
     b.target.from(a);
 
@@ -45,12 +45,12 @@ describe('Switch', () => {
 
   it('should work with async functions in `cases` as well.', done => {
     let a = new Source();
-    let b = new Switch([
+    let b = new Switch(
       (n: number) => n % 2 == 0,
       (n: number, done: (_: boolean) => void) => {
         setTimeout(() => done(n % 2 == 1), 5);
       },
-    ]);
+    );
 
     b.target.from(a);
 
@@ -64,9 +64,25 @@ describe('Switch', () => {
     a.send(3);
   });
 
-  it.only('should activate as many outputs as they match.', () => {
+  it('should hanlde errors thrown by sync case functions.', done => {
+    let s = new Switch(() => { throw new Error('well ...')});
+    let a = new Source().to(s.target);
+
+    s.case(0).observable.subscribe(() => {}, () => done());
+    a.send();
+  });
+
+  it('should allow async case functions to throw errors through the second callback passed to them.', done => {
+    let s = new Switch((_:any, __:any, err: any) => err(new Error()));
+    let a = new Source().to(s.target);
+
+    s.case(0).observable.subscribe(() => {}, () => done());
+    a.send();
+  });
+
+  it('should activate as many outputs as they match.', () => {
     let a = new Source();
-    let b = new Switch([1, () => true]);
+    let b = new Switch(1, () => true);
     let calls = 0;
 
     b.target.from(a);

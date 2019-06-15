@@ -24,6 +24,10 @@ export class Source extends Connectible {
     return super.clear();
   }
 
+  protected isConnected() {
+    return !!this._subs || super.isConnected();
+  }
+
   protected resolveInbound(inbound: PinLike[]) {
     inbound.forEach(pin => {
       if (!this._subs)

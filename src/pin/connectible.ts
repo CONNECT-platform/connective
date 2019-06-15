@@ -40,6 +40,9 @@ export abstract class Connectible extends BasePin {
   }
 
   public get locked(): boolean { return this.isLocked(this._observable); }
+  public get connected(): boolean { return this.isConnected(); }
+
+  protected isConnected(): boolean { return this._inbound.length > 0 }
 
   protected abstract isLocked(observable: Observable<any> | undefined): boolean;
   protected abstract shouldResolveInbound(inbound: PinLike[], observable: Observable<any> | undefined): boolean;

@@ -1,4 +1,4 @@
 export interface Signature {
-  inputs: string[];
+  inputs?: string[];
   outputs: string[];
 }

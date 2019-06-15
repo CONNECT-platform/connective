@@ -8,11 +8,15 @@ import { Agent } from './agent';
 
 
 export class Switch extends Agent {
-  constructor(readonly cases: any[]) {
+  readonly cases : any[];
+
+  constructor(...cases: any[]) {
     super({
       inputs: ['target'],
       outputs: cases.map((_, index) => index.toString()),
     });
+
+    this.cases = cases;
   }
 
   public get target() { return this.in('target'); }
@@ -28,8 +32,17 @@ export class Switch extends Agent {
       else
         return lazy(() => this.target.observable.pipe(
           mergeMap(value =>
-            new Observable(subscriber => _case(value, (res: boolean) => subscriber.next(res)))
-              .pipe(filter(_ => !!_), map(_ => value))
+            new Observable(subscriber => _case(
+              value,
+              (res: boolean) => {
+                subscriber.next(res);
+                subscriber.complete();
+              },
+              (error: Error | string) => {
+                subscriber.error(error);
+              },
+            ))
+            .pipe(filter(_ => !!_), map(_ => value))
           )
         ));
     }

@@ -29,7 +29,7 @@ export class Agent {
   }
 
   protected checkInput(label: string) {
-    if (!this.signature.inputs.includes(label))
+    if (!this.signature.inputs || !this.signature.inputs.includes(label))
       throw new InputNotInSignatureError(label, this.signature);
   }
 
