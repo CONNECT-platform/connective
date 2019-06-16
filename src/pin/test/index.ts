@@ -4,5 +4,6 @@ describe('pin', () => {
   require('./wrap.test');
   require('./lazy.test');
   require('./control.test');
+  require('./filter.test');
   require('./pin-map.test.ts');
 });

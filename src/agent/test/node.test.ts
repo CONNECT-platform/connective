@@ -5,7 +5,7 @@ import { Source } from '../../pin/source';
 import { Control } from '../../pin/control';
 
 
-describe.only('Node', () => {
+describe('Node', () => {
   it('should run its `.run()` function with all of its inputs and output the given `output`.', done => {
     class _N extends Node {
       constructor(){
