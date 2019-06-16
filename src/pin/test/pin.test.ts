@@ -2,6 +2,7 @@ import { should, expect } from 'chai'; should();
 
 import { Pin } from '../pin';
 import { Source } from '../source';
+import filter from '../filter';
 
 
 describe('Pin', () => {
@@ -37,6 +38,23 @@ describe('Pin', () => {
 
       a.send(2); b.send(3); a.send(5);
       _.should.be.eql([2, 3, 3, 5]);
+    });
+
+    it.skip('should work properly with a cycle of pins.', done => {
+      let a = new Source(); let b = new Pin();
+      let f1 = filter((n: number) => n < 5);
+      let f2 = filter((n: number) => n >= 5);
+      let c = new Pin();
+
+      b.from(a);
+      f1.from(b); f2.from(b);
+      a.from(f1); c.from(f2);
+
+      c.observable.subscribe(n => {
+        n.should.equal(5);
+        done();
+      });
+      a.send(0);
     });
 
     it('should throw an error when is invoked after the pin\'s observable was accessed.', () => {

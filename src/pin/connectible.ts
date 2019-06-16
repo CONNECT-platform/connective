@@ -25,8 +25,8 @@ export abstract class Connectible extends BasePin {
   }
 
   public get observable(): Observable<any> {
-    if (this.shouldResolveInbound(this._inbound, this._observable))
-      this._observable = this.resolveInbound(this._inbound);
+    if (this.shouldResolve(this._inbound, this._observable))
+      this._observable = this.resolve(this._inbound);
 
     if (!this._observable) throw new UnresolvedPinObservableError();
     return this._observable;
@@ -45,6 +45,6 @@ export abstract class Connectible extends BasePin {
   protected isConnected(): boolean { return this._inbound.length > 0 }
 
   protected abstract isLocked(observable: Observable<any> | undefined): boolean;
-  protected abstract shouldResolveInbound(inbound: PinLike[], observable: Observable<any> | undefined): boolean;
-  protected abstract resolveInbound(inbound: PinLike[]): Observable<any>;
+  protected abstract shouldResolve(inbound: PinLike[], observable: Observable<any> | undefined): boolean;
+  protected abstract resolve(inbound: PinLike[]): Observable<any>;
 }

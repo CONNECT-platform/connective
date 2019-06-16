@@ -13,7 +13,7 @@ export type FilterFunc = FilterFuncSync | FilterFuncAsync;
 export class Filter extends Pin {
   constructor(readonly filter: FilterFunc) {super();}
 
-  protected resolveInbound(inbound: Pin[]) {
+  protected resolve(inbound: Pin[]) {
     let merged = merge(...inbound.map(pin => pin.observable));
     if (this.filter.length <= 1)
       return merged.pipe(filter(this.filter as FilterFuncSync));

@@ -28,7 +28,7 @@ export class Source extends Connectible {
     return !!this._subs || super.isConnected();
   }
 
-  protected resolveInbound(inbound: PinLike[]) {
+  protected resolve(inbound: PinLike[]) {
     inbound.forEach(pin => {
       if (!this._subs)
         this._subs = new Subscription();
@@ -40,7 +40,7 @@ export class Source extends Connectible {
   }
 
   protected isLocked() { return false; }
-  protected shouldResolveInbound(inbound: PinLike[], observable: Observable<any> | undefined) {
+  protected shouldResolve(inbound: PinLike[], observable: Observable<any> | undefined) {
     return inbound.length > 0 || !observable;
   }
 }
