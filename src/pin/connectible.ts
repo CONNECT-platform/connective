@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 
 import { BasePin } from './base';
 import { PinLike } from './pin-like';
@@ -10,6 +10,9 @@ import { UnresolvedPinObservableError } from './errors/unresolved-observable.err
 export abstract class Connectible extends BasePin {
   private _inbound: PinLike[];
   private _observable: Observable<any> | undefined;
+  private _resolving = false;
+  private _sub: Subscription | undefined;
+  private _deferred: Subject<any> | undefined;
 
   constructor() {
     super();
@@ -25,8 +28,19 @@ export abstract class Connectible extends BasePin {
   }
 
   public get observable(): Observable<any> {
-    if (this.shouldResolve(this._inbound, this._observable))
-      this._observable = this.resolve(this._inbound);
+    if (this.shouldResolve(this._inbound, this._observable)) {
+      if (this._resolving) {
+        this._deferred = new Subject<any>();
+        return this._deferred;
+      }
+      else {
+        this._resolving = true;
+        this._observable = this.resolve(this._inbound);
+        if (this._deferred)
+          this.track(this._observable.subscribe(this._deferred));
+        this._resolving = false;
+      }
+    }
 
     if (!this._observable) throw new UnresolvedPinObservableError();
     return this._observable;
@@ -36,7 +50,23 @@ export abstract class Connectible extends BasePin {
     this._inbound = [];
     this._observable = undefined;
 
+    if (this._sub) {
+      this._sub.unsubscribe();
+      this._sub = undefined;
+    }
+
+    if (this._deferred) {
+      this._deferred.complete();
+      this._deferred = undefined;
+    }
+
     return this;
+  }
+
+  protected track(sub: Subscription) : Subscription {
+    if (!this._sub) this._sub = new Subscription();
+    this._sub.add(sub);
+    return sub;
   }
 
   public get locked(): boolean { return this.isLocked(this._observable); }

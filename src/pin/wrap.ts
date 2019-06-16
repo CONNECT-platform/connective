@@ -21,4 +21,5 @@ class Wrapper implements PinLike {
   }
 }
 
+
 export default function(observable: Observable<any>) { return new Wrapper(observable); }

@@ -3,6 +3,7 @@ import { should, expect } from 'chai'; should();
 import { Pin } from '../pin';
 import { Source } from '../source';
 import filter from '../filter';
+import map from '../map';
 
 
 describe('Pin', () => {
@@ -40,15 +41,16 @@ describe('Pin', () => {
       _.should.be.eql([2, 3, 3, 5]);
     });
 
-    it.skip('should work properly with a cycle of pins.', done => {
+    it('should work properly with a cycle of pins.', done => {
       let a = new Source(); let b = new Pin();
       let f1 = filter((n: number) => n < 5);
       let f2 = filter((n: number) => n >= 5);
+      let m = map((n: number) => n + 1);
       let c = new Pin();
 
       b.from(a);
       f1.from(b); f2.from(b);
-      a.from(f1); c.from(f2);
+      m.from(f1); b.from(m); c.from(f2);
 
       c.observable.subscribe(n => {
         n.should.equal(5);

@@ -33,4 +33,5 @@ class Lazy implements PinLike {
   }
 }
 
+
 export default function(lazy: LazyObservable<any>) { return new Lazy(lazy); }
