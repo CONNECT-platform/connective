@@ -38,6 +38,6 @@ describe('filter()', () => {
     let a = new Source();
     let f = filter((_: any, __: any, err: any) => { err(new Error()); }).from(a);
     f.observable.subscribe(() => {}, () => done());
-    a.send();cl
+    a.send();
   });
 });
