@@ -2,7 +2,6 @@ import isequal from 'lodash.isequal';
 import { shareReplay, tap } from 'rxjs/operators';
 
 import { PinLike } from '../pin/pin-like';
-// import lazy from '../pin/lazy';
 import pipe from '../pin/pipe';
 import filter from '../pin/filter';
 
