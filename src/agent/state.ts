@@ -1,8 +1,10 @@
 import isequal from 'lodash.isequal';
-import { shareReplay, tap, filter } from 'rxjs/operators';
+import { shareReplay, tap } from 'rxjs/operators';
 
 import { PinLike } from '../pin/pin-like';
-import lazy from '../pin/lazy';
+// import lazy from '../pin/lazy';
+import pipe from '../pin/pipe';
+import filter from '../pin/filter';
 
 import { Agent } from './agent';
 
@@ -19,12 +21,16 @@ export class State extends Agent {
 
   get input() { return this.in('value'); }
   get output() { return this.out('value'); }
+  get last() { return this._last; }
 
   protected createOutput(_: string): PinLike {
-    return lazy(() => this.input.observable.pipe(
-      filter(value => !isequal(value, this._last)),
+    return pipe(
       tap(value => this._last = value),
       shareReplay(1)
-    ));
+    )
+    .from(
+      filter((value: any) => !isequal(value, this._last))
+      .from(this.input)
+    );
   }
 }

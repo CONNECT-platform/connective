@@ -1,4 +1,4 @@
-import { Observable, Subscription, Subject } from 'rxjs';
+import { Observable, Subscription, Subject, defer } from 'rxjs';
 
 import { BasePin } from './base';
 import { PinLike } from './pin-like';
@@ -13,6 +13,7 @@ export abstract class Connectible extends BasePin {
   private _resolving = false;
   private _sub: Subscription | undefined;
   private _deferred: Subject<any> | undefined;
+  private _deference_connected = false;
 
   constructor() {
     super();
@@ -30,14 +31,25 @@ export abstract class Connectible extends BasePin {
   public get observable(): Observable<any> {
     if (this.shouldResolve(this._inbound, this._observable)) {
       if (this._resolving) {
-        this._deferred = new Subject<any>();
+        if (!this._deferred) {
+          this._deferred = new Subject<any>();
+        }
         return this._deferred;
       }
       else {
         this._resolving = true;
         this._observable = this.resolve(this._inbound);
-        if (this._deferred)
-          this.track(this._observable.subscribe(this._deferred));
+        if (this._deferred) {
+          let _pristine = this._observable;
+          this._observable = defer(() => {
+            if (!this._deference_connected) {
+              this.track(_pristine.subscribe(this._deferred));
+              this._deference_connected = true;
+            }
+
+            return _pristine;
+          });
+        }
         this._resolving = false;
       }
     }
@@ -49,6 +61,7 @@ export abstract class Connectible extends BasePin {
   public clear() {
     this._inbound = [];
     this._observable = undefined;
+    this._deference_connected = false;
 
     if (this._sub) {
       this._sub.unsubscribe();

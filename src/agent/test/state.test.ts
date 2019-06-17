@@ -1,11 +1,11 @@
-import { should } from 'chai'; should();
+import { should, expect } from 'chai'; should();
 
 import { State } from '../state';
 import { Source } from '../../pin/source';
 import { Pin } from '../../pin/pin';
 
 
-describe('State', () => {
+describe.only('State', () => {
   it('should send out data it receives.', done => {
     let a = new Source();
     let s = new State();
@@ -61,5 +61,20 @@ describe('State', () => {
       data.should.equal('hellow');
       done();
     });
+  });
+
+  it('should be possible to bind two states together.', () => {
+    let a = new Source(); let b = new Source();
+    let s1 = new State(); let s2 = new State();
+
+    a.to(s1.input); s1.output.to(s2.input);
+    b.to(s2.input); s2.output.to(s1.input);
+
+    let _s1; let _s2;
+    new Pin().from(s1.output).observable.subscribe(val => _s1 = val);
+    new Pin().from(s2.output).observable.subscribe(val => _s2 = val);
+
+    a.send('hellow'); expect(_s1).to.equal('hellow'); expect(_s2).to.equal('hellow');
+    b.send(42); expect(_s1).to.equal(42); expect(_s2).to.equal(42)
   });
 })
