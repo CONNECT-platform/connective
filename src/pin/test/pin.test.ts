@@ -21,7 +21,7 @@ describe('Pin', () => {
       let a = new Source(); let b = new Source();
       let _ = 0;
 
-      new Pin().from(a).from(b).observable.subscribe(n => {
+      new Pin().from(a, b).observable.subscribe(n => {
         _ += n;
       });
 
@@ -33,7 +33,7 @@ describe('Pin', () => {
       let a = new Source(); let b = new Source();
       let _: number[] = [];
 
-      new Pin().from(new Pin().from(a).from(b)).from(new Pin().from(b)).observable.subscribe(n => {
+      new Pin().from(new Pin().from(a, b), new Pin().from(b)).observable.subscribe(n => {
         _.push(n);
       });
 
@@ -42,15 +42,18 @@ describe('Pin', () => {
     });
 
     it('should work properly with a cycle of pins.', done => {
-      let a = new Source(); let b = new Pin();
-      let f1 = filter((n: number) => n < 5);
-      let f2 = filter((n: number) => n >= 5);
-      let m = map((n: number) => n + 1);
+      let a = new Source();
+      let b = new Pin();
       let c = new Pin();
 
-      b.from(a);
-      f1.from(b); f2.from(b);
-      m.from(f1); b.from(m); c.from(f2);
+      a.to(
+        b.to(
+          filter((n: number) => n < 5).to(
+            map((n: number) => n + 1).to(b)
+          ),
+          filter((n: number) => n >= 5).to(c)
+        )
+      );
 
       c.observable.subscribe(n => {
         n.should.equal(5);

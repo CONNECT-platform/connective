@@ -1,4 +1,4 @@
-import { should } from 'chai'; should();
+import { should, expect } from 'chai'; should();
 
 import { Source } from '../source';
 import { PinMap } from '../pin-map';
@@ -9,7 +9,19 @@ describe('pack()', () => {
   it('should wait for all incoming pins and send their data.', done => {
     let a = new Source();
     let b = new Source();
-    pack().from(a).from(b).observable.subscribe(data => {
+    pack().from(a, b).observable.subscribe(data => {
+      data.should.eql(['hellow', 'world']);
+      done();
+    });
+
+    a.send('hellow');
+    b.send('world');
+  });
+
+  it('should receive the incoming pins in constructor as well.', done => {
+    let a = new Source();
+    let b = new Source();
+    pack(a,b).observable.subscribe(data => {
       data.should.eql(['hellow', 'world']);
       done();
     });
@@ -50,5 +62,25 @@ describe('pack()', () => {
 
   it('should send data instantly if connected pinmap has no pins.', done => {
     pack(new PinMap()).observable.subscribe(() => done());
+  });
+
+  it('should also handle a combination of pins and pinmaps.', done => {
+    let pm = new PinMap(); let pm2 = new PinMap();
+    let a = new Source();
+    let b = new Source().to(pm.get('x'));
+    let c = new Source().to(pm.get('y'));
+    let d = new Source();
+    let e = new Source().to(pm2.get('I'));
+
+    pack(a, pm, d, pm2).observable.subscribe(data => {
+      data[0].should.equal(42);
+      data[1].x.should.equal('world');
+      expect(data[1].y).to.be.undefined;
+      data[2].should.be.false;
+      expect(data[3].I).to.be.undefined;
+      done();
+    });
+
+    a.send(42); b.send('world'); c.send(); d.send(false); e.send(undefined);
   });
 });

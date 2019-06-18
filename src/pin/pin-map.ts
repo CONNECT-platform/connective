@@ -10,7 +10,7 @@ export type PinMapSusbcriber = (label: string, pin: PinLike) => void;
 
 export class PinMap {
   private _pins: {[label: string]: PinLike} = {};
-  private _subject: Subject<[string, PinLike]>;
+  private _subject: Subject<[string, PinLike]> | undefined;
 
   constructor(
     readonly factory: PinMapFactory = () => new Pin()
@@ -49,6 +49,11 @@ export class PinMap {
   public clear(): this {
     this.pins.forEach(pin => pin.clear());
     this._pins = {};
+
+    if (this._subject) {
+      this._subject.complete();
+      this._subject = undefined;
+    }
 
     return this;
   }

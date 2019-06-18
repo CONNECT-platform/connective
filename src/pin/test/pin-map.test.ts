@@ -58,6 +58,58 @@ describe('PinMap', () => {
     });
   });
 
+  describe('.subscribe()', () => {
+    it('should invoke the callback with proper parameters for every pin that is created', done => {
+      let p = new Pin();
+      let pm = new PinMap(() => p);
+      pm.subscribe((label, pin) => {
+        label.should.equal('AA');
+        pin.should.equal(p);
+        done();
+      });
+
+      pm.get('AA');
+    });
+
+    it('should only invoke the callback on creation.', () => {
+      let _c = 0;
+      let pm = new PinMap();
+      pm.subscribe(() => _c++);
+
+      pm.get('X'); pm.get('X');
+      _c.should.equal(1);
+    });
+
+    it('should feed any subscriber all already created pins.', () => {
+      let a = <string[]>[]; let b = <string[]>[]; let c = <string[]>[];
+
+      let pm = new PinMap();
+      pm.get('a');
+      pm.subscribe(label => a.push(label));
+      pm.get('b');
+      pm.subscribe(label => b.push(label));
+      pm.get('c');
+      pm.subscribe(label => c.push(label));
+
+      a.should.eql(['a', 'b', 'c']);
+      b.should.eql(['a', 'b', 'c']);
+      c.should.eql(['a', 'b', 'c']);
+    });
+
+    it('should return a subscription that can be unsubscribed', () => {
+      let _c = 0;
+
+      let pm = new PinMap();
+      let sub = pm.subscribe(() => _c++);
+
+      pm.get('a'); pm.get('b');
+      sub.unsubscribe();
+      pm.get('c');
+
+      _c.should.equal(2);
+    });
+  });
+
   describe('.pins', () => {
     it('should return all instantiated pins.', () => {
       let a = new Pin(); let b = new Pin();

@@ -34,7 +34,7 @@ export class Node extends Agent {
         }
       }, error);
     })
-    .from(pack().from(pack(this.inputs), this._control));
+    .from(pack(this.inputs, this._control));
   }
 
   public get control(): PinLike { return this._control; }

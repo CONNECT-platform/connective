@@ -36,4 +36,9 @@ export class Pack extends Pin {
 }
 
 
-export default function pack(pinmap?: PinMap) { return new Pack(pinmap); }
+export default function pack(...stuff: (PinMap|PinLike)[]) {
+  let _mapped = stuff.map(each => (each instanceof PinMap)?new Pack(each):each);
+  if (_mapped.length == 0) return new Pack();
+  if (_mapped.length == 1) return (_mapped[0] instanceof Pack)?_mapped[0]:new Pack().from(_mapped[0]);
+  return new Pack().from(..._mapped);
+}
