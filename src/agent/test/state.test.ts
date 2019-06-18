@@ -77,4 +77,18 @@ describe('State', () => {
     a.send('hellow'); expect(_s1).to.equal('hellow'); expect(_s2).to.equal('hellow');
     b.send(42); expect(_s1).to.equal(42); expect(_s2).to.equal(42)
   });
+
+  describe('.bind()', () => {
+    it('should cause the state start storing values.', done => {
+      let s = new State();
+      let a = new Source().to(s.input);
+
+      s.bind();
+      a.send(42);
+      s.output.observable.subscribe(data => {
+        data.should.equal(42);
+        done();
+      });
+    });
+  });
 })

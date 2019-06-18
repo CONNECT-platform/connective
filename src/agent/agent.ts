@@ -1,3 +1,5 @@
+import { Subscription } from 'rxjs';
+
 import { PinMap } from '../pin/pin-map';
 import { PinLike } from '../pin/pin-like';
 import { Pin } from '../pin/pin';
@@ -8,6 +10,7 @@ import { Signature } from './signature';
 
 
 export class Agent {
+  private _subs: Subscription | undefined;
   private _inputs: PinMap;
   private _outputs: PinMap;
 
@@ -25,6 +28,12 @@ export class Agent {
   public clear(): this {
     this._inputs.clear();
     this._outputs.clear();
+
+    if (this._subs) {
+      this._subs.unsubscribe();
+      this._subs = undefined;
+    }
+
     return this;
   }
 
@@ -46,5 +55,11 @@ export class Agent {
   protected createOutput(label: string): PinLike {
     this.checkOutput(label);
     return new Pin();
+  }
+
+  protected track(sub: Subscription): this {
+    if (!this._subs) this._subs = new Subscription();
+    this._subs.add(sub);
+    return this;
   }
 }

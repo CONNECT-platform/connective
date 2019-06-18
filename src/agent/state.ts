@@ -22,6 +22,10 @@ export class State extends Agent {
   get output() { return this.out('value'); }
   get last() { return this._last; }
 
+  public bind(): this {
+    return this.track(this.output.observable.subscribe(() => {}));
+  }
+
   protected createOutput(_: string): PinLike {
     return pipe(
       tap(value => this._last = value),
