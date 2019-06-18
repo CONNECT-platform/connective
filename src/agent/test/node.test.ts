@@ -97,6 +97,21 @@ describe('Node', () => {
     b.send();
   });
 
+  it('should error if some of the inputs in `signature.required` are not provided.', done => {
+    class _N extends Node {
+      constructor(){super({inputs: ['a', 'b'], required: ['a'], outputs: ['c']})}
+      run(_: NodeInputs, out: NodeOutput) {out('c');}
+    }
+
+    let n = new _N();
+    let b = new Source().to(n.in('b'));
+    n.out('c').observable.subscribe(() => {}, _ => {
+      done();
+    });
+
+    b.send(42);
+  });
+
   it('should error its outputs when an output out of the signature is invoked.', done => {
     class _N extends Node {
       constructor(){super({outputs: ['out']})}
