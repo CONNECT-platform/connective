@@ -4,12 +4,17 @@ import { PinLike } from './pin-like';
 
 
 export abstract class BasePin implements PinLike {
-  abstract from(_: PinLike): this;
+  abstract connect(_: PinLike): this;
   abstract clear(): this;
   abstract observable: Observable<any>;
 
-  to(pin: PinLike) {
-    pin.from(this);
+  to(...pins: PinLike[]) {
+    pins.forEach(pin => pin.from(this));
+    return this;
+  }
+
+  from(...pins: PinLike[]) {
+    pins.forEach(pin => this.connect(pin));
     return this;
   }
 }

@@ -29,4 +29,8 @@ describe('Control', () => {
     a.send(); c.should.equal(1);
     b.send(); c.should.equal(2);
   });
+
+  it('should send data when not connected to any pin.', done => {
+    new Control().observable.subscribe(() => done());
+  });
 });

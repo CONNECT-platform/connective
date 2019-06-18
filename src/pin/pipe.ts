@@ -1,6 +1,7 @@
 import { merge, OperatorFunction } from 'rxjs';
 
 import { Pin } from './pin';
+import { PinLike } from './pin-like';
 
 
 export type PipeFunc = OperatorFunction<any, unknown>;
@@ -14,10 +15,13 @@ export class Pipe extends Pin {
     this.pipes = pipes;
   }
 
-  protected resolve(inbound: Pin[]) {
+  protected resolve(inbound: PinLike[]) {
     return this.pipes.reduce(
       (observable, pipe) => observable.pipe(pipe),
-      merge(...inbound.map(pin => pin.observable)));
+        (inbound.length == 1)?
+        inbound[0].observable:
+        merge(...inbound.map(pin => pin.observable))
+      );
   }
 }
 

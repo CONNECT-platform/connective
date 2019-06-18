@@ -14,6 +14,8 @@ export class Pin extends Connectible {
   }
 
   protected resolve(inbound: PinLike[]): Observable<any> {
-    return merge(...inbound.map(pin => pin.observable));
+    return (inbound.length == 1)?
+      inbound[0].observable:
+      merge(...inbound.map(pin => pin.observable));
   }
 }

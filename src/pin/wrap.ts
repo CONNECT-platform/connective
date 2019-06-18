@@ -7,12 +7,12 @@ import { PinLike } from './pin-like';
 class Wrapper implements PinLike {
   constructor(readonly observable: Observable<any>) {}
 
-  from(_: PinLike): this {
+  from(..._: PinLike[]): this {
     throw new PinLockedError();
   }
 
-  to(pin: PinLike) {
-    pin.from(this);
+  to(...pins: PinLike[]) {
+    pins.forEach(pin => pin.from(this));
     return this;
   }
 

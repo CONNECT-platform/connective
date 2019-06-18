@@ -27,6 +27,7 @@ describe('Node', () => {
       res.should.equal(5);
       done();
     });
+
     a.send(2); b.send(3);
   });
 

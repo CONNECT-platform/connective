@@ -1,9 +1,8 @@
-import { combineLatest, of, Observable } from 'rxjs';
-import { filter, map, concatMap } from 'rxjs/operators';
-
 import { PinLike } from '../pin/pin-like';
 import { Control } from '../pin/control';
-import lazy from '../pin/lazy';
+import pack from '../pin/pack';
+import filter from '../pin/filter';
+import map from '../pin/map';
 
 import { OutputNotInSignatureError } from './errors/signature-mismatch.error';
 import { Signature } from './signature';
@@ -25,41 +24,17 @@ export class Node extends Agent {
     super(signature);
 
     this._control = new Control();
-    this._res = lazy(() => {
-      let _inputs = this.inputs.entries;
-      let _observables = _inputs.map(entry => entry[1].observable);
-      if (this._control.connected)
-        _observables.push(this._control.observable);
-
-      _observables.push(of(true));
-
-      return combineLatest(..._observables)
-        .pipe(
-          concatMap(data => new Observable(subscriber => {
-            this.run(
-              _inputs.reduce((_in, entry, index) => {
-                _in[entry[0]] = data[index];
-                return _in
-              }, <NodeInputs>{}),
-              (out: string, data?: any) => {
-                if (!this.signature.outputs.includes(out)) {
-                  subscriber.error(new OutputNotInSignatureError(out, this.signature));
-                }
-                else {
-                  subscriber.next({
-                    out: out,
-                    data: data
-                  });
-                  subscriber.complete();
-                }
-              },
-              (error: Error | string) => {
-                subscriber.error(error);
-              }
-            )
-          }))
-        )
-    });
+    this._res = map((all, callback, error) => {
+      this.run(all[0], (out: string, data?: any) => {
+        if (!this.signature.outputs.includes(out)) {
+          error(new OutputNotInSignatureError(out, this.signature));
+        }
+        else {
+          callback({out, data});
+        }
+      }, error);
+    })
+    .from(pack().from(pack(this.inputs), this._control));
   }
 
   public get control(): PinLike { return this._control; }
@@ -78,9 +53,10 @@ export class Node extends Agent {
   ) {}
 
   protected createOutput(label: string): PinLike {
-    return lazy(() => this._res.observable.pipe(
-      filter(res => res.out == label),
-      map(res => res.data)
-    ));
+    return map((res: any) => res.data)
+      .from(
+        filter((res: any) => res.out == label)
+        .from(this._res)
+      )
   }
 }

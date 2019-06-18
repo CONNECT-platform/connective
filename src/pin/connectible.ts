@@ -20,7 +20,7 @@ export abstract class Connectible extends BasePin {
     this._inbound = [];
   }
 
-  public from(pin: PinLike) {
+  public connect(pin: PinLike) {
     if (this.locked) throw new PinLockedError();
     if (!this._inbound.includes(pin))
       this._inbound.push(pin);
