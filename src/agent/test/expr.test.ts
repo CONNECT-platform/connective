@@ -54,7 +54,7 @@ describe('Expr', () => {
   });
 });
 
-describe.only('expr()', () => {
+describe('expr()', () => {
   it('should return a proper Expr.', done => {
     let e = expr(['a', 'b'], (a: any, b: any) => a * b);
     e.should.be.instanceof(Expr);
