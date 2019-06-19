@@ -19,8 +19,8 @@ export class Agent {
     this._outputs = new PinMap(label => this.createOutput(label));
   }
 
-  public in(label: string) { return this._inputs.get(label); }
-  public out(label: string) { return this._outputs.get(label); }
+  public in(label: string | number) { return this._inputs.get(label.toString()); }
+  public out(label: string | number) { return this._outputs.get(label.toString()); }
 
   public get inputs(): PinMap { return this._inputs; }
   public get outputs(): PinMap { return this._outputs; }
