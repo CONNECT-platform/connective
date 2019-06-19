@@ -17,7 +17,7 @@ export class Switch extends Agent {
   }
 
   public get target() { return this.in('target'); }
-  public case(index: number) { return this.out(`${index}`); }
+  public case(index: number) { return this.out(index); }
 
   protected createOutput(label: string): PinLike {
     let _case = this.cases[label as any];

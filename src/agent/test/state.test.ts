@@ -78,6 +78,20 @@ describe('State', () => {
     b.send(42); expect(_s1).to.equal(42); expect(_s2).to.equal(42)
   });
 
+  describe('.input', () => {
+    it('should be equal to `.in("value")`', () => {
+      let s = new State();
+      s.input.should.equal(s.in('value'));
+    });
+  });
+
+  describe('.output', () => {
+    it('should be equal to `.out("value")`', () => {
+      let s = new State();
+      s.output.should.equal(s.out('value'));
+    });
+  });
+
   describe('.bind()', () => {
     it('should cause the state start storing values.', done => {
       let s = new State();

@@ -24,7 +24,7 @@ export class Expr extends Node {
       output('result', val);
   }
 
-  public get output() { return this.out('result'); }
+  public get result() { return this.out('result'); }
 }
 
 

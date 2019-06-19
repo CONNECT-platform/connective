@@ -7,7 +7,6 @@ import expr from '../expr';
 import { Source } from '../../pin/source';
 
 
-
 describe('Expr', () => {
   it('should be a subclass of Node.', () => {
     new Expr(() => {}).should.be.instanceof(Node);
@@ -17,7 +16,7 @@ describe('Expr', () => {
     let e = new Expr(['a', 'b'], (a: any, b: any) => a + b);
     let a = new Source().to(e.in('a'));
     let b = new Source().to(e.in('b'));
-    e.output.observable.subscribe(res => {
+    e.result.observable.subscribe(res => {
       res.should.equal(5);
       done();
     });
@@ -28,21 +27,21 @@ describe('Expr', () => {
 
   it('should throw an error if not all parameters are provided.', done => {
     new Expr(['a'], (a: any) => a).
-      output.observable.subscribe(() => {}, () => done());
+      result.observable.subscribe(() => {}, () => done());
   });
 
   it('should run given function instantly if no inputs are outlined.', done => {
-    new Expr(() => true).output.observable.subscribe(() => done());
+    new Expr(() => true).result.observable.subscribe(() => done());
   });
 
   it('should pass the proper error callback to the function.', done => {
     new Expr((error: NodeError) => error('hellow')).
-      output.observable.subscribe(() => {}, () => done());
+      result.observable.subscribe(() => {}, () => done());
   });
 
   it('should run the result of the function as an async callback if the result is a function itself.', done => {
     new Expr(() => (done: any) => done('hellow')).
-      output.observable.subscribe(res => {
+      result.observable.subscribe(res => {
         res.should.equal('hellow');
         done();
       });
@@ -50,7 +49,14 @@ describe('Expr', () => {
 
   it('should also provide the proper error callback to the async callback.', done => {
     new Expr(() => (_: any, err: NodeError) => err('yup')).
-      output.observable.subscribe(() => {}, () => done());
+      result.observable.subscribe(() => {}, () => done());
+  });
+
+  describe('.result', () => {
+    it('should be equal to `.out("result")`', () => {
+      let e = new Expr();
+      e.result.should.equal(e.out('result'));
+    });
   });
 });
 
@@ -60,7 +66,7 @@ describe('expr()', () => {
     e.should.be.instanceof(Expr);
 
     let a = new Source().to(e.in('a')); let b = new Source().to(e.in('b'));
-    e.output.observable.subscribe(res => {
+    e.result.observable.subscribe(res => {
       res.should.equal(6);
       done();
     });
@@ -74,7 +80,7 @@ describe('expr()', () => {
     let a = new Source().to(e.in(0));
     let b = new Source().to(e.in(1));
 
-    e.output.observable.subscribe(val => {
+    e.result.observable.subscribe(val => {
       val.should.equal(1);
       done();
     });
@@ -90,7 +96,7 @@ describe('expr()', () => {
     });
 
     let a = new Source().to(e.in(0));
-    e.output.observable.subscribe(() => {}, () => done());
+    e.result.observable.subscribe(() => {}, () => done());
     a.send(42);
   });
 });

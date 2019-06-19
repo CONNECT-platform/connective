@@ -92,4 +92,18 @@ describe('Switch', () => {
     a.send(1);
     calls.should.equal(2);
   });
+
+  describe('.target', () => {
+    it('should be equal to `.in("target")`', () => {
+      let s = new Switch();
+      s.target.should.equal(s.in('target'));
+    });
+  });
+
+  describe('.case()', () => {
+    it('should be equal to `.out(<n>)`', () => {
+      let s = new Switch(true);
+      s.case(0).should.equal(s.out(0));
+    });
+  });
 });
