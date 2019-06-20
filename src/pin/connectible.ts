@@ -82,6 +82,8 @@ export abstract class Connectible extends BasePin {
     return sub;
   }
 
+  protected get tracking(): boolean { return !!this._sub; }
+
   public get locked(): boolean { return this.isLocked(this._observable); }
   public get connected(): boolean { return this.isConnected(); }
 

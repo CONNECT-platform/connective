@@ -62,4 +62,9 @@ export class Agent {
     this._subs.add(sub);
     return this;
   }
+
+  protected untrack(sub: Subscription): this {
+    if (this._subs) this._subs.remove(sub);
+    return this;
+  }
 }

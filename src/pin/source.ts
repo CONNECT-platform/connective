@@ -1,4 +1,4 @@
-import { Subject, Subscription, Observable } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 
 import { PinLike } from './pin-like';
 import { Connectible } from './connectible';
@@ -6,18 +6,12 @@ import { Connectible } from './connectible';
 
 export class Source extends Connectible {
   private _subject = new Subject<any>();
-  private _subs: Subscription | undefined;
 
   public send(data?: any) {
     this._subject.next(data);
   }
 
   clear() {
-    if (this._subs) {
-      this._subs.unsubscribe();
-      this._subs = undefined;
-    }
-
     this._subject.complete();
     this._subject = new Subject<any>();
 
@@ -25,14 +19,12 @@ export class Source extends Connectible {
   }
 
   protected isConnected() {
-    return !!this._subs || super.isConnected();
+    return this.tracking || super.isConnected();
   }
 
   protected resolve(inbound: PinLike[]) {
     inbound.forEach(pin => {
-      if (!this._subs)
-        this._subs = new Subscription();
-      this._subs.add(pin.observable.subscribe(this._subject));
+      this.track(pin.observable.subscribe(this._subject));
     });
 
     inbound.length = 0;
