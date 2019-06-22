@@ -19,3 +19,6 @@ export class Pin extends Connectible {
       merge(...inbound.map(pin => pin.observable));
   }
 }
+
+
+export default function() { return new Pin(); }

@@ -54,7 +54,7 @@ describe('Expr', () => {
 
   describe('.result', () => {
     it('should be equal to `.out("result")`', () => {
-      let e = new Expr();
+      let e = new Expr(() => {});
       e.result.should.equal(e.out('result'));
     });
   });

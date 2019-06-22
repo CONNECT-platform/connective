@@ -2,6 +2,7 @@ import { Subscription } from 'rxjs';
 
 import { Source } from '../pin/source';
 
+import { Signature } from './signature';
 import { Agent } from './agent';
 
 
@@ -28,3 +29,6 @@ export class Proxy extends Agent {
     return new Source();
   }
 }
+
+
+export default function(signature: Signature) { return new Proxy(signature); }

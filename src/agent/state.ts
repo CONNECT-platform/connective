@@ -38,3 +38,6 @@ export class State extends Agent implements Bindable {
     );
   }
 }
+
+
+export default function() { return new State(); }

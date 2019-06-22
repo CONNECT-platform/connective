@@ -10,3 +10,6 @@ export class Control extends Pin {
     else return zip(...inbound.map(pin => pin.observable));
   }
 }
+
+
+export default function() { return new Control(); }

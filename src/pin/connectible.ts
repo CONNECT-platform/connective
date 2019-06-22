@@ -59,7 +59,7 @@ export abstract class Connectible extends BasePin {
   }
 
   public clear() {
-    this._inbound = [];
+    this._inbound.length = 0;
     this._observable = undefined;
     this._deference_connected = false;
 

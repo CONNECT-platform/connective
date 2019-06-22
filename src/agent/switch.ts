@@ -29,3 +29,6 @@ export class Switch extends Agent {
           .from(this.target);
   }
 }
+
+
+export default function(...cases: any[]) { return new Switch(...cases); }

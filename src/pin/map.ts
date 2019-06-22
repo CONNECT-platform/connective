@@ -38,4 +38,4 @@ export class Map extends Pipe {
 }
 
 
-export default function(filter: MapFunc) { return new Map(filter); }
+export default function(map: MapFunc) { return new Map(map); }

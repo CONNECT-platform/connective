@@ -36,3 +36,6 @@ export class Source extends Connectible {
     return inbound.length > 0 || !observable;
   }
 }
+
+
+export default function() { return new Source(); }

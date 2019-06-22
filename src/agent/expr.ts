@@ -1,10 +1,17 @@
 import { Node, NodeInputs, NodeOutput, NodeError } from './node';
 
 
+export type ExprNoArgFunc = (error: NodeError) => any;
+export type ExprWithArgFunc = (...args: any[]) => any;
+export type ExprFunc = ExprNoArgFunc | ExprWithArgFunc;
+
+
 export class Expr extends Node {
   readonly func: any;
 
-  constructor(inputsOrFunc?: string[] | any, func?: any){
+  constructor(func: ExprNoArgFunc);
+  constructor(inputs: string[], func: ExprWithArgFunc);
+  constructor(inputsOrFunc?: string[] | ExprNoArgFunc, func?: ExprWithArgFunc){
     super({
       inputs: (typeof inputsOrFunc === 'function')?[]:inputsOrFunc,
       required: (typeof inputsOrFunc === 'function')?[]:inputsOrFunc,
@@ -28,10 +35,17 @@ export class Expr extends Node {
 }
 
 
-export default function(inputsOrFunc?: string[] | any, func?: any) {
-  if (func) return new Expr(inputsOrFunc, func);
-  else return new Expr(
-    Array.apply(0, {length: inputsOrFunc.length}).map((_:0, i:number) => i.toString()),
-    inputsOrFunc
-  );
+function expr(func: ExprFunc): Expr;
+function expr(inputs: string[], func: ExprFunc): Expr;
+function expr(inputsOrFunc?: string[] | ExprFunc, func?: ExprFunc): Expr {
+  if (func) return new Expr(inputsOrFunc as string[], func);
+  else {
+    let func = inputsOrFunc as ExprFunc;
+    return new Expr(
+      Array.apply(0, {length: func.length}).map((_:0, i:number) => i.toString()),
+      func
+    );
+  }
 }
+
+export default expr;
