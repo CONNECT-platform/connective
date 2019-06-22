@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 
 import sink from '../sink';
 import wrap from '../wrap';
+import { Source } from '../source';
 import { Pin } from '../pin';
 
 
@@ -22,5 +23,27 @@ describe('sink()', () => {
     })
     .from(wrap(of(42)))
     .bind();
+  });
+
+  it('should not invoke the function after `.clear()`', () => {
+    let c = 0;
+    let a = new Source();
+    let s1 = sink(() => c++).from(a);
+    let s2 = sink(() => c++).from(a);
+
+    a.send();
+    c.should.equal(0);
+
+    s1.bind();
+    a.send();
+    c.should.equal(1);
+
+    s2.bind();
+    a.send();
+    c.should.equal(3);
+
+    s1.clear();
+    a.send();
+    c.should.equal(4);
   });
 });

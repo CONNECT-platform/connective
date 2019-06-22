@@ -3,7 +3,7 @@ import { should } from 'chai'; should();
 import { isBindable } from '../bindable';
 
 
-describe.only('bindable', () => {
+describe('bindable', () => {
   describe('.isBindable()', () => {
     it('should return if something satisfies bindable interface.', () => {
       class X { bind(): this { return this; } }

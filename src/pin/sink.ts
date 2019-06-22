@@ -12,7 +12,7 @@ export class Sink extends Pin implements Bindable {
   }
 
   bind(): this {
-    this.observable.subscribe(this.func);
+    this.track(this.observable.subscribe(this.func));
     return this;
   }
 }
