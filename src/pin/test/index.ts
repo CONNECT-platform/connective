@@ -6,5 +6,6 @@ describe('pin', () => {
   require('./filter.test');
   require('./map.test');
   require('./pack.test');
-  require('./pin-map.test.ts');
+  require('./pin-map.test');
+  require('./sink.test');
 });
