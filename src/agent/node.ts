@@ -4,8 +4,8 @@ import pack from '../pin/pack';
 import filter from '../pin/filter';
 import map from '../pin/map';
 
-import { OutputNotInSignatureError } from './errors/signature-mismatch.error';
-import { InsufficientInputsError } from './errors/insufficient-input.error';
+import { OutputNotInSignature } from './errors/signature-mismatch.error';
+import { InsufficientInputs } from './errors/insufficient-input.error';
 
 import { Signature } from './signature';
 import { Agent } from './agent';
@@ -33,11 +33,11 @@ export class Node extends Agent {
     this._control = new Control();
     this._res = map((all, callback, error) => {
       if (signature.required && signature.required.some(label => !(label in all[0])))
-        error(new InsufficientInputsError(signature.required.filter(label => !(label in all[0]))));
+        error(new InsufficientInputs(signature.required.filter(label => !(label in all[0]))));
       else {
         this.run(all[0], (out: string, data?: any) => {
           if (!this.signature.outputs.includes(out)) {
-            error(new OutputNotInSignatureError(out, this.signature));
+            error(new OutputNotInSignature(out, this.signature));
           }
           else {
             callback({out, data});

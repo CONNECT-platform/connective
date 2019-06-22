@@ -4,8 +4,8 @@ import { PinMap } from '../pin/pin-map';
 import { PinLike } from '../pin/pin-like';
 import { Pin } from '../pin/pin';
 
-import { InputNotInSignatureError,
-        OutputNotInSignatureError } from './errors/signature-mismatch.error';
+import { InputNotInSignature,
+        OutputNotInSignature } from './errors/signature-mismatch.error';
 import { Signature } from './signature';
 
 
@@ -39,12 +39,12 @@ export class Agent {
 
   protected checkInput(label: string) {
     if (!this.signature.inputs || !this.signature.inputs.includes(label))
-      throw new InputNotInSignatureError(label, this.signature);
+      throw new InputNotInSignature(label, this.signature);
   }
 
   protected checkOutput(label: string) {
     if (!this.signature.outputs.includes(label))
-      throw new OutputNotInSignatureError(label, this.signature);
+      throw new OutputNotInSignature(label, this.signature);
   }
 
   protected createInput(label: string): PinLike {

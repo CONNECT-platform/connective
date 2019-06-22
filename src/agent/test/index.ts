@@ -4,4 +4,5 @@ describe('agent', () => {
   require('./node.test');
   require('./expr.test');
   require('./proxy.test');
+  require('./composition.test');
 });

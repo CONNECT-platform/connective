@@ -1,7 +1,7 @@
 import { Signature } from '../signature';
 
 
-export class InputNotInSignatureError extends Error {
+export class InputNotInSignature extends Error {
   constructor(
     readonly input: string,
     readonly signature: Signature
@@ -11,7 +11,7 @@ export class InputNotInSignatureError extends Error {
 }
 
 
-export class OutputNotInSignatureError extends Error {
+export class OutputNotInSignature extends Error {
   constructor(
     readonly output: string,
     readonly signature: Signature
