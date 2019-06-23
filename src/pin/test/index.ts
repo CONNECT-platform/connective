@@ -8,4 +8,5 @@ describe('pin', () => {
   require('./pack.test');
   require('./pin-map.test');
   require('./sink.test');
+  require('./value.test');
 });
