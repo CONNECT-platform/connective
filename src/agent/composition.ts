@@ -6,6 +6,7 @@ import { Signature } from './signature';
 import { Agent } from './agent';
 
 import { ChildNotDefined } from './errors/child-not-defined.error';
+import { ChildIsNotPin, ChildIsNotAgent } from './errors/child-type-mismatch.error';
 
 
 type _ChildType = PinLike | Agent;
@@ -34,7 +35,7 @@ export abstract class Composition extends Agent implements Bindable {
       this._children = {};
 
     if (!child)
-      return this.add(`_${Object.keys(this._children).length}`, nameOrChild as _ChildType);
+      return this.add(`${Object.keys(this._children).length}`, nameOrChild as _ChildType);
 
     let _name = nameOrChild as string;
     this._children[_name] = child;
@@ -45,11 +46,24 @@ export abstract class Composition extends Agent implements Bindable {
     return child;
   }
 
-  protected child(name: string): _ChildType {
+  protected child(name: string|number): _ChildType {
+    if (typeof name !== 'string') return this.child(name.toString());
     if (this._children && name in this._children)
       return this._children[name];
 
     throw new ChildNotDefined(name);
+  }
+
+  protected pin(name: string|number): PinLike {
+    let _child = this.child(name);
+    if (_child instanceof Agent) throw new ChildIsNotPin(name.toString());
+    return _child;
+  }
+
+  protected agent(name: string|number): Agent {
+    let _child = this.child(name);
+    if (!(_child instanceof Agent)) throw new ChildIsNotAgent(name.toString());
+    return _child;
   }
 
   protected toBind(bindable: Bindable): this {
