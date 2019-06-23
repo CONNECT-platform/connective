@@ -163,7 +163,8 @@ describe('Node', () => {
 
   describe('.control', () => {
     it('should be instance of `Control`.', () => {
-      new Node({outputs:['o']}).control.should.be.instanceOf(Control);
+      class _N extends Node { constructor(){super({outputs:[]})} run() {}}
+      new _N().control.should.be.instanceOf(Control);
     });
   });
 });

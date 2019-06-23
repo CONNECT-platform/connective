@@ -22,7 +22,7 @@ export interface NodeSignature extends Signature {
 }
 
 
-export class Node extends Agent {
+export abstract class Node extends Agent {
   private _context: NodeContext;
   private _control: Control;
   private _res: PinLike;
@@ -57,11 +57,11 @@ export class Node extends Agent {
 
   protected get context(): NodeContext { return this._context; }
 
-  protected run(
+  protected abstract run(
     _: NodeInputs,
     __: NodeOutput,
     ___: NodeError,
-  ) {}
+  ): void;
 
   protected createOutput(label: string): PinLike {
     return map((res: any) => res.data)

@@ -5,7 +5,7 @@ import { Pin } from '../pin';
 import value from '../value';
 
 
-describe.only('value()', () => {
+describe('value()', () => {
   it('should be a `Pin`.', () => {
     value(42).should.be.instanceof(Pin);
   });
