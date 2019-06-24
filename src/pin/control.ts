@@ -5,7 +5,7 @@ import { Pin } from './pin';
 import { PinLike } from './pin-like';
 
 
-class _UNSET {};
+const _UNSET = {};
 
 export class Control extends Pin {
   constructor(readonly val: any = _UNSET) { super(); }

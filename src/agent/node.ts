@@ -70,4 +70,9 @@ export abstract class Node extends Agent {
         .from(this._res)
       )
   }
+
+  clear() {
+    this.control.clear();
+    return super.clear();
+  }
 }

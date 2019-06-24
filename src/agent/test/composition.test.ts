@@ -12,7 +12,7 @@ import expr from '../expr';
 import state from '../state';
 
 
-describe.only('Composition', () => {
+describe('Composition', () => {
   it('should invoke its `.build()` and `.wire()` functions in order.', () => {
     let res: string[] = [];
     class C extends Composition {
