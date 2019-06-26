@@ -5,7 +5,7 @@ import source from '../../pin/source';
 import { Gate } from '../gate';
 
 
-describe.only('Gate', () => {
+describe('Gate', () => {
   it('should only pass values that receive a `true` signal.', () => {
     let res: number[] = [];
     let g = new Gate();

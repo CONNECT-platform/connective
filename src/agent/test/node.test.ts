@@ -1,6 +1,8 @@
 import { should } from 'chai'; should();
 
-import { Node, NodeInputs, NodeOutput, NodeError } from '../node';
+import { ErrorCallback } from '../../shared/types';
+
+import { Node, NodeInputs, NodeOutput } from '../node';
 import { Source } from '../../pin/source';
 import { Control } from '../../pin/control';
 
@@ -97,6 +99,39 @@ describe('Node', () => {
     b.send();
   });
 
+  it('should wait for control pin at most once.', () => {
+    let r = 0;
+    class _N extends Node {
+      constructor(){super({inputs: ['a', 'b'], outputs: ['o']})}
+      run(_: NodeInputs, out:NodeOutput) {r++; out('o');}
+    }
+
+    let n = new _N();
+    let a = new Source().to(n.in('a'));
+    let b = new Source().to(n.in('b'));
+    let c = new Source().to(n.control);
+    n.out('o').observable.subscribe(() => {});
+
+    a.send(2); b.send(3); r.should.equal(0);
+    c.send(); r.should.equal(1);
+    a.send(4); r.should.equal(2);
+  });
+
+  it('should re-execute each time a control is sent.', () => {
+    let r = 0;
+    class _N extends Node {
+      constructor(){super({outputs: ['o']})}
+      run(_: NodeInputs, out:NodeOutput) {r++; out('o');}
+    }
+
+    let n = new _N();
+    let c = new Source().to(n.control);
+    n.out('o').observable.subscribe(() => {});
+
+    c.send(); r.should.equal(1);
+    c.send(); r.should.equal(2);
+  });
+
   it('should error if some of the inputs in `signature.required` are not provided.', done => {
     class _N extends Node {
       constructor(){super({inputs: ['a', 'b'], required: ['a'], outputs: ['c']})}
@@ -135,7 +170,7 @@ describe('Node', () => {
   it('should provide an error function to `.run()` so that it can signal errors through any of its outputs.', done => {
     class _N extends Node {
       constructor(){super({outputs: ['out']})}
-      run(_: NodeInputs, __: NodeOutput, error: NodeError) { error(new Error()); }
+      run(_: NodeInputs, __: NodeOutput, error: ErrorCallback) { error(new Error()); }
     }
 
     let a = new _N();

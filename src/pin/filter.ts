@@ -1,13 +1,15 @@
 import { Observable } from 'rxjs';
 import { filter, map, mergeMap } from 'rxjs/operators';
 
+import { ResolveCallback, ErrorCallback } from '../shared/types';
+
 import { Pipe } from './pipe';
 
 
 export type FilterFuncSync = (value: any) => boolean;
 export type FilterFuncAsync = (value: any,
-                            callback: (result: boolean) => void,
-                            error: (error: Error | string) => void) => void;
+                            callback: ResolveCallback<boolean>,
+                            error: ErrorCallback) => void;
 export type FilterFunc = FilterFuncSync | FilterFuncAsync;
 
 

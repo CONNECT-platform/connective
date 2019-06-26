@@ -1,13 +1,15 @@
 import { Observable } from 'rxjs';
 import { map, concatMap } from 'rxjs/operators';
 
+import { ResolveCallback, ErrorCallback } from '../shared/types';
+
 import { Pipe } from './pipe';
 
 
 export type MapFuncSync = (value: any) => any;
 export type MapFuncAsync = (value: any,
-                            callback: (result: any) => void,
-                            error: (error: Error | string) => void) => void;
+                            callback: ResolveCallback<any>,
+                            error: ErrorCallback) => void;
 export type MapFunc = MapFuncSync | MapFuncAsync;
 
 

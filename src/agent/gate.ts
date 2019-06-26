@@ -3,9 +3,10 @@ import map from '../pin/map';
 import filter from '../pin/filter';
 
 import { Agent } from './agent';
+import { NodeLike } from './node-like';
 
 
-export class Gate extends Agent {
+export class Gate extends Agent implements NodeLike {
   private _control: Control;
 
   constructor() {

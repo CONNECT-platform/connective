@@ -1,7 +1,9 @@
-import { Node, NodeInputs, NodeOutput, NodeError } from './node';
+import { ErrorCallback } from '../shared/types';
+
+import { Node, NodeInputs, NodeOutput } from './node';
 
 
-export type ExprNoArgFunc = (error: NodeError) => any;
+export type ExprNoArgFunc = (error: ErrorCallback) => any;
 export type ExprWithArgFunc = (...args: any[]) => any;
 export type ExprFunc = ExprNoArgFunc | ExprWithArgFunc;
 
@@ -21,7 +23,7 @@ export class Expr extends Node {
     this.func = func?func:inputsOrFunc;
   }
 
-  run(inputs: NodeInputs, output: NodeOutput, error: NodeError) {
+  run(inputs: NodeInputs, output: NodeOutput, error: ErrorCallback) {
     let _ilist = this.signature.inputs?this.signature.inputs.map(i => inputs[i]):[];
     let val = this.func.apply(undefined, _ilist.concat(error));
 

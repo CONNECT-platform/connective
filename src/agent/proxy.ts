@@ -4,10 +4,11 @@ import { Source } from '../pin/source';
 
 import { Signature } from './signature';
 import { Agent } from './agent';
+import { AgentLike } from './agent-like';
 
 
 export class Proxy extends Agent {
-  public proxy(agent: Agent): Subscription {
+  public proxy(agent: AgentLike): Subscription {
 
     let subs = new Subscription(() => {
       this.untrack(subs);

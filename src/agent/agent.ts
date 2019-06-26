@@ -7,9 +7,10 @@ import { Pin } from '../pin/pin';
 import { InputNotInSignature,
         OutputNotInSignature } from './errors/signature-mismatch.error';
 import { Signature } from './signature';
+import { AgentLike } from './agent-like';
 
 
-export class Agent {
+export class Agent implements AgentLike {
   private _subs: Subscription | undefined;
   private _inputs: PinMap;
   private _outputs: PinMap;

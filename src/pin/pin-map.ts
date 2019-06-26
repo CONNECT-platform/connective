@@ -19,8 +19,9 @@ export class PinMap {
   public get(label: string): PinLike {
     if (!(label in this._pins)) {
       let _pin = this.factory(label);
+      this._pins[label] = _pin;
       if (this._subject) this._subject.next([label, _pin]);
-      return this._pins[label] = _pin;
+      return _pin;
     }
 
     return this._pins[label];

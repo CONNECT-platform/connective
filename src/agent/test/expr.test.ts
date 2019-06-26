@@ -1,6 +1,8 @@
 import { should } from 'chai'; should();
 
-import { Node, NodeError } from '../node';
+import { ErrorCallback } from '../../shared/types';
+
+import { Node } from '../node';
 import { Expr } from '../expr';
 import expr from '../expr';
 
@@ -35,7 +37,7 @@ describe('Expr', () => {
   });
 
   it('should pass the proper error callback to the function.', done => {
-    new Expr((error: NodeError) => error('hellow')).
+    new Expr((error: ErrorCallback) => error('hellow')).
       result.observable.subscribe(() => {}, () => done());
   });
 
@@ -48,7 +50,7 @@ describe('Expr', () => {
   });
 
   it('should also provide the proper error callback to the async callback.', done => {
-    new Expr(() => (_: any, err: NodeError) => err('yup')).
+    new Expr(() => (_: any, err: ErrorCallback) => err('yup')).
       result.observable.subscribe(() => {}, () => done());
   });
 
@@ -90,7 +92,7 @@ describe('expr()', () => {
   });
 
   it('should pass the error function in `rest` param if automatically creating a signature.', done => {
-    let e = expr((a: any, ...[error]:[NodeError]) => {
+    let e = expr((a: any, ...[error]:[ErrorCallback]) => {
       a.should.equal(42);
       error('well ...');
     });

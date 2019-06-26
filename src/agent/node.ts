@@ -1,3 +1,5 @@
+import { ContextType, ErrorCallback } from '../shared/types';
+
 import { PinLike } from '../pin/pin-like';
 import { Control } from '../pin/control';
 import pack from '../pin/pack';
@@ -9,12 +11,11 @@ import { InsufficientInputs } from './errors/insufficient-input.error';
 
 import { Signature } from './signature';
 import { Agent } from './agent';
+import { NodeLike } from './node-like';
 
 
-export type NodeInputs = {[input: string]: any};
+export type NodeInputs = ContextType;
 export type NodeOutput = (out: string, data?: any) => void;
-export type NodeError = (error: Error | string) => void;
-export type NodeContext = {[key: string]: any};
 
 
 export interface NodeSignature extends Signature {
@@ -22,8 +23,8 @@ export interface NodeSignature extends Signature {
 }
 
 
-export abstract class Node extends Agent {
-  private _context: NodeContext;
+export abstract class Node extends Agent implements NodeLike {
+  private _context: ContextType;
   private _control: Control;
   private _res: PinLike;
 
@@ -48,19 +49,19 @@ export abstract class Node extends Agent {
     .from(pack(this.inputs, this._control));
   }
 
-  public get control(): PinLike { return this._control; }
+  public get control(): Control { return this._control; }
 
-  public with(context: NodeContext): this {
+  public with(context: ContextType): this {
     this._context = context;
     return this;
   }
 
-  protected get context(): NodeContext { return this._context; }
+  protected get context(): ContextType { return this._context; }
 
   protected abstract run(
     _: NodeInputs,
     __: NodeOutput,
-    ___: NodeError,
+    ___: ErrorCallback,
   ): void;
 
   protected createOutput(label: string): PinLike {
