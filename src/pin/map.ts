@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { map, concatMap } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 
 import { ResolveCallback, ErrorCallback } from '../shared/types';
 
@@ -21,7 +21,7 @@ export class Map extends Pipe {
       (_map.length <= 1)?
       (map(_map as MapFuncSync)):
       (
-        concatMap(value =>
+        mergeMap(value =>
           new Observable(subscriber => {
             _map(value, (res: boolean) => {
               subscriber.next(res);

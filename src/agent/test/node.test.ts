@@ -33,7 +33,7 @@ describe('Node', () => {
     a.send(2); b.send(3);
   });
 
-  it('should return results in the order of requested execution.', done => {
+  it('should not return results in the order of requested execution.', done => {
     class _N extends Node {
       constructor() {
         super({
@@ -54,7 +54,7 @@ describe('Node', () => {
     n.out('delay').observable.subscribe(delay => {
       res.push(delay);
       if (res.length >= 2) {
-        res.should.eql([20, 10]);
+        res.should.eql([10, 20]);
         done();
       }
     });

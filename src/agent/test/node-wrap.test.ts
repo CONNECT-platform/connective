@@ -1,46 +1,127 @@
 import { should } from 'chai'; should();
 
 import source from '../../pin/source';
-import map from '../../pin/map';
-import filter from '../../pin/filter';
 
+
+import expr from '../expr';
 import { NodeWrap } from '../node-wrap';
 import { Composition } from '../composition';
 
 
-describe('NodeWrap', () => {
-  it('should make an agent behave like a node', done => {
+describe.only('NodeWrap', () => {
+  it('should wait for all connected inputs before feeding them to wrapped agent.', done => {
     class C extends Composition {
-      constructor() { super({inputs: ['i'], outputs: ['o']})}
+      constructor() { super({inputs: ['a', 'b'], outputs: ['o']})}
       build() {
-        this.add(filter((val: any) => val == 5));
-        this.add(filter((val: any) => val != 5));
-
-        this.add(map((val: any, callback: any) => {
-          setTimeout(() => callback(val), 1);
-        }));
+        this.add(expr((a: number, b: number) => a + b));
       }
       wire() {
-        this.in('i').to(
-          this.pin(0),
-          this.pin(1).to(this.pin(2)));
-        this.out('o').from(this.pin(0), this.pin(2));
+        this.in('a').to(this.agent(0).in(0));
+        this.in('b').to(this.agent(0).in(1));
+        this.out('o').from(this.agent(0).out('result'));
       }
     }
 
-    let res: number[] = [];
     let c = new NodeWrap(new C());
-    let a = source().to(c.in('i'));
-
-    c.out('o').observable.subscribe(v => {
-      res.push(v);
-      if (res.length >= 2) {
-        res.should.eql([10, 5]);
-        done();
-      }
+    let a = source().to(c.in('a'));
+    let b = source().to(c.in('b'));
+    c.out('o').observable.subscribe(val => {
+      val.should.equal(5);
+      done();
     });
 
-    a.send(10);
-    a.send(5);
+    a.send(2);
+    b.send(3);
+  });
+
+  it('should only wait for connected inputs before feeding them to wrapped agent.', done => {
+    class C extends Composition {
+      constructor() { super({inputs: ['a', 'b'], outputs: ['o']})}
+      build() {
+        this.add(expr((_: number, b: number) => {
+          if (b) return 'two';
+          else return 'one';
+        }));
+      }
+      wire() {
+        this.in('a').to(this.agent(0).in(0));
+        this.in('b').to(this.agent(0).in(1));
+        this.out('o').from(this.agent(0).out('result'));
+      }
+    }
+
+    let c = new NodeWrap(new C());
+    let a = source().to(c.in('a'));
+    c.out('o').observable.subscribe(val => {
+      val.should.equal('one');
+      done();
+    });
+
+    a.send(2);
+  });
+
+  it('should wait for its control before feeding inputs to wrapped agent.', () => {
+    class C extends Composition {
+      constructor() { super({inputs: ['i'], outputs: ['o']}) }
+      build() {}
+      wire() { this.in('i').to(this.out('o')); }
+    }
+
+    let c = new NodeWrap(new C());
+    let res: number[] = [];
+
+    let a = source().to(c.in('i'));
+    let b = source().to(c.control);
+
+    c.out('o').observable.subscribe(val => res.push(val));
+
+    a.send(2);
+    res.should.eql([]);
+    b.send();
+    res.should.eql([2]);
+  });
+
+  it('should wait for its control only once.', () => {
+    class C extends Composition {
+      constructor() { super({inputs: ['i'], outputs: ['o']}) }
+      build() {}
+      wire() { this.in('i').to(this.out('o')); }
+    }
+
+    let c = new NodeWrap(new C());
+    let res: number[] = [];
+
+    let a = source().to(c.in('i'));
+    let b = source().to(c.control);
+
+    c.out('o').observable.subscribe(val => res.push(val));
+
+    a.send(2);
+    b.send();
+    res.should.eql([2]);
+
+    a.send(3);
+    res.should.eql([2, 3]);
+  });
+
+  it('should re-execute upon control signal.', () => {
+    class C extends Composition {
+      constructor() { super({inputs: ['i'], outputs: ['o']}) }
+      build() {}
+      wire() { this.in('i').to(this.out('o')); }
+    }
+
+    let c = new NodeWrap(new C());
+    let res: number[] = [];
+
+    let a = source().to(c.in('i'));
+    let b = source().to(c.control);
+
+    c.out('o').observable.subscribe(val => res.push(val));
+
+    a.send(2);
+    b.send();
+    b.send();
+    res.should.eql([2, 2]);
   });
 });

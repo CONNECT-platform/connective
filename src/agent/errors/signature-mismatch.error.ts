@@ -6,7 +6,7 @@ export class InputNotInSignature extends Error {
     readonly input: string,
     readonly signature: Signature
   ) {
-    super(`Input ${input} not in signature ${signature}`);
+    super(`Input ${input} not in signature {inputs: ${signature.inputs}}`);
   }
 }
 
@@ -16,6 +16,6 @@ export class OutputNotInSignature extends Error {
     readonly output: string,
     readonly signature: Signature
   ) {
-    super(`Output ${output} not in signature ${signature}`);
+    super(`Output ${output} not in signature {outputs: ${signature.outputs}}`);
   }
 }

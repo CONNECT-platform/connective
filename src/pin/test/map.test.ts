@@ -25,7 +25,7 @@ describe('map()', () => {
     res.should.eql([3, 5]);
   });
 
-  it('should keep the order for an async map.', done => {
+  it('should not keep the order for an async map.', done => {
     let a = new Source();
     let f = map((n: number, cb: any) => setTimeout(() => cb(n * 2 + 1), 5 - n)).from(a);
     let res: number[] = [];
@@ -33,7 +33,7 @@ describe('map()', () => {
       x => res.push(x),
       () => {},
       () => {
-        res.should.eql([3, 5]);
+        res.should.eql([5, 3]);
         done();
       }
     );
