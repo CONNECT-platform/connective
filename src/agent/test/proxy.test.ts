@@ -13,7 +13,7 @@ describe('Proxy', () => {
     let a = new Source().to(p.in('a'));
     let e = expr((x: number) => x * 2);
     p.out('result').to(e.in(0));
-    e.result.observable.subscribe((x: number) => res.push(x));
+    e.result.subscribe((x: number) => res.push(x));
 
     a.send(1);
     res.should.eql([]);
@@ -29,7 +29,7 @@ describe('Proxy', () => {
     let a = new Source().to(p.in('a'));
     let e = expr((x: number) => x * 3);
     p.out('result').to(e.in(0));
-    e.result.observable.subscribe((x: number) => res.push(x));
+    e.result.subscribe((x: number) => res.push(x));
 
     p.proxy(expr(['a'], (a: number) => a + 1));
     p.proxy(expr(['a'], (a: number) => a + 2));
@@ -45,7 +45,7 @@ describe('Proxy', () => {
     let a = new Source().to(p.in('a'));
     let e = expr((x: number) => x * 5);
     p.out('result').to(e.in(0));
-    e.result.observable.subscribe((x: number) => res.push(x));
+    e.result.subscribe((x: number) => res.push(x));
 
     p.proxy(expr(['a'], (a: number) => a + 1));
     let sub = p.proxy(expr(['a'], (a: number) => a + 2));

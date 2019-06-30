@@ -5,11 +5,14 @@ import { PinMap } from '../pin-map';
 import pack from '../pack';
 
 
+//
+// TODO: add context-related tests.
+//
 describe('pack()', () => {
   it('should wait for all incoming pins and send their data.', done => {
     let a = new Source();
     let b = new Source();
-    pack().from(a, b).observable.subscribe(data => {
+    pack().from(a, b).subscribe(data => {
       data.should.eql(['hellow', 'world']);
       done();
     });
@@ -21,7 +24,7 @@ describe('pack()', () => {
   it('should receive the incoming pins in constructor as well.', done => {
     let a = new Source();
     let b = new Source();
-    pack(a,b).observable.subscribe(data => {
+    pack(a,b).subscribe(data => {
       data.should.eql(['hellow', 'world']);
       done();
     });
@@ -35,7 +38,7 @@ describe('pack()', () => {
     let p = pack(pm);
     let a = new Source().to(pm.get('x'));
     let b = new Source().to(pm.get('y'));
-    p.observable.subscribe(data => {
+    p.subscribe(data => {
       data.x.should.equal(2);
       data.y.should.equal(3);
       done();
@@ -50,7 +53,7 @@ describe('pack()', () => {
     let a = new Source().to(pm.get('x'));
     let b = new Source().to(pm.get('y'));
     let p = pack(pm);
-    p.observable.subscribe(data => {
+    p.subscribe(data => {
       data.x.should.equal(2);
       data.y.should.equal(3);
       done();
@@ -72,7 +75,7 @@ describe('pack()', () => {
     let d = new Source();
     let e = new Source().to(pm2.get('I'));
 
-    pack(a, pm, d, pm2).observable.subscribe(data => {
+    pack(a, pm, d, pm2).subscribe(data => {
       data[0].should.equal(42);
       data[1].x.should.equal('world');
       expect(data[1].y).to.be.undefined;

@@ -2,6 +2,8 @@ import { should } from 'chai'; should();
 
 import { of } from 'rxjs';
 
+import emission from '../../shared/emission';
+
 import sink from '../sink';
 import wrap from '../wrap';
 import { Source } from '../source';
@@ -45,5 +47,24 @@ describe('sink()', () => {
     s1.clear();
     a.send();
     c.should.equal(4);
+  });
+
+  it('should also call the function when `.bind()` is not called but the pin chain is actualized.', done => {
+    let p = new Pin();
+    let a = new Source();
+    sink(() => done()).from(a).to(p);
+
+    p.subscribe();
+    a.send(42);
+  });
+
+  it('should provide the sink func with context.', done => {
+    let a = new Source();
+    sink((_, ctx) => {
+      ctx.x.should.equal(42);
+      done();
+    }).from(a).subscribe();
+
+    a.emit(emission(2, {x: 42}));
   });
 });

@@ -1,5 +1,7 @@
 import { Subject, Subscription } from 'rxjs';
 
+import { Tracker } from '../shared/tracker';
+
 import { PinLike } from './pin-like';
 import { Pin } from './pin';
 
@@ -8,13 +10,15 @@ export type PinMapFactory = (label: string) => PinLike;
 export type PinMapSusbcriber = (label: string, pin: PinLike) => void;
 
 
-export class PinMap {
+export class PinMap extends Tracker {
   private _pins: {[label: string]: PinLike} = {};
   private _subject: Subject<[string, PinLike]> | undefined;
 
   constructor(
     readonly factory: PinMapFactory = () => new Pin()
-  ) {}
+  ) {
+    super();
+  }
 
   public get(label: string): PinLike {
     if (!(label in this._pins)) {
@@ -44,7 +48,7 @@ export class PinMap {
       this._subject = new Subject<[string, PinLike]>();
 
     this.entries.forEach(entry => subscriber(...entry));
-    return this._subject.subscribe(entry => subscriber(...entry));
+    return this.track(this._subject.subscribe(entry => subscriber(...entry)));
   }
 
   public clear(): this {
@@ -56,6 +60,6 @@ export class PinMap {
       this._subject = undefined;
     }
 
-    return this;
+    return super.clear();
   }
 }

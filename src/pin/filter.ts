@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { filter, map, mergeMap } from 'rxjs/operators';
 
-import { ResolveCallback, ErrorCallback } from '../shared/types';
+import { ResolveCallback, ErrorCallback, ContextType } from '../shared/types';
 
 import { Pipe } from './pipe';
 
@@ -9,7 +9,8 @@ import { Pipe } from './pipe';
 export type FilterFuncSync = (value: any) => boolean;
 export type FilterFuncAsync = (value: any,
                             callback: ResolveCallback<boolean>,
-                            error: ErrorCallback) => void;
+                            error: ErrorCallback,
+                            context: ContextType) => void;
 export type FilterFunc = FilterFuncSync | FilterFuncAsync;
 
 
@@ -19,19 +20,20 @@ export class Filter extends Pipe {
   constructor(_filter: FilterFunc) {
     super(
       (_filter.length <= 1)?
-      (filter(_filter as FilterFuncSync)):
+      (filter(emission => (_filter as FilterFuncSync)(emission.value))):
       (
-        mergeMap(value =>
+        mergeMap(emission =>
           new Observable(subscriber => {
-            _filter(value, (res: boolean) => {
+            _filter(emission.value, (res: boolean) => {
               subscriber.next(res);
               subscriber.complete();
             },
             (error: Error | string) => {
               subscriber.error(error);
-            });
+            },
+            emission.context);
           })
-          .pipe(filter(_ => !!_), map(_ => value))
+          .pipe(filter(_ => !!_), map(_ => emission))
         )
       )
     );

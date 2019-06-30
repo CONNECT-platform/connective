@@ -1,11 +1,16 @@
 import { combineLatest, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import emission, { Emission } from '../shared/emission';
+
 import { Pin } from './pin';
 import { PinLike } from './pin-like';
 import { PinMap } from './pin-map';
 
 
+//
+// TODO: add context related tests.
+//
 export class Pack extends Pin {
   constructor(readonly pinmap?: PinMap) {
     super();
@@ -17,21 +22,22 @@ export class Pack extends Pin {
   protected resolve(inbound: PinLike[]) {
     if (this.pinmap) {
       let _entries = this.pinmap.entries;
-      if (_entries.length == 0) return of(undefined);
+      if (_entries.length == 0) return of(emission());
       return combineLatest(..._entries.map(entry => entry[1].observable))
               .pipe(map(
-                  data => _entries.reduce(
+                  emissions => Emission.from(emissions, _entries.reduce(
                     (_map, entry, index) => {
-                      _map[entry[0]] = data[index];
+                      _map[entry[0]] = emissions[index].value;
                       return _map;
                     }
-                    , <{[label: string]: any}>{})
+                    , <{[label: string]: Emission}>{}))
               ))
     }
     else
       return combineLatest(
         ...inbound
-        .map(pin => pin.observable));
+        .map(pin => pin.observable))
+        .pipe(map(emissions => Emission.from(emissions)));
   }
 }
 

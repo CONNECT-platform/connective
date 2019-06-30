@@ -2,13 +2,12 @@ import { should } from 'chai'; should();
 
 import source from '../../pin/source';
 
-
 import expr from '../expr';
 import { NodeWrap } from '../node-wrap';
 import { Composition } from '../composition';
 
 
-describe.only('NodeWrap', () => {
+describe('NodeWrap', () => {
   it('should wait for all connected inputs before feeding them to wrapped agent.', done => {
     class C extends Composition {
       constructor() { super({inputs: ['a', 'b'], outputs: ['o']})}
@@ -25,7 +24,7 @@ describe.only('NodeWrap', () => {
     let c = new NodeWrap(new C());
     let a = source().to(c.in('a'));
     let b = source().to(c.in('b'));
-    c.out('o').observable.subscribe(val => {
+    c.out('o').subscribe(val => {
       val.should.equal(5);
       done();
     });
@@ -52,7 +51,7 @@ describe.only('NodeWrap', () => {
 
     let c = new NodeWrap(new C());
     let a = source().to(c.in('a'));
-    c.out('o').observable.subscribe(val => {
+    c.out('o').subscribe(val => {
       val.should.equal('one');
       done();
     });
@@ -73,7 +72,7 @@ describe.only('NodeWrap', () => {
     let a = source().to(c.in('i'));
     let b = source().to(c.control);
 
-    c.out('o').observable.subscribe(val => res.push(val));
+    c.out('o').subscribe(val => res.push(val));
 
     a.send(2);
     res.should.eql([]);
@@ -94,7 +93,7 @@ describe.only('NodeWrap', () => {
     let a = source().to(c.in('i'));
     let b = source().to(c.control);
 
-    c.out('o').observable.subscribe(val => res.push(val));
+    c.out('o').subscribe(val => res.push(val));
 
     a.send(2);
     b.send();
@@ -117,7 +116,7 @@ describe.only('NodeWrap', () => {
     let a = source().to(c.in('i'));
     let b = source().to(c.control);
 
-    c.out('o').observable.subscribe(val => res.push(val));
+    c.out('o').subscribe(val => res.push(val));
 
     a.send(2);
     b.send();

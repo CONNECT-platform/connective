@@ -1,5 +1,7 @@
 import { Subscription } from 'rxjs';
 
+import { Emission } from '../shared/emission';
+
 import { Source } from '../pin/source';
 
 import { Signature } from './signature';
@@ -16,13 +18,12 @@ export class Proxy extends Agent {
 
     this.inputs.entries.forEach(entry => agent.in(entry[0]).from(entry[1]));
     this.outputs.entries.forEach(entry => {
-      subs.add(agent.out(entry[0]).observable.subscribe(data => {
-        (entry[1] as Source).send(data);
+      subs.add(agent.out(entry[0]).observable.subscribe((emission: Emission) => {
+        (entry[1] as Source).emit(emission);
       }));
     });
 
-    this.track(subs);
-    return subs;
+    return this.track(subs);
   }
 
   protected createOutput(label: string) {

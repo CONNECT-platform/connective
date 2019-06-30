@@ -1,14 +1,21 @@
 import { Subject, Observable } from 'rxjs';
 
+import { ContextType } from '../shared/types';
+import emission, { Emission } from '../shared/emission';
+
 import { PinLike } from './pin-like';
 import { Connectible } from './connectible';
 
 
 export class Source extends Connectible {
-  private _subject = new Subject<any>();
+  private _subject = new Subject<Emission>();
 
-  public send(data?: any) {
-    this._subject.next(data);
+  public send(value?: any, context?: ContextType) {
+    this.emit(emission(value, context));
+  }
+
+  public emit(emission: Emission) {
+    this._subject.next(emission);
   }
 
   clear() {

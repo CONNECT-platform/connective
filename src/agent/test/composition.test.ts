@@ -111,7 +111,7 @@ describe('Composition', () => {
         wire() { this.pin(0).to(this.out('42')); }
       }
 
-      new C().out('42').observable.subscribe(v => {
+      new C().out('42').subscribe(v => {
         v.should.equal(42);
         done();
       });
@@ -136,7 +136,7 @@ describe('Composition', () => {
         wire() { this.agent(0).out('result').to(this.out('42')); }
       }
 
-      new C().out('42').observable.subscribe(v => {
+      new C().out('42').subscribe(v => {
         v.should.equal(42);
         done();
       });
@@ -170,7 +170,7 @@ describe('Composition', () => {
       let s = source().to(c.in('i'));
       c.bind();
       s.send(42);
-      c.out('o').observable.subscribe(v => {
+      c.out('o').subscribe(v => {
         v.should.equal(42);
         done();
       });
@@ -226,20 +226,15 @@ describe('Composition', () => {
       let res = 0;
       let c = new C();
       let a = source().to(c.in('i'));
-      let sub = c.out('o').observable.subscribe(x => res += x);
+      c.out('o').subscribe(x => res += x);
 
       a.send(1);
       res.should.equal(2);
 
-      sub.unsubscribe();
-      sub = c.out('o').observable.subscribe(x => res += x);
+      c.clear();
+      c.out('o').subscribe(x => res += x);
       a.send(1);
-      res.should.equal(4);
-
-      sub.unsubscribe(); c.clear();
-      sub = c.out('o').observable.subscribe(x => res += x);
-      a.send(1);
-      res.should.equal(4);
+      res.should.equal(2);
     });
   });
 });

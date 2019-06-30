@@ -1,4 +1,4 @@
-import { should, expect } from 'chai'; should();
+import { should } from 'chai'; should();
 
 import { PinMap } from '../pin-map';
 import { Pin } from '../pin';
@@ -55,6 +55,18 @@ describe('PinMap', () => {
       pm.instantiated('dude').should.be.true;
       pm.clear();
       pm.instantiated('dude').should.be.false;
+    });
+
+    it('should also clear subscriptions to the pinmap.', () => {
+      let p = new Pin();
+      let pm = new PinMap(() => p);
+      let c = 0;
+      pm.subscribe(() => c++);
+
+      pm.get('a'); c.should.equal(1);
+      pm.get('b'); c.should.equal(2);
+      pm.clear();
+      pm.get('c'); c.should.equal(2);
     });
   });
 

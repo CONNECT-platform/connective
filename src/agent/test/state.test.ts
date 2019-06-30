@@ -10,7 +10,7 @@ describe('State', () => {
     let a = new Source();
     let s = new State();
     s.input.from(a);
-    s.output.observable.subscribe(data => {
+    s.output.subscribe(data => {
       data.should.equal(42);
       done();
     });
@@ -24,7 +24,7 @@ describe('State', () => {
     let calls = 0;
 
     s.input.from(a);
-    s.output.observable.subscribe(() => calls++);
+    s.output.subscribe(() => calls++);
 
     a.send(42); a.send(42);
     calls.should.equal(1);
@@ -38,11 +38,11 @@ describe('State', () => {
     let s = new State();
 
     s.input.from(a);
-    s.output.observable.subscribe(() => {});
+    s.output.subscribe(() => {});
 
     a.send(42);
 
-    s.output.observable.subscribe(data => {
+    s.output.subscribe(data => {
       data.should.equal(42);
       done();
     });
@@ -53,11 +53,11 @@ describe('State', () => {
     let s = new State();
 
     a.to(s.input);
-    s.output.observable.subscribe(() => {});
+    s.output.subscribe(() => {});
 
     a.send('hellow');
 
-    new Pin().from(s.output).observable.subscribe(data => {
+    new Pin().from(s.output).subscribe(data => {
       data.should.equal('hellow');
       done();
     });
@@ -71,8 +71,8 @@ describe('State', () => {
     b.to(s2.input.from(s1.output));
 
     let _s1; let _s2;
-    new Pin().from(s1.output).observable.subscribe(val => _s1 = val);
-    new Pin().from(s2.output).observable.subscribe(val => _s2 = val);
+    new Pin().from(s1.output).subscribe(val => _s1 = val);
+    new Pin().from(s2.output).subscribe(val => _s2 = val);
 
     a.send('hellow'); expect(_s1).to.equal('hellow'); expect(_s2).to.equal('hellow');
     b.send(42); expect(_s1).to.equal(42); expect(_s2).to.equal(42)
@@ -99,7 +99,7 @@ describe('State', () => {
 
       s.bind();
       a.send(42);
-      s.output.observable.subscribe(data => {
+      s.output.subscribe(data => {
         data.should.equal(42);
         done();
       });

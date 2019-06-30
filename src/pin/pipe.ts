@@ -1,10 +1,12 @@
 import { merge, OperatorFunction } from 'rxjs';
 
+import { Emission } from '../shared/emission';
+
 import { Pin } from './pin';
 import { PinLike } from './pin-like';
 
 
-export type PipeFunc = OperatorFunction<any, unknown>;
+export type PipeFunc = OperatorFunction<Emission, Emission>;
 
 
 export class Pipe extends Pin {

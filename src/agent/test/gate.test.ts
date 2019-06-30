@@ -12,7 +12,7 @@ describe('Gate', () => {
     let a = source().to(g.input);
     let c = source().to(g.control);
 
-    g.output.observable.subscribe(v => res.push(v));
+    g.output.subscribe(v => res.push(v));
 
     a.send(42); c.send(true);
     a.send(24); c.send(false);
@@ -27,7 +27,7 @@ describe('Gate', () => {
     let a = source().to(g.input);
     let c = source().to(g.control);
 
-    g.output.observable.subscribe(v => res.push(v));
+    g.output.subscribe(v => res.push(v));
 
     c.send(true); a.send(42);
     c.send(false); c.send(true);
@@ -42,7 +42,7 @@ describe('Gate', () => {
     let a = source().to(g.input);
     let c = source().to(g.control);
 
-    g.output.observable.subscribe(v => res.push(v));
+    g.output.subscribe(v => res.push(v));
 
     a.send(42); a.send(24); a.send(13);
     res.should.eql([]);
@@ -59,7 +59,7 @@ describe('Gate', () => {
     let c1 = source().to(g.control);
     let c2 = source().to(g.control);
 
-    g.output.observable.subscribe(v => res.push(v));
+    g.output.subscribe(v => res.push(v));
 
     a.send(42); a.send(24); a.send(13);
 

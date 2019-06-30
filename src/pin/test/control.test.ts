@@ -5,6 +5,10 @@ import { Control } from '../control';
 import { Pin } from '../pin';
 
 
+//
+// TODO: add value-aggregation tests
+// TODO: add context-related tests
+//
 describe('Control', () => {
   it('should be a `Pin`.', () => {
     new Control().should.be.instanceof(Pin);
@@ -14,7 +18,7 @@ describe('Control', () => {
     let c = false;
     let a = new Source(); let b = new Source();
 
-    new Control().from(a).from(b).observable.subscribe(() => c = true);
+    new Control().from(a).from(b).subscribe(() => c = true);
 
     a.send(); c.should.be.false;
     b.send(); c.should.be.true;
@@ -23,7 +27,7 @@ describe('Control', () => {
   it('should again wait for all of its inbound pins for subsequent data.', () => {
     let c = 0;
     let a = new Source(); let b = new Source();
-    new Control().from(a).from(b).observable.subscribe(() => c++);
+    new Control().from(a).from(b).subscribe(() => c++);
 
     a.send(); b.send(); c.should.equal(1);
     a.send(); c.should.equal(1);
@@ -31,6 +35,6 @@ describe('Control', () => {
   });
 
   it('should send data when not connected to any pin.', done => {
-    new Control().observable.subscribe(() => done());
+    new Control().subscribe(() => done());
   });
 });

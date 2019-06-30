@@ -10,7 +10,7 @@ describe('Pin', () => {
   describe('.from()', () => {
     it('should receive from data another pin.', done => {
       let s = new Source();
-      new Pin().from(s).observable.subscribe(data => {
+      new Pin().from(s).subscribe(data => {
         data.should.equal('all work and no play ...');
         done();
       });
@@ -21,7 +21,7 @@ describe('Pin', () => {
       let a = new Source(); let b = new Source();
       let _ = 0;
 
-      new Pin().from(a, b).observable.subscribe(n => {
+      new Pin().from(a, b).subscribe(n => {
         _ += n;
       });
 
@@ -33,7 +33,7 @@ describe('Pin', () => {
       let a = new Source(); let b = new Source();
       let _: number[] = [];
 
-      new Pin().from(new Pin().from(a, b), new Pin().from(b)).observable.subscribe(n => {
+      new Pin().from(new Pin().from(a, b), new Pin().from(b)).subscribe(n => {
         _.push(n);
       });
 
@@ -55,7 +55,7 @@ describe('Pin', () => {
         )
       );
 
-      c.observable.subscribe(n => {
+      c.subscribe(n => {
         n.should.equal(5);
         done();
       });
@@ -79,8 +79,8 @@ describe('Pin', () => {
 
     it('should send data to multiple other pins.', () => {
       let a = new Source(); let b = new Pin().from(a);
-      let x = false; new Pin().from(b).observable.subscribe(() => x = true);
-      let y = false; new Pin().from(b).observable.subscribe(() => y = true);
+      let x = false; new Pin().from(b).subscribe(() => x = true);
+      let y = false; new Pin().from(b).subscribe(() => y = true);
 
       x.should.be.false;
       y.should.be.false;
@@ -95,13 +95,13 @@ describe('Pin', () => {
   describe('.clear()', () => {
     it('should clear the pin.', () => {
       let a = new Source(); let b = new Pin().from(a); let called = false;
-      let sub = b.observable.subscribe(() => called = true);
+      b.subscribe(() => called = true);
 
       a.send();
       called.should.be.true;
 
-      called = false; sub.unsubscribe();
-      b.clear(); b.observable.subscribe(() => called = true);
+      called = false;
+      b.clear(); b.subscribe(() => called = true);
 
       a.send();
       called.should.be.false;
@@ -113,6 +113,13 @@ describe('Pin', () => {
       let a = new Pin();
       a.locked.should.be.false;
       a.observable;
+      a.locked.should.be.true;
+    });
+
+    it('should be false before `.subscribe()` is called and true afterwards.', () => {
+      let a = new Pin();
+      a.locked.should.be.false;
+      a.subscribe(() => {});
       a.locked.should.be.true;
     });
 

@@ -12,9 +12,9 @@ describe('Switch', () => {
     s.target.from(a);
 
     let res = '';
-    s.case(0).observable.subscribe(() => res = 'A');
-    s.case(1).observable.subscribe(() => res = 'B');
-    s.case(2).observable.subscribe(() => res = 'C');
+    s.case(0).subscribe(() => res = 'A');
+    s.case(1).subscribe(() => res = 'B');
+    s.case(2).subscribe(() => res = 'C');
 
     a.send('hellow');
     res.should.equal('B');
@@ -33,8 +33,8 @@ describe('Switch', () => {
     b.target.from(a);
 
     let res = '';
-    b.case(0).observable.subscribe(() => res = 'even');
-    b.case(1).observable.subscribe(() => res = 'odd');
+    b.case(0).subscribe(() => res = 'even');
+    b.case(1).subscribe(() => res = 'odd');
 
     a.send(2);
     res.should.equal('even');
@@ -55,8 +55,8 @@ describe('Switch', () => {
     b.target.from(a);
 
     let res = '';
-    b.case(0).observable.subscribe(() => res = 'even');
-    b.case(1).observable.subscribe(val => {
+    b.case(0).subscribe(() => res = 'even');
+    b.case(1).subscribe(val => {
       val.should.equal(3);
       res.should.not.equal('even');
       done();
@@ -68,7 +68,7 @@ describe('Switch', () => {
     let s = new Switch(() => { throw new Error('well ...')});
     let a = new Source().to(s.target);
 
-    s.case(0).observable.subscribe(() => {}, () => done());
+    s.case(0).subscribe(() => {}, () => done());
     a.send();
   });
 
@@ -76,7 +76,7 @@ describe('Switch', () => {
     let s = new Switch((_:any, __:any, err: any) => err(new Error()));
     let a = new Source().to(s.target);
 
-    s.case(0).observable.subscribe(() => {}, () => done());
+    s.case(0).subscribe(() => {}, () => done());
     a.send();
   });
 
@@ -86,8 +86,8 @@ describe('Switch', () => {
     let calls = 0;
 
     b.target.from(a);
-    b.case(0).observable.subscribe(() => calls++);
-    b.case(1).observable.subscribe(() => calls++);
+    b.case(0).subscribe(() => calls++);
+    b.case(1).subscribe(() => calls++);
 
     a.send(1);
     calls.should.equal(2);

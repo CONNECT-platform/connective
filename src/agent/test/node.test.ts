@@ -1,6 +1,7 @@
 import { should } from 'chai'; should();
 
-import { ErrorCallback } from '../../shared/types';
+import emission from '../../shared/emission';
+import { ErrorCallback, ContextType } from '../../shared/types';
 
 import { Node, NodeInputs, NodeOutput } from '../node';
 import { Source } from '../../pin/source';
@@ -25,7 +26,7 @@ describe('Node', () => {
     let n = new _N();
     let a = new Source(); let b = new Source();
     a.to(n.in('a')); b.to(n.in('b'));
-    n.out('c').observable.subscribe(res => {
+    n.out('c').subscribe(res => {
       res.should.equal(5);
       done();
     });
@@ -51,7 +52,7 @@ describe('Node', () => {
     let a = new Source();
     let res : number[] = [];
     a.to(n.in('delay'));
-    n.out('delay').observable.subscribe(delay => {
+    n.out('delay').subscribe(delay => {
       res.push(delay);
       if (res.length >= 2) {
         res.should.eql([10, 20]);
@@ -70,7 +71,7 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    n.out('out').observable.subscribe(() => done());
+    n.out('out').subscribe(() => done());
   });
 
   it('should only wait on inputs that are connected.', done => {
@@ -81,7 +82,7 @@ describe('Node', () => {
 
     let n = new _N();
     let a = new Source().to(n.in('a'));
-    n.out('o').observable.subscribe(() => done());
+    n.out('o').subscribe(() => done());
     a.send();
   });
 
@@ -94,7 +95,7 @@ describe('Node', () => {
     let n = new _N();
     let a = new Source().to(n.control);
     let b = new Source().to(n.control);
-    n.out('out').observable.subscribe(() => done());
+    n.out('out').subscribe(() => done());
     a.send();
     b.send();
   });
@@ -110,7 +111,7 @@ describe('Node', () => {
     let a = new Source().to(n.in('a'));
     let b = new Source().to(n.in('b'));
     let c = new Source().to(n.control);
-    n.out('o').observable.subscribe(() => {});
+    n.out('o').subscribe(() => {});
 
     a.send(2); b.send(3); r.should.equal(0);
     c.send(); r.should.equal(1);
@@ -126,7 +127,7 @@ describe('Node', () => {
 
     let n = new _N();
     let c = new Source().to(n.control);
-    n.out('o').observable.subscribe(() => {});
+    n.out('o').subscribe(() => {});
 
     c.send(); r.should.equal(1);
     c.send(); r.should.equal(2);
@@ -140,7 +141,7 @@ describe('Node', () => {
 
     let n = new _N();
     let b = new Source().to(n.in('b'));
-    n.out('c').observable.subscribe(() => {}, _ => {
+    n.out('c').subscribe(() => {}, _ => {
       done();
     });
 
@@ -154,7 +155,7 @@ describe('Node', () => {
     }
 
     let a = new _N();
-    a.out('out').observable.subscribe(() => {}, () => done());
+    a.out('out').subscribe(() => {}, () => done());
   });
 
   it('should channel synchronously thrown errors in `.run()` to error of its outputs.', done => {
@@ -164,7 +165,7 @@ describe('Node', () => {
     }
 
     let a = new _N();
-    a.out('out').observable.subscribe(() => {}, () => done());
+    a.out('out').subscribe(() => {}, () => done());
   });
 
   it('should provide an error function to `.run()` so that it can signal errors through any of its outputs.', done => {
@@ -174,26 +175,22 @@ describe('Node', () => {
     }
 
     let a = new _N();
-    a.out('out').observable.subscribe(() => {}, () => done());
+    a.out('out').subscribe(() => {}, () => done());
   });
 
-  describe('.with()', () => {
-    it('should set a context object on the node accessible on all runs via `.context`.', done => {
-      class _N extends Node {
-        constructor(){super({outputs:['o']})}
-        run(_: NodeInputs, out: NodeOutput) { this.context.count++; out('o', this.context.count); }
+  it('should provide context to `.run()` as well', done => {
+    class _N extends Node {
+      constructor(){super({inputs: ['i'], outputs: ['o']})}
+      run(_: NodeInputs, __: NodeOutput, ___: ErrorCallback, context: ContextType) {
+        context.purpose.should.equal('All work and no play makes jack a dull boy.');
+        done();
       }
+    }
 
-      let n = new _N().with({count: 0});
-      let a = new Source().to(n.control);
-
-      n.out('o').observable.subscribe(val => {
-        if (val >= 2) done();
-      });
-
-      a.send();
-      a.send();
-    });
+    let n = new _N();
+    let a = new Source().to(n.in('i'));
+    n.out('o').subscribe();
+    a.emit(emission(42, {purpose: 'All work and no play makes jack a dull boy.'}));
   });
 
   describe('.control', () => {

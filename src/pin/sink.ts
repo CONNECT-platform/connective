@@ -1,18 +1,22 @@
+import { tap } from 'rxjs/operators';
+
+import { Emission } from '../shared/emission';
 import { Bindable } from '../shared/bindable';
+import { ContextType } from '../shared/types';
 
-import { Pin } from './pin';
-
-
-export type SinkFunc = (data: any) => any;
+import { Pipe } from './pipe';
 
 
-export class Sink extends Pin implements Bindable {
+export type SinkFunc = (value: any, context: ContextType) => void;
+
+
+export class Sink extends Pipe implements Bindable {
   constructor(readonly func: SinkFunc = () => {}) {
-    super();
+    super(tap((emission: Emission) => func(emission.value, emission.context)));
   }
 
   bind(): this {
-    this.track(this.observable.subscribe(this.func));
+    this.track(this.subscribe());
     return this;
   }
 }

@@ -10,7 +10,7 @@ describe('wrap()', () => {
   it('should return a `PinLike` wrapping a given observable.', done => {
     let p = wrap(of('hellow'));
 
-    p.observable.subscribe(data => {
+    p.subscribe(data => {
       data.should.equal('hellow');
       done();
     });
@@ -25,7 +25,7 @@ describe('wrap()', () => {
     new Pin()
       .from(wrap(of(1)))
       .from(wrap(from([2, 3, 4])))
-      .observable.subscribe(n => _.push(n));
+      .subscribe(n => _.push(n));
     _.should.have.members([4, 3, 2, 1]);
   });
 });

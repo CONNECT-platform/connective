@@ -23,8 +23,10 @@ export interface NodeSignature extends Signature {
 }
 
 
+//
+// TODO: add context related tests.
+//
 export abstract class Node extends Agent implements NodeLike {
-  private _context: ContextType;
   private _control: Control;
   private _res: PinLike;
 
@@ -32,7 +34,7 @@ export abstract class Node extends Agent implements NodeLike {
     super(signature);
 
     this._control = new Control();
-    this._res = map((all, callback, error) => {
+    this._res = map((all, callback, error, context) => {
       if (signature.required && signature.required.some(label => !(label in all[0])))
         error(new InsufficientInputs(signature.required.filter(label => !(label in all[0]))));
       else {
@@ -43,7 +45,7 @@ export abstract class Node extends Agent implements NodeLike {
           else {
             callback({out, data});
           }
-        }, error);
+        }, error, context);
       }
     })
     .from(pack(this.inputs, this._control));
@@ -51,17 +53,11 @@ export abstract class Node extends Agent implements NodeLike {
 
   public get control(): Control { return this._control; }
 
-  public with(context: ContextType): this {
-    this._context = context;
-    return this;
-  }
-
-  protected get context(): ContextType { return this._context; }
-
   protected abstract run(
-    _: NodeInputs,
-    __: NodeOutput,
-    ___: ErrorCallback,
+    inputs: NodeInputs,
+    output: NodeOutput,
+    error: ErrorCallback,
+    context: ContextType,
   ): void;
 
   protected createOutput(label: string): PinLike {

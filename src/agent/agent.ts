@@ -1,4 +1,4 @@
-import { Subscription } from 'rxjs';
+import { Tracker } from '../shared/tracker';
 
 import { PinMap } from '../pin/pin-map';
 import { PinLike } from '../pin/pin-like';
@@ -10,12 +10,12 @@ import { Signature } from './signature';
 import { AgentLike } from './agent-like';
 
 
-export class Agent implements AgentLike {
-  private _subs: Subscription | undefined;
+export class Agent extends Tracker implements AgentLike {
   private _inputs: PinMap;
   private _outputs: PinMap;
 
   constructor(readonly signature: Signature) {
+    super();
     this._inputs = new PinMap(label => this.createInput(label));
     this._outputs = new PinMap(label => this.createOutput(label));
   }
@@ -30,12 +30,7 @@ export class Agent implements AgentLike {
     this._inputs.clear();
     this._outputs.clear();
 
-    if (this._subs) {
-      this._subs.unsubscribe();
-      this._subs = undefined;
-    }
-
-    return this;
+    return super.clear();
   }
 
   protected checkInput(label: string) {
@@ -56,16 +51,5 @@ export class Agent implements AgentLike {
   protected createOutput(label: string): PinLike {
     this.checkOutput(label);
     return new Pin();
-  }
-
-  protected track(sub: Subscription): this {
-    if (!this._subs) this._subs = new Subscription();
-    this._subs.add(sub);
-    return this;
-  }
-
-  protected untrack(sub: Subscription): this {
-    if (this._subs) this._subs.remove(sub);
-    return this;
   }
 }

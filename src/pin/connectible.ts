@@ -1,4 +1,6 @@
-import { Observable, Subscription, Subject, defer } from 'rxjs';
+import { Observable, Subject, defer } from 'rxjs';
+
+import { Emission } from '../shared/emission';
 
 import { BasePin } from './base';
 import { PinLike } from './pin-like';
@@ -9,10 +11,9 @@ import { UnresolvedPinObservableError } from './errors/unresolved-observable.err
 
 export abstract class Connectible extends BasePin {
   private _inbound: PinLike[];
-  private _observable: Observable<any> | undefined;
+  private _observable: Observable<Emission> | undefined;
   private _resolving = false;
-  private _sub: Subscription | undefined;
-  private _deferred: Subject<any> | undefined;
+  private _deferred: Subject<Emission> | undefined;
   private _deference_connected = false;
 
   constructor() {
@@ -28,7 +29,7 @@ export abstract class Connectible extends BasePin {
     return this;
   }
 
-  public get observable(): Observable<any> {
+  public get observable(): Observable<Emission> {
     if (this.shouldResolve(this._inbound, this._observable)) {
       if (this._resolving) {
         if (!this._deferred) {
@@ -63,33 +64,20 @@ export abstract class Connectible extends BasePin {
     this._observable = undefined;
     this._deference_connected = false;
 
-    if (this._sub) {
-      this._sub.unsubscribe();
-      this._sub = undefined;
-    }
-
     if (this._deferred) {
       this._deferred.complete();
       this._deferred = undefined;
     }
 
-    return this;
+    return super.clear();
   }
-
-  protected track(sub: Subscription) : Subscription {
-    if (!this._sub) this._sub = new Subscription();
-    this._sub.add(sub);
-    return sub;
-  }
-
-  protected get tracking(): boolean { return !!this._sub; }
 
   public get locked(): boolean { return this.isLocked(this._observable); }
   public get connected(): boolean { return this.isConnected(); }
 
   protected isConnected(): boolean { return this._inbound.length > 0 }
 
-  protected abstract isLocked(observable: Observable<any> | undefined): boolean;
-  protected abstract shouldResolve(inbound: PinLike[], observable: Observable<any> | undefined): boolean;
-  protected abstract resolve(inbound: PinLike[]): Observable<any>;
+  protected abstract isLocked(observable: Observable<Emission> | undefined): boolean;
+  protected abstract shouldResolve(inbound: PinLike[], observable: Observable<Emission> | undefined): boolean;
+  protected abstract resolve(inbound: PinLike[]): Observable<Emission>;
 }
