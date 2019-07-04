@@ -5,9 +5,7 @@ export class MergedEmissionContextVal {
   constructor(readonly values: any[]) {}
 }
 
-//
-// TODO: add tests for this.
-//
+
 export class Emission {
   constructor(
     readonly value: any = undefined,
@@ -20,10 +18,18 @@ export class Emission {
       emissions.reduce((ctx, emission) => {
         Object.entries(emission.context).forEach(([key, value]) => {
           if (key in ctx) {
-            if (ctx[key] instanceof MergedEmissionContextVal)
-              ctx[key].values.push(value);
-            else
-              ctx[key] = new MergedEmissionContextVal([ctx[key], value]);
+            if (ctx[key] instanceof MergedEmissionContextVal) {
+              if (value instanceof MergedEmissionContextVal)
+                ctx[key] = new MergedEmissionContextVal(ctx[key].values.concat(value.values));
+              else
+                ctx[key].values.push(value);
+            }
+            else {
+              if (value instanceof MergedEmissionContextVal)
+                ctx[key] = new MergedEmissionContextVal([ctx[key]].concat(value.values));
+              else
+                ctx[key] = new MergedEmissionContextVal([ctx[key], value]);
+            }
           }
           else ctx[key] = value;
         });

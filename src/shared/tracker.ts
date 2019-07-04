@@ -2,9 +2,7 @@ import { Subscription } from 'rxjs';
 
 import { Clearable } from './clearable';
 
-//
-// TODO: add tests for this.
-//
+
 export class Tracker implements Clearable {
   _sub: Subscription | undefined;
 
