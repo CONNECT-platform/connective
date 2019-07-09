@@ -6,6 +6,7 @@ import { ErrorCallback, ContextType } from '../../shared/types';
 import { Node, NodeInputs, NodeOutput } from '../node';
 import { Source } from '../../pin/source';
 import { Control } from '../../pin/control';
+import pin from '../../pin/pin';
 
 
 describe('Node', () => {
@@ -191,6 +192,26 @@ describe('Node', () => {
     let a = new Source().to(n.in('i'));
     n.out('o').subscribe();
     a.emit(emission(42, {purpose: 'All work and no play makes jack a dull boy.'}));
+  });
+
+  it('should be shared to avoid multiple invocations of run().', () => {
+    let r = 0;
+    class _N extends Node {
+      constructor(){super({outputs: ['o']})}
+      run(_: NodeInputs, __: NodeOutput) {
+        r++;
+        __('o');
+      }
+    }
+
+    let n = new _N();
+    let a = new Source().to(n.control);
+    let p1 = pin().from(n.out('o'));
+    let p2 = pin().from(n.out('o'));
+    p1.subscribe();
+    p2.subscribe();
+    a.send();
+    r.should.equal(1);
   });
 
   describe('.control', () => {

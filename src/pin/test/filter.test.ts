@@ -3,6 +3,7 @@ import { should } from 'chai'; should();
 import emission from '../../shared/emission';
 
 import { Source } from '../source';
+import pin from '../pin';
 import filter from '../filter';
 
 
@@ -41,6 +42,24 @@ describe('filter()', () => {
     let f = filter((_: any, __: any, err: any) => { err(new Error()); }).from(a);
     f.subscribe(() => {}, () => done());
     a.send();
+  });
+
+  it('should not share a sync func.', () => {
+    let a = new Source(); let r = 0;
+    let m = filter(() => r+=1).from(a);
+    let p1 = pin().from(m); let p2 = pin().from(m);
+    p1.subscribe(); p2.subscribe();
+    a.send();
+    r.should.equal(2);
+  });
+
+  it('should share an async func.', () => {
+    let a = new Source(); let r = 0;
+    let m = filter((_, done) => done(!!(r+=1))).from(a);
+    let p1 = pin().from(m); let p2 = pin().from(m);
+    p1.subscribe(); p2.subscribe();
+    a.send();
+    r.should.equal(1);
   });
 
   it('should provide the async function also with context.', done => {

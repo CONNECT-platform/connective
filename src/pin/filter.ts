@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { filter, map, mergeMap } from 'rxjs/operators';
+import { filter, map, mergeMap, share } from 'rxjs/operators';
 
 import { ResolveCallback, ErrorCallback, ContextType } from '../shared/types';
 
@@ -20,8 +20,8 @@ export class Filter extends Pipe {
   constructor(_filter: FilterFunc) {
     super(
       (_filter.length <= 1)?
-      (filter(emission => (_filter as FilterFuncSync)(emission.value))):
-      (
+      ([filter(emission => (_filter as FilterFuncSync)(emission.value))]):
+      ([
         mergeMap(emission =>
           new Observable(subscriber => {
             _filter(emission.value, (res: boolean) => {
@@ -34,8 +34,9 @@ export class Filter extends Pipe {
             emission.context);
           })
           .pipe(filter(_ => !!_), map(_ => emission))
-        )
-      )
+        ),
+        share()
+      ])
     );
 
     this.filter = _filter;

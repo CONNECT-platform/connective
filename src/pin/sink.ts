@@ -12,7 +12,7 @@ export type SinkFunc = (value: any, context: ContextType) => void;
 
 export class Sink extends Pipe implements Bindable {
   constructor(readonly func: SinkFunc = () => {}) {
-    super(tap((emission: Emission) => func(emission.value, emission.context)));
+    super([tap((emission: Emission) => func(emission.value, emission.context))]);
   }
 
   bind(): this {

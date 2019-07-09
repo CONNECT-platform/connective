@@ -12,7 +12,7 @@ export type PipeFunc = OperatorFunction<Emission, Emission>;
 export class Pipe extends Pin {
   readonly pipes: PipeFunc[];
 
-  constructor(...pipes: PipeFunc[]) {
+  constructor(pipes: PipeFunc[]) {
     super();
     this.pipes = pipes;
   }
@@ -28,4 +28,4 @@ export class Pipe extends Pin {
 }
 
 
-export default function(...pipes: PipeFunc[]) { return new Pipe(...pipes); }
+export default function(...pipes: PipeFunc[]) { return new Pipe(pipes); }
