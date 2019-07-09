@@ -1,7 +1,7 @@
 import { ContextType, ErrorCallback } from '../shared/types';
 
 import { PinLike } from '../pin/pin-like';
-import { Control } from '../pin/control';
+import control, { Control } from '../pin/control';
 import pack from '../pin/pack';
 import filter from '../pin/filter';
 import map from '../pin/map';
@@ -23,18 +23,21 @@ export interface NodeSignature extends Signature {
 }
 
 
-//
-// TODO: add context related tests.
-//
 export abstract class Node extends Agent implements NodeLike {
   private _control: Control;
   private _res: PinLike;
 
+  private _counter = 0;
+  private _head = 0;
+
   constructor(signature: NodeSignature) {
     super(signature);
 
-    this._control = new Control();
+    this._control = control();
+
     this._res = map((all, callback, error, context) => {
+      if (this._control.connected)
+        this._head++;
       if (signature.required && signature.required.some(label => !(label in all[0])))
         error(new InsufficientInputs(signature.required.filter(label => !(label in all[0]))));
       else {
@@ -48,7 +51,9 @@ export abstract class Node extends Agent implements NodeLike {
         }, error, context);
       }
     })
-    .from(pack(this.inputs, this._control));
+    .from(filter(() => this._counter > this._head)
+      .from(pack(this.inputs, map(() => ++this._counter).from(this.control)))
+    );
   }
 
   public get control(): Control { return this._control; }

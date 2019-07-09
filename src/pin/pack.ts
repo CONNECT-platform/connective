@@ -8,9 +8,6 @@ import { PinLike } from './pin-like';
 import { PinMap } from './pin-map';
 
 
-//
-// TODO: add context related tests.
-//
 export class Pack extends Pin {
   constructor(readonly pinmap?: PinMap) {
     super();

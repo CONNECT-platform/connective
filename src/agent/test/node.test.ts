@@ -45,7 +45,9 @@ describe('Node', () => {
       }
 
       protected run(inputs: NodeInputs, output: NodeOutput) {
-        setTimeout(() => output('delay', inputs.delay), inputs.delay);
+        setTimeout(() => {
+          output('delay', inputs.delay)
+        }, inputs.delay);
       }
     }
 
@@ -101,7 +103,7 @@ describe('Node', () => {
     b.send();
   });
 
-  it('should wait for control pin at most once.', () => {
+  it('should wait for control pin every time.', () => {
     let r = 0;
     class _N extends Node {
       constructor(){super({inputs: ['a', 'b'], outputs: ['o']})}
@@ -116,7 +118,8 @@ describe('Node', () => {
 
     a.send(2); b.send(3); r.should.equal(0);
     c.send(); r.should.equal(1);
-    a.send(4); r.should.equal(2);
+    a.send(4); r.should.equal(1);
+    c.send(); r.should.equal(2);
   });
 
   it('should re-execute each time a control is sent.', () => {

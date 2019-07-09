@@ -18,15 +18,26 @@ export class Emission {
       emissions.reduce((ctx, emission) => {
         Object.entries(emission.context).forEach(([key, value]) => {
           if (key in ctx) {
+            if (ctx[key] == value) return ctx;
+
             if (ctx[key] instanceof MergedEmissionContextVal) {
-              if (value instanceof MergedEmissionContextVal)
-                ctx[key] = new MergedEmissionContextVal(ctx[key].values.concat(value.values));
-              else
-                ctx[key].values.push(value);
+              if (value instanceof MergedEmissionContextVal) {
+                ctx[key] = new MergedEmissionContextVal(ctx[key].values.concat(
+                  value.values.filter(v => !ctx[key].values.includes(v))
+                ));
+              }
+              else {
+                if (!ctx[key].values.includes(value))
+                  ctx[key].values.push(value);
+              }
             }
             else {
-              if (value instanceof MergedEmissionContextVal)
-                ctx[key] = new MergedEmissionContextVal([ctx[key]].concat(value.values));
+              if (value instanceof MergedEmissionContextVal) {
+                if (value.values.includes(ctx[key]))
+                  ctx[key] = value;
+                else
+                  ctx[key] = new MergedEmissionContextVal([ctx[key]].concat(value.values));
+              }
               else
                 ctx[key] = new MergedEmissionContextVal([ctx[key], value]);
             }

@@ -1,5 +1,7 @@
 import { should, expect } from 'chai'; should();
 
+import emission from '../../shared/emission';
+
 import { Pin } from '../pin';
 import { Source } from '../source';
 import filter from '../filter';
@@ -87,6 +89,20 @@ describe('Pin', () => {
 
       a.send();
 
+      x.should.be.true;
+      y.should.be.true;
+    });
+
+    it('should pass down the same context object.', () => {
+      let ctx = {};
+      let x = false; let y = false;
+
+      let a = new Source();
+      let b = new Pin().from(a);
+      new Pin().from(b).observable.subscribe(e => x = e.context == ctx);
+      new Pin().from(b).observable.subscribe(e => y = e.context == ctx);
+
+      a.emit(emission(undefined, ctx));
       x.should.be.true;
       y.should.be.true;
     });

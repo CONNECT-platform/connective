@@ -6,9 +6,6 @@ import { PinLike } from './pin-like';
 import { Connectible } from './connectible';
 
 
-//
-// TODO: add context related tests.
-//
 export class Pin extends Connectible {
   protected isLocked(observable: Observable<Emission> | undefined) {
     return observable !== undefined;

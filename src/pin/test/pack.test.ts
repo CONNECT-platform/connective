@@ -1,13 +1,12 @@
 import { should, expect } from 'chai'; should();
 
+import emission from '../../shared/emission';
+
 import { Source } from '../source';
 import { PinMap } from '../pin-map';
 import pack from '../pack';
 
 
-//
-// TODO: add context-related tests.
-//
 describe('pack()', () => {
   it('should wait for all incoming pins and send their data.', done => {
     let a = new Source();
@@ -85,5 +84,26 @@ describe('pack()', () => {
     });
 
     a.send(42); b.send('world'); c.send(); d.send(false); e.send(undefined);
+  });
+
+  it('should merge context of incoming emissions.', done => {
+    let a = new Source();
+    let b = new Source();
+    let pm = new PinMap();
+    let c = new Source().to(pm.get('x'));
+    let d = new Source().to(pm.get('y'));
+
+    pack(a, b, pm).observable.subscribe(emission => {
+      emission.context.x.should.equal(2);
+      emission.context.y.should.equal(3);
+      emission.context.w.should.equal(4);
+      emission.context.z.should.equal(5);
+      done();
+    });
+
+    a.emit(emission(undefined, { x : 2 }));
+    b.emit(emission(undefined, { y : 3 }));
+    c.emit(emission(undefined, { w : 4 }));
+    d.emit(emission(undefined, { z : 5 }));
   });
 });

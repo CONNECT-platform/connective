@@ -1,14 +1,12 @@
 import { should } from 'chai'; should();
 
+import emission from '../../shared/emission';
+
 import { Source } from '../source';
 import { Control } from '../control';
 import { Pin } from '../pin';
 
 
-//
-// TODO: add value-aggregation tests
-// TODO: add context-related tests
-//
 describe('Control', () => {
   it('should be a `Pin`.', () => {
     new Control().should.be.instanceof(Pin);
@@ -36,5 +34,30 @@ describe('Control', () => {
 
   it('should send data when not connected to any pin.', done => {
     new Control().subscribe(() => done());
+  });
+
+  it('should aggregate incoming values.', done => {
+    let a = new Source();
+    let b = new Source();
+    new Control().from(a, b).subscribe(val => {
+      val.sort().should.eql([1, 2]);
+      done();
+    });
+
+    a.send(1);
+    b.send(2);
+  });
+
+  it('should merge the context of incoming emissions.', done => {
+    let a = new Source();
+    let b = new Source();
+    new Control().from(a, b).observable.subscribe(emission => {
+      emission.context.x.should.equal(2);
+      emission.context.y.should.equal(3);
+      done();
+    });
+
+    a.emit(emission(undefined, { x : 2 }));
+    b.emit(emission(undefined, { y : 3 }));
   });
 });
