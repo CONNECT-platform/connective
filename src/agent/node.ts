@@ -27,8 +27,7 @@ export abstract class Node extends Agent implements NodeLike {
   private _control: Control;
   private _res: PinLike;
 
-  private _counter = 0;
-  private _head = 0;
+  private _control_required = true;
 
   constructor(signature: NodeSignature) {
     super(signature);
@@ -36,11 +35,11 @@ export abstract class Node extends Agent implements NodeLike {
     this._control = control();
 
     this._res =
-    pack(this.inputs, this.control.to(map(() => ++this._counter)))
-    .to(filter(() => this._counter > this._head))
+    pack(this.inputs, this.control.to(map(() => this._control_required = false)))
+    .to(filter(() => !this._control_required))
     .to(map((all, callback, error, context) => {
       if (this._control.connected)
-        this._head++;
+        this._control_required = true;
       if (signature.required && signature.required.some(label => !(label in all[0])))
         error(new InsufficientInputs(signature.required.filter(label => !(label in all[0]))));
       else {

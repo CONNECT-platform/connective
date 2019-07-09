@@ -80,7 +80,7 @@ describe('NodeWrap', () => {
     res.should.eql([2]);
   });
 
-  it('should wait for its control only once.', () => {
+  it('should wait for its control each time.', () => {
     class C extends Composition {
       constructor() { super({inputs: ['i'], outputs: ['o']}) }
       build() {}
@@ -100,6 +100,8 @@ describe('NodeWrap', () => {
     res.should.eql([2]);
 
     a.send(3);
+    res.should.eql([2]);
+    b.send();
     res.should.eql([2, 3]);
   });
 
