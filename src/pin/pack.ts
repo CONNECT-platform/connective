@@ -3,6 +3,7 @@ import { map } from 'rxjs/operators';
 
 import emission, { Emission } from '../shared/emission';
 
+import group from './group';
 import { Pin } from './pin';
 import { PinLike } from './pin-like';
 import { PinMap } from './pin-map';
@@ -42,6 +43,6 @@ export class Pack extends Pin {
 export default function pack(...stuff: (PinMap|PinLike)[]) {
   let _mapped = stuff.map(each => (each instanceof PinMap)?new Pack(each):each);
   if (_mapped.length == 0) return new Pack();
-  if (_mapped.length == 1) return (_mapped[0] instanceof Pack)?_mapped[0]:new Pack().from(_mapped[0]);
-  return new Pack().from(..._mapped);
+  if (_mapped.length == 1) return (_mapped[0] instanceof Pack)?_mapped[0]:_mapped[0].to(new Pack());
+  return group(..._mapped).to(new Pack());
 }

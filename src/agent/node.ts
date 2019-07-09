@@ -35,7 +35,10 @@ export abstract class Node extends Agent implements NodeLike {
 
     this._control = control();
 
-    this._res = map((all, callback, error, context) => {
+    this._res =
+    pack(this.inputs, this.control.to(map(() => ++this._counter)))
+    .to(filter(() => this._counter > this._head))
+    .to(map((all, callback, error, context) => {
       if (this._control.connected)
         this._head++;
       if (signature.required && signature.required.some(label => !(label in all[0])))
@@ -50,10 +53,7 @@ export abstract class Node extends Agent implements NodeLike {
           }
         }, error, context);
       }
-    })
-    .from(filter(() => this._counter > this._head)
-      .from(pack(this.inputs, map(() => ++this._counter).from(this.control)))
-    );
+    }));
   }
 
   public get control(): Control { return this._control; }
@@ -66,11 +66,10 @@ export abstract class Node extends Agent implements NodeLike {
   ): void;
 
   protected createOutput(label: string): PinLike {
-    return map((res: any) => res.data)
-      .from(
-        filter((res: any) => res.out == label)
-        .from(this._res)
-      )
+    return this._res
+      .to(filter((res: any) => res.out == label))
+      .to(map((res: any) => res.data))
+    ;
   }
 
   clear() {

@@ -2,6 +2,8 @@ import { Control } from '../pin/control';
 import map from '../pin/map';
 import filter from '../pin/filter';
 
+import group from '../pin/group';
+
 import { Agent } from './agent';
 import { NodeLike } from './node-like';
 
@@ -19,12 +21,10 @@ export class Gate extends Agent implements NodeLike {
   public get control() { return this._control; }
 
   protected createOutput() {
-    return map((_: [any, any]) => _[1])
-      .from(
-        filter((_: [any[], any]) => _[0].every(_ => !!_))
-        .from(new Control().from(this.control, this.input))
-      )
-      ;
+    return group(this.control, this.input)
+      .to(new Control())
+      .to(filter(([ctrl, _]: [any[], any]) => ctrl.every(signal => !!signal)))
+      .to(map(([_, input]: [any, any]) => input));
   }
 
   clear() {

@@ -2,6 +2,7 @@ import { should, expect } from 'chai'; should();
 
 import emission from '../../shared/emission';
 
+import group from '../group';
 import { Source } from '../source';
 import { PinMap } from '../pin-map';
 import pack from '../pack';
@@ -11,7 +12,7 @@ describe('pack()', () => {
   it('should wait for all incoming pins and send their data.', done => {
     let a = new Source();
     let b = new Source();
-    pack().from(a, b).subscribe(data => {
+    group(a, b).to(pack()).subscribe(data => {
       data.should.eql(['hellow', 'world']);
       done();
     });
@@ -35,8 +36,8 @@ describe('pack()', () => {
   it('should wait for all instantiated pins of a pin map and send their data in a key-value object', done => {
     let pm = new PinMap();
     let p = pack(pm);
-    let a = new Source().to(pm.get('x'));
-    let b = new Source().to(pm.get('y'));
+    let a = new Source(); a.to(pm.get('x'));
+    let b = new Source(); b.to(pm.get('y'));
     p.subscribe(data => {
       data.x.should.equal(2);
       data.y.should.equal(3);
@@ -49,8 +50,8 @@ describe('pack()', () => {
 
   it('should work properly if connected to a pinmap that already has some pins.', done => {
     let pm = new PinMap();
-    let a = new Source().to(pm.get('x'));
-    let b = new Source().to(pm.get('y'));
+    let a = new Source(); a.to(pm.get('x'));
+    let b = new Source(); b.to(pm.get('y'));
     let p = pack(pm);
     p.subscribe(data => {
       data.x.should.equal(2);
@@ -69,10 +70,10 @@ describe('pack()', () => {
   it('should also handle a combination of pins and pinmaps.', done => {
     let pm = new PinMap(); let pm2 = new PinMap();
     let a = new Source();
-    let b = new Source().to(pm.get('x'));
-    let c = new Source().to(pm.get('y'));
+    let b = new Source(); b.to(pm.get('x'));
+    let c = new Source(); c.to(pm.get('y'));
     let d = new Source();
-    let e = new Source().to(pm2.get('I'));
+    let e = new Source(); e.to(pm2.get('I'));
 
     pack(a, pm, d, pm2).subscribe(data => {
       data[0].should.equal(42);
@@ -90,8 +91,8 @@ describe('pack()', () => {
     let a = new Source();
     let b = new Source();
     let pm = new PinMap();
-    let c = new Source().to(pm.get('x'));
-    let d = new Source().to(pm.get('y'));
+    let c = new Source(); c.to(pm.get('x'));
+    let d = new Source(); d.to(pm.get('y'));
 
     pack(a, b, pm).observable.subscribe(emission => {
       emission.context.x.should.equal(2);

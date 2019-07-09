@@ -2,6 +2,7 @@ import { should, expect } from 'chai'; should();
 
 import emission from '../../shared/emission';
 
+import group from '../group';
 import { Pin } from '../pin';
 import { Source } from '../source';
 import filter from '../filter';
@@ -12,7 +13,7 @@ describe('Pin', () => {
   describe('.from()', () => {
     it('should receive from data another pin.', done => {
       let s = new Source();
-      new Pin().from(s).subscribe(data => {
+      s.to(new Pin()).subscribe(data => {
         data.should.equal('all work and no play ...');
         done();
       });
@@ -23,7 +24,7 @@ describe('Pin', () => {
       let a = new Source(); let b = new Source();
       let _ = 0;
 
-      new Pin().from(a, b).subscribe(n => {
+      group(a, b).to(new Pin()).subscribe(n => {
         _ += n;
       });
 
@@ -35,7 +36,10 @@ describe('Pin', () => {
       let a = new Source(); let b = new Source();
       let _: number[] = [];
 
-      new Pin().from(new Pin().from(a, b), new Pin().from(b)).subscribe(n => {
+      group(
+        group(a, b).to(new Pin()),
+        b.to(new Pin())
+      ).to(new Pin()).subscribe(n => {
         _.push(n);
       });
 
@@ -48,14 +52,12 @@ describe('Pin', () => {
       let b = new Pin();
       let c = new Pin();
 
-      a.to(
-        b.to(
-          filter((n: number) => n < 5).to(
-            map((n: number) => n + 1).to(b)
-          ),
-          filter((n: number) => n >= 5).to(c)
-        )
-      );
+      a.to(b)
+        .to(filter((n: number) => n < 5))
+        .to(map((n: number) => n + 1))
+        .to(b)
+        .to(filter((n: number) => n >= 5))
+        .to(c);
 
       c.subscribe(n => {
         n.should.equal(5);
@@ -74,15 +76,18 @@ describe('Pin', () => {
   describe('.to()', () => {
     it('should send data to another pin.', done => {
       let a = new Source(); let b = new Pin();
-      new Pin().from(a).to(b);
+      a.to(new Pin()).to(b);
       b.observable.subscribe(() => done());
       a.send();
     });
 
     it('should send data to multiple other pins.', () => {
-      let a = new Source(); let b = new Pin().from(a);
-      let x = false; new Pin().from(b).subscribe(() => x = true);
-      let y = false; new Pin().from(b).subscribe(() => y = true);
+      let a = new Source(); let b = new Pin();
+      let x = false;
+      let y = false;
+
+      a.to(b).to(new Pin()).subscribe(() => x = true);
+      b.to(new Pin()).subscribe(() => y = true);
 
       x.should.be.false;
       y.should.be.false;
@@ -99,8 +104,8 @@ describe('Pin', () => {
 
       let a = new Source();
       let b = new Pin().from(a);
-      new Pin().from(b).observable.subscribe(e => x = e.context == ctx);
-      new Pin().from(b).observable.subscribe(e => y = e.context == ctx);
+      b.to(new Pin()).observable.subscribe(e => x = e.context == ctx);
+      b.to(new Pin()).observable.subscribe(e => y = e.context == ctx);
 
       a.emit(emission(undefined, ctx));
       x.should.be.true;
@@ -110,8 +115,8 @@ describe('Pin', () => {
 
   describe('.clear()', () => {
     it('should clear the pin.', () => {
-      let a = new Source(); let b = new Pin().from(a); let called = false;
-      b.subscribe(() => called = true);
+      let a = new Source(); let b = new Pin(); let called = false;
+      a.to(b).subscribe(() => called = true);
 
       a.send();
       called.should.be.true;
@@ -140,7 +145,7 @@ describe('Pin', () => {
     });
 
     it('should lock all pins that are connected to this pin.', () => {
-      let a = new Pin(); let b = new Pin(); let c = new Pin().from(a).from(b);
+      let a = new Pin(); let b = new Pin(); let c = group(a, b).to(new Pin());
       a.locked.should.be.false; b.locked.should.be.false;
 
       c.observable;

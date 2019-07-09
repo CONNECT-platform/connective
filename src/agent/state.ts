@@ -26,19 +26,18 @@ export class State extends Agent implements Bindable {
   get last() { return this._last; }
 
   public bind(): this {
-    this.track(this.output.observable.subscribe(() => {}));
+    this.track(this.output.observable.subscribe());
     return this;
   }
 
   protected createOutput(_: string): PinLike {
-    return pipe(
-      tap((emission: Emission) => this._last = emission.value),
-      shareReplay(1)
-    )
-    .from(
-      filter((value: any) => !isequal(value, this._last))
-      .from(this.input)
-    );
+    return this.input
+      .to(filter((value: any) => !isequal(value, this._last)))
+      .to(pipe(
+        tap((emission: Emission) => this._last = emission.value),
+        shareReplay(1)
+      ))
+      ;
   }
 }
 

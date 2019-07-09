@@ -2,6 +2,7 @@ import { should } from 'chai'; should();
 
 import emission from '../../shared/emission';
 
+import group from '../group';
 import { Source } from '../source';
 import { Control } from '../control';
 import { Pin } from '../pin';
@@ -16,7 +17,7 @@ describe('Control', () => {
     let c = false;
     let a = new Source(); let b = new Source();
 
-    new Control().from(a).from(b).subscribe(() => c = true);
+    group(a, b).to(new Control()).subscribe(() => c = true);
 
     a.send(); c.should.be.false;
     b.send(); c.should.be.true;
@@ -25,7 +26,7 @@ describe('Control', () => {
   it('should again wait for all of its inbound pins for subsequent data.', () => {
     let c = 0;
     let a = new Source(); let b = new Source();
-    new Control().from(a).from(b).subscribe(() => c++);
+    group(a, b).to(new Control()).subscribe(() => c++);
 
     a.send(); b.send(); c.should.equal(1);
     a.send(); c.should.equal(1);
@@ -39,7 +40,7 @@ describe('Control', () => {
   it('should aggregate incoming values.', done => {
     let a = new Source();
     let b = new Source();
-    new Control().from(a, b).subscribe(val => {
+    group(a, b).to(new Control()).subscribe(val => {
       val.sort().should.eql([1, 2]);
       done();
     });
@@ -51,7 +52,7 @@ describe('Control', () => {
   it('should merge the context of incoming emissions.', done => {
     let a = new Source();
     let b = new Source();
-    new Control().from(a, b).observable.subscribe(emission => {
+    group(a, b).to(new Control()).observable.subscribe(emission => {
       emission.context.x.should.equal(2);
       emission.context.y.should.equal(3);
       done();

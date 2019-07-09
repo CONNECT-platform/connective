@@ -21,12 +21,12 @@ export class Switch extends Agent {
 
   protected createOutput(label: string): PinLike {
     let _case = this.cases[label as any];
-    return (
-            (typeof _case === 'function')?
-            filter(_case):
-            filter((value: any) => _case === value)
-          )
-          .from(this.target);
+
+    return this.target
+      .to((typeof _case === 'function')?
+          filter(_case):
+          filter((value: any) => _case === value))
+      ;
   }
 }
 

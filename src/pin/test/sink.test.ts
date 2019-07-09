@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 
 import emission from '../../shared/emission';
 
-import sink from '../sink';
+import sink, { Sink } from '../sink';
 import wrap from '../wrap';
 import { Source } from '../source';
 import { Pin } from '../pin';
@@ -13,25 +13,28 @@ import { Pin } from '../pin';
 describe('sink()', () => {
   it('should be a lock the connected graph before it when its `.bind()` is called.', () => {
     let s = sink();
-    let a = new Pin().to(new Pin().to(s), new Pin().to(s));
+    let a = new Pin();
+    a.to(new Pin(), new Pin()).to(s);
     s.bind();
     a.locked.should.be.true;
   });
 
   it('should invoke the given sink func upon `.bind()`', done => {
-    sink((val: any) => {
-      val.should.equal(42);
-      done();
-    })
-    .from(wrap(of(42)))
-    .bind();
+    (
+      wrap(of(42))
+      .to(sink((val: any) => {
+        val.should.equal(42);
+        done();
+      })) as Sink
+    ).bind();
   });
 
   it('should not invoke the function after `.clear()`', () => {
     let c = 0;
     let a = new Source();
-    let s1 = sink(() => c++).from(a);
-    let s2 = sink(() => c++).from(a);
+    let s1 = sink(() => c++);
+    let s2 = sink(() => c++);
+    a.to(s1, s2);
 
     a.send();
     c.should.equal(0);
@@ -52,7 +55,7 @@ describe('sink()', () => {
   it('should also call the function when `.bind()` is not called but the pin chain is actualized.', done => {
     let p = new Pin();
     let a = new Source();
-    sink(() => done()).from(a).to(p);
+    a.to(sink(() => done())).to(p);
 
     p.subscribe();
     a.send(42);
@@ -60,10 +63,10 @@ describe('sink()', () => {
 
   it('should provide the sink func with context.', done => {
     let a = new Source();
-    sink((_, ctx) => {
+    a.to(sink((_, ctx) => {
       ctx.x.should.equal(42);
       done();
-    }).from(a).subscribe();
+    })).subscribe();
 
     a.emit(emission(2, {x: 42}));
   });

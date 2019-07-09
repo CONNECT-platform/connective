@@ -3,10 +3,12 @@ import { should } from 'chai'; should();
 import emission from '../../shared/emission';
 import { ErrorCallback, ContextType } from '../../shared/types';
 
-import { Node, NodeInputs, NodeOutput } from '../node';
 import { Source } from '../../pin/source';
 import { Control } from '../../pin/control';
+import { Group } from '../../pin/group';
 import pin from '../../pin/pin';
+
+import { Node, NodeInputs, NodeOutput } from '../node';
 
 
 describe('Node', () => {
@@ -84,7 +86,7 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    let a = new Source().to(n.in('a'));
+    let a = new Source(); a.to(n.in('a'));
     n.out('o').subscribe(() => done());
     a.send();
   });
@@ -96,8 +98,8 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    let a = new Source().to(n.control);
-    let b = new Source().to(n.control);
+    let a = new Source(); a.to(n.control);
+    let b = new Source(); b.to(n.control);
     n.out('out').subscribe(() => done());
     a.send();
     b.send();
@@ -111,9 +113,9 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    let a = new Source().to(n.in('a'));
-    let b = new Source().to(n.in('b'));
-    let c = new Source().to(n.control);
+    let a = new Source(); a.to(n.in('a'));
+    let b = new Source(); b.to(n.in('b'));
+    let c = new Source(); c.to(n.control);
     n.out('o').subscribe(() => {});
 
     a.send(2); b.send(3); r.should.equal(0);
@@ -130,7 +132,7 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    let c = new Source().to(n.control);
+    let c = new Source(); c.to(n.control);
     n.out('o').subscribe(() => {});
 
     c.send(); r.should.equal(1);
@@ -144,7 +146,7 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    let b = new Source().to(n.in('b'));
+    let b = new Source(); b.to(n.in('b'));
     n.out('c').subscribe(() => {}, _ => {
       done();
     });
@@ -192,7 +194,7 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    let a = new Source().to(n.in('i'));
+    let a = new Source(); a.to(n.in('i'));
     n.out('o').subscribe();
     a.emit(emission(42, {purpose: 'All work and no play makes jack a dull boy.'}));
   });
@@ -208,9 +210,8 @@ describe('Node', () => {
     }
 
     let n = new _N();
-    let a = new Source().to(n.control);
-    let p1 = pin().from(n.out('o'));
-    let p2 = pin().from(n.out('o'));
+    let a = new Source(); a.to(n.control);
+    let [p1, p2] = (n.out('o').to(pin(), pin()) as Group).pins;
     p1.subscribe();
     p2.subscribe();
     a.send();

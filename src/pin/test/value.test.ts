@@ -1,5 +1,6 @@
 import { should, expect } from 'chai'; should();
 
+import group from '../group';
 import { Source } from '../source';
 import { Pin } from '../pin';
 import value from '../value';
@@ -14,7 +15,7 @@ describe('value()', () => {
     let c = undefined;
     let a = new Source(); let b = new Source();
 
-    value('hellow').from(a).from(b).subscribe(val => c = val);
+    group(a, b).to(value('hellow')).subscribe(val => c = val);
 
     a.send(); expect(c).to.be.undefined;
     b.send(); expect(c).to.equal('hellow');
@@ -23,7 +24,7 @@ describe('value()', () => {
   it('should again wait for all of its inbound pins for subsequently resending its value.', () => {
     let c = 0;
     let a = new Source(); let b = new Source();
-    value(3).from(a).from(b).subscribe(v => c += v);
+    group(a, b).to(value(3)).subscribe(v => c += v);
 
     a.send(); b.send(); c.should.equal(3);
     a.send(); c.should.equal(3);

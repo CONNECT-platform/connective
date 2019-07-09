@@ -22,8 +22,8 @@ describe('NodeWrap', () => {
     }
 
     let c = new NodeWrap(new C());
-    let a = source().to(c.in('a'));
-    let b = source().to(c.in('b'));
+    let a = source(); a.to(c.in('a'));
+    let b = source(); b.to(c.in('b'));
     c.out('o').subscribe(val => {
       val.should.equal(5);
       done();
@@ -50,7 +50,7 @@ describe('NodeWrap', () => {
     }
 
     let c = new NodeWrap(new C());
-    let a = source().to(c.in('a'));
+    let a = source(); a.to(c.in('a'));
     c.out('o').subscribe(val => {
       val.should.equal('one');
       done();
@@ -69,8 +69,8 @@ describe('NodeWrap', () => {
     let c = new NodeWrap(new C());
     let res: number[] = [];
 
-    let a = source().to(c.in('i'));
-    let b = source().to(c.control);
+    let a = source(); a.to(c.in('i'));
+    let b = source(); b.to(c.control);
 
     c.out('o').subscribe(val => res.push(val));
 
@@ -90,8 +90,8 @@ describe('NodeWrap', () => {
     let c = new NodeWrap(new C());
     let res: number[] = [];
 
-    let a = source().to(c.in('i'));
-    let b = source().to(c.control);
+    let a = source(); a.to(c.in('i'));
+    let b = source(); b.to(c.control);
 
     c.out('o').subscribe(val => res.push(val));
 
@@ -113,8 +113,8 @@ describe('NodeWrap', () => {
     let c = new NodeWrap(new C());
     let res: number[] = [];
 
-    let a = source().to(c.in('i'));
-    let b = source().to(c.control);
+    let a = source(); a.to(c.in('i'));
+    let b = source(); b.to(c.control);
 
     c.out('o').subscribe(val => res.push(val));
 

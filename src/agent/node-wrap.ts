@@ -20,7 +20,7 @@ export class NodeWrap extends Agent implements NodeLike {
     this._pack = pack(this.inputs, this._control);
 
     this.track(core.inputs.subscribe((label, pin) => {
-      this._pack.to(map((all: any) => all[0][label]).to(pin));
+      this._pack.to(map((all: any) => all[0][label])).to(pin);
     }));
 
     this.track(core.outputs.subscribe((label, pin) => {

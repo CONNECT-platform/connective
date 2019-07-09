@@ -17,8 +17,8 @@ describe('Expr', () => {
 
   it('should run given function.', done => {
     let e = new Expr(['a', 'b'], (a: any, b: any) => a + b);
-    let a = new Source().to(e.in('a'));
-    let b = new Source().to(e.in('b'));
+    let a = new Source(); a.to(e.in('a'));
+    let b = new Source(); b.to(e.in('b'));
     e.result.subscribe(res => {
       res.should.equal(5);
       done();
@@ -48,7 +48,7 @@ describe('Expr', () => {
       done();
     });
 
-    let a = new Source().to(e.in('i'));
+    let a = new Source(); a.to(e.in('i'));
     e.result.subscribe();
     a.emit(emission('whatever', {name: 'the dude'}));
   });
@@ -79,7 +79,8 @@ describe('expr()', () => {
     let e = expr(['a', 'b'], (a: any, b: any) => a * b);
     e.should.be.instanceof(Expr);
 
-    let a = new Source().to(e.in('a')); let b = new Source().to(e.in('b'));
+    let a = new Source(); a.to(e.in('a'));
+    let b = new Source(); b.to(e.in('b'));
     e.result.subscribe(res => {
       res.should.equal(6);
       done();
@@ -91,8 +92,8 @@ describe('expr()', () => {
 
   it('should create numeric inputs for the signature if no named inputs are given but the given function has inputs.', done => {
     let e = expr((a: any, b: any) => b - a);
-    let a = new Source().to(e.in(0));
-    let b = new Source().to(e.in(1));
+    let a = new Source(); a.to(e.in(0));
+    let b = new Source(); b.to(e.in(1));
 
     e.result.subscribe(val => {
       val.should.equal(1);
@@ -109,7 +110,7 @@ describe('expr()', () => {
       error('well ...');
     });
 
-    let a = new Source().to(e.in(0));
+    let a = new Source(); a.to(e.in(0));
     e.result.subscribe(() => {}, () => done());
     a.send(42);
   });
@@ -120,7 +121,7 @@ describe('expr()', () => {
       done();
     });
 
-    let a = new Source().to(e.in(0));
+    let a = new Source(); a.to(e.in(0));
     e.result.subscribe();
     a.emit(emission('whatever', {name: 'the dude'}));
   });

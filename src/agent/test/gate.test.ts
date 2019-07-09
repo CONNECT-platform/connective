@@ -9,8 +9,8 @@ describe('Gate', () => {
   it('should only pass values that receive a `true` signal.', () => {
     let res: number[] = [];
     let g = new Gate();
-    let a = source().to(g.input);
-    let c = source().to(g.control);
+    let a = source(); a.to(g.input);
+    let c = source(); c.to(g.control);
 
     g.output.subscribe(v => res.push(v));
 
@@ -24,8 +24,8 @@ describe('Gate', () => {
   it('should match signals and values.', () => {
     let res: number[] = [];
     let g = new Gate();
-    let a = source().to(g.input);
-    let c = source().to(g.control);
+    let a = source(); a.to(g.input);
+    let c = source(); c.to(g.control);
 
     g.output.subscribe(v => res.push(v));
 
@@ -39,8 +39,8 @@ describe('Gate', () => {
   it('should wait for a boolean signal for each value.', () => {
     let res: number[] = [];
     let g = new Gate();
-    let a = source().to(g.input);
-    let c = source().to(g.control);
+    let a = source(); a.to(g.input);
+    let c = source(); c.to(g.control);
 
     g.output.subscribe(v => res.push(v));
 
@@ -55,9 +55,9 @@ describe('Gate', () => {
   it('should wait for all connections to its control and only allow those who receive `true` by all.', () => {
     let res: number[] = [];
     let g = new Gate();
-    let a = source().to(g.input);
-    let c1 = source().to(g.control);
-    let c2 = source().to(g.control);
+    let a = source(); a.to(g.input);
+    let c1 = source(); c1.to(g.control);
+    let c2 = source(); c2.to(g.control);
 
     g.output.subscribe(v => res.push(v));
 

@@ -10,9 +10,8 @@ import filter from '../filter';
 describe('filter()', () => {
   it('should return a `PinLike` that only passes values that match the given function.', () => {
     let a = new Source();
-    let f = filter((n: number) => n % 2 == 0).from(a);
     let res: number[] = [];
-    f.subscribe(x => res.push(x));
+    a.to(filter((n: number) => n % 2 == 0)).subscribe(x => res.push(x));
     a.send(1); a.send(2);
     a.send(3); a.send(4);
 
@@ -21,9 +20,8 @@ describe('filter()', () => {
 
   it('should also work with an async function.', () => {
     let a = new Source();
-    let f = filter((n: number, c: (r: boolean)=>void) => c(n % 2 == 1)).from(a);
     let res: number[] = [];
-    f.subscribe(x => res.push(x));
+    a.to(filter((n: number, c: (r: boolean)=>void) => c(n % 2 == 1))).subscribe(x => res.push(x));
     a.send(1); a.send(2);
     a.send(3); a.send(4);
 
@@ -32,44 +30,37 @@ describe('filter()', () => {
 
   it('should hanlde errors of a sync function.', done => {
     let a = new Source();
-    let f = filter(() => { throw new Error() }).from(a);
-    f.subscribe(() => {}, () => done());
+    a.to(filter(() => { throw new Error() })).subscribe(() => {}, () => done());
     a.send();
   });
 
   it('should provide an async function with an error callback.', done => {
     let a = new Source();
-    let f = filter((_: any, __: any, err: any) => { err(new Error()); }).from(a);
-    f.subscribe(() => {}, () => done());
+    a.to(filter((_: any, __: any, err: any) => { err(new Error()); })).subscribe(() => {}, () => done());
     a.send();
   });
 
   it('should not share a sync func.', () => {
     let a = new Source(); let r = 0;
-    let m = filter(() => r+=1).from(a);
-    let p1 = pin().from(m); let p2 = pin().from(m);
-    p1.subscribe(); p2.subscribe();
+    a.to(filter(() => r+=1)).to(pin(), pin()).subscribe();
     a.send();
     r.should.equal(2);
   });
 
   it('should share an async func.', () => {
     let a = new Source(); let r = 0;
-    let m = filter((_, done) => done(!!(r+=1))).from(a);
-    let p1 = pin().from(m); let p2 = pin().from(m);
-    p1.subscribe(); p2.subscribe();
+    a.to(filter((_, done) => done(!!(r+=1)))).to(pin(), pin()).subscribe();
     a.send();
     r.should.equal(1);
   });
 
   it('should provide the async function also with context.', done => {
     let a = new Source();
-    let f = filter((_, __, ___, ctx) => {
+    a.to(filter((_, __, ___, ctx) => {
       ctx.x.should.equal(2);
       done();
-    }).from(a);
+    })).subscribe();
 
-    f.subscribe(() => {});
     a.emit(emission(42, {x: 2}));
   });
 });

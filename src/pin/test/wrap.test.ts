@@ -2,6 +2,7 @@ import { should, expect } from 'chai'; should();
 
 import { from, of } from 'rxjs';
 
+import group from '../group';
 import wrap from '../wrap';
 import { Pin } from '../pin';
 
@@ -22,10 +23,14 @@ describe('wrap()', () => {
 
   it('should return a `PinLike` that can connect to other pins.', () => {
     let _ : number[] = [];
-    new Pin()
-      .from(wrap(of(1)))
-      .from(wrap(from([2, 3, 4])))
-      .subscribe(n => _.push(n));
+
+    group(
+      wrap(of(1)),
+      wrap(from([2, 3, 4]))
+    )
+    .to(new Pin())
+    .subscribe(n => _.push(n));
+
     _.should.have.members([4, 3, 2, 1]);
   });
 });

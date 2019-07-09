@@ -1,4 +1,5 @@
 describe('pin', () => {
+  require('./group.test');
   require('./source.test');
   require('./pin.test');
   require('./wrap.test');

@@ -167,7 +167,7 @@ describe('Composition', () => {
       }
 
       let c = new C();
-      let s = source().to(c.in('i'));
+      let s = source(); s.to(c.in('i'));
       c.bind();
       s.send(42);
       c.out('o').subscribe(v => {
@@ -220,12 +220,12 @@ describe('Composition', () => {
       class C extends Composition {
         constructor() { super({inputs: ['i'], outputs: ['o']})}
         build() { this.add(map((x: number) => x * 2)); }
-        wire() {  this.in('i').to(this.pin(0).to(this.out('o'))); }
+        wire() {  this.in('i').to(this.pin(0)).to(this.out('o')); }
       }
 
       let res = 0;
       let c = new C();
-      let a = source().to(c.in('i'));
+      let a = source(); a.to(c.in('i'));
       c.out('o').subscribe(x => res += x);
 
       a.send(1);

@@ -67,12 +67,12 @@ describe('State', () => {
     let a = new Source(); let b = new Source();
     let s1 = new State(); let s2 = new State();
 
-    a.to(s1.input.from(s2.output));
-    b.to(s2.input.from(s1.output));
+    a.to(s2.output.to(s1.input));
+    b.to(s1.output.to(s2.input));
 
     let _s1; let _s2;
-    new Pin().from(s1.output).subscribe(val => _s1 = val);
-    new Pin().from(s2.output).subscribe(val => _s2 = val);
+    s1.output.to(new Pin()).subscribe(val => _s1 = val);
+    s2.output.to(new Pin()).subscribe(val => _s2 = val);
 
     a.send('hellow'); expect(_s1).to.equal('hellow'); expect(_s2).to.equal('hellow');
     b.send(42); expect(_s1).to.equal(42); expect(_s2).to.equal(42)
@@ -95,7 +95,7 @@ describe('State', () => {
   describe('.bind()', () => {
     it('should cause the state start storing values.', done => {
       let s = new State();
-      let a = new Source().to(s.input);
+      let a = new Source(); a.to(s.input);
 
       s.bind();
       a.send(42);

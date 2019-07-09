@@ -1,5 +1,6 @@
 import { should, expect } from 'chai'; should();
 
+import group from '../group';
 import { Source } from '../source';
 import { Pin } from '../pin';
 
@@ -29,7 +30,7 @@ describe('Source', () => {
   describe('.from()', () => {
     it('should receive data from another pin.', done => {
       let a = new Source(); let b = new Source();
-      b.from(a).subscribe(data => {
+      a.to(b).subscribe(data => {
         data.should.equal('Howdy!!');
         done();
       });
@@ -39,18 +40,16 @@ describe('Source', () => {
     it('should be able to receive from multiple sources.', () => {
       let _ = 0;
       let a = new Source(); let b = new Source();
-      let c = new Source().from(a).from(b);
+      group(a, b).to(new Source()).subscribe(n => _ += n);
 
-      c.subscribe(n => _ += n);
       a.send(1); b.send(2); a.send(3);
       _.should.equal(6);
     });
 
     it('should also receive context.', done => {
       let a = new Source();
-      let b = new Source().from(a);
 
-      b.observable.subscribe(emission => {
+      a.to(new Source()).observable.subscribe(emission => {
         emission.context.x.should.equal(42);
         done();
       });
@@ -67,16 +66,17 @@ describe('Source', () => {
 
   describe('.to()', () => {
     it('should channel data to another pin.', done => {
-      let a = new Source(); let b = new Source().to(a);
-      a.subscribe(() => done());
-      b.send();
+      let a = new Source();
+      a.to(new Source()).subscribe(() => done());
+      a.send();
     });
   });
 
   describe('.clear()', () => {
     it('should clear the incoming connections.', () => {
-      let a = new Source(); let b = new Source().from(a); let called = false;
-      b.subscribe(() => called = true);
+      let a = new Source(); let b = new Source();
+      let called = false;
+      a.to(b).subscribe(() => called = true);
 
       a.send();
       called.should.be.true;
@@ -88,8 +88,8 @@ describe('Source', () => {
     });
 
     it('should clear outgoing connections as well.', () => {
-      let a = new Source(); let b = new Source().from(a); let called = false;
-      b.subscribe(() => called = true);
+      let a = new Source(); let b = new Source(); let called = false;
+      a.to(b).subscribe(() => called = true);
 
       a.send();
       called.should.be.true;
@@ -101,7 +101,8 @@ describe('Source', () => {
     });
 
     it('should be usable after being cleared.', () => {
-      let a = new Source(); let b = new Source().from(a); let called = false;
+      let a = new Source(); let b = new Source();
+      let called = false; a.to(b);
 
       a.clear().to(b);
       b.subscribe(() => called = true);

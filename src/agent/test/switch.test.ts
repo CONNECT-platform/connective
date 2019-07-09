@@ -66,7 +66,7 @@ describe('Switch', () => {
 
   it('should hanlde errors thrown by sync case functions.', done => {
     let s = new Switch(() => { throw new Error('well ...')});
-    let a = new Source().to(s.target);
+    let a = new Source(); a.to(s.target);
 
     s.case(0).subscribe(() => {}, () => done());
     a.send();
@@ -74,7 +74,7 @@ describe('Switch', () => {
 
   it('should allow async case functions to throw errors through the second callback passed to them.', done => {
     let s = new Switch((_:any, __:any, err: any) => err(new Error()));
-    let a = new Source().to(s.target);
+    let a = new Source(); a.to(s.target);
 
     s.case(0).subscribe(() => {}, () => done());
     a.send();
