@@ -5,7 +5,7 @@ import { Source } from '../../pin/source';
 import { Pin } from '../../pin/pin';
 
 
-describe.only('State', () => {
+describe('State', () => {
   it('should send out data it receives.', done => {
     let a = new Source();
     let s = new State();

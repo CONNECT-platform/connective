@@ -7,4 +7,5 @@ describe('agent', () => {
   require('./gate.test');
   require('./composition.test');
   require('./node-wrap.test');
+  require('./sequence.test');
 });

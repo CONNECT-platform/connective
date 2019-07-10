@@ -10,9 +10,10 @@ import proxy, { Proxy } from './proxy';
 import { Signature } from './signature';
 import state, { State } from './state';
 import _switch, { Switch } from './switch';
+import sequence, { Sequence } from './sequence';
 
 export {
-  expr, gate, nodeWrap, proxy, state, _switch,
-  Expr, Gate, NodeWrap, Proxy, State, Switch,
+  expr, gate, nodeWrap, proxy, state, _switch, sequence,
+  Expr, Gate, NodeWrap, Proxy, State, Switch, Sequence,
   AgentLike, Agent, Composition, NodeLike, Node, Signature,
 }
