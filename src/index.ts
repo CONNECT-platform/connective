@@ -1,2 +1,2 @@
-export * from './agent';
-export * from './pin';
+export * from './agent/index';
+export * from './pin/index';

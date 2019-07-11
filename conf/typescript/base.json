@@ -1,10 +1,5 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": true,
-    "sourceMap": true,
-    "outDir": "./dist/",
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -16,17 +11,19 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "typeRoots": [
-      "node_modules/@types"
+      "../../node_modules/@types"
     ],
     "lib": [
       "es2017"
     ]
   },
   "include": [
-    "src/**/*"
+    "../../src/**/*"
   ],
   "exclude": [
-    "test.ts",
-    "src/test/**/*"
+    "../../test.ts",
+    "../../src/test/**/*",
+    "../../src/**/test/*",
+    "../../src/**/*.test.ts"
   ]
 }

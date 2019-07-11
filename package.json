@@ -2,20 +2,33 @@
   "name": "connective",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/es5/index.js",
+  "types": "dist/es5/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "test": "ts-node test.ts"
+    "build": "tsc -p conf/typescript/es5.json && tsc -p conf/typescript/es6.json",
+    "pack": "rollup -c conf/rollup/es6.js && rollup -c conf/rollup/es5.js",
+    "test": "ts-node --project conf/typescript/es5.json test.ts"
   },
+  "files": [
+    "dist/es5",
+    "dist/bundles"
+  ],
   "author": "Eugene Ghanizadeh Khoub <ghanizadeh.eugene@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.0.7",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
+    "rollup": "^1.16.7",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-terser": "^5.1.1",
+    "rollup-plugin-uglify": "^6.0.2",
     "ts-node": "^8.2.0",
+    "tslib": "^1.10.0",
     "typescript": "^3.5.1"
   },
   "dependencies": {

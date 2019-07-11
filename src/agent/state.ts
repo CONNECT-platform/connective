@@ -9,8 +9,11 @@ import pipe from '../pin/pipe';
 import { Agent } from './agent';
 
 
+export type EqualityFunc = (a: any, b: any) => boolean;
+
+
 export class State extends Agent implements Bindable {
-  constructor() {
+  constructor(readonly compare: EqualityFunc = isequal) {
     super({
       inputs: ['value'],
       outputs: ['value']
@@ -28,11 +31,11 @@ export class State extends Agent implements Bindable {
   protected createOutput(_: string): PinLike {
     return this.input
       .to(pipe(
-        distinctUntilKeyChanged('value', isequal),
+        distinctUntilKeyChanged('value', this.compare),
         shareReplay(1)
       ))
   }
 }
 
 
-export default function() { return new State(); }
+export default function(compare: EqualityFunc = isequal) { return new State(compare); }
