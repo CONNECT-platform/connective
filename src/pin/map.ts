@@ -3,6 +3,7 @@ import { map, mergeMap, share } from 'rxjs/operators';
 
 import { ResolveCallback, ErrorCallback, ContextType } from '../shared/types';
 import { Emission } from '../shared/emission';
+import { EmissionError } from '../shared/errors/emission-error';
 
 import { Pipe } from './pipe';
 
@@ -21,7 +22,13 @@ export class Map extends Pipe {
   constructor(_map: MapFunc) {
     super(
       (_map.length <= 1)?
-      ([map(emission => emission.fork((_map as MapFuncSync)(emission.value)))]):
+      ([map(emission => {
+        try {
+          return emission.fork((_map as MapFuncSync)(emission.value));
+        } catch(error) {
+          throw new EmissionError(error, emission);
+        }
+      })]):
       ([
         mergeMap(emission =>
           new Observable<Emission>(subscriber => {
@@ -30,7 +37,7 @@ export class Map extends Pipe {
               subscriber.complete();
             },
             (error: Error | string) => {
-              subscriber.error(error);
+              subscriber.error(new EmissionError(error, emission));
             },
             emission.context);
           })

@@ -1,8 +1,6 @@
 {
-  "extends": "./base",
+  "extends": "./build",
   "compilerOptions": {
-    "declaration": true,
-    "sourceMap": true,
     "inlineSources": true,
     "target": "es6",
     "outDir": "../../dist/es6/"

@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { filter, map, mergeMap, share } from 'rxjs/operators';
 
 import { ResolveCallback, ErrorCallback, ContextType } from '../shared/types';
+import { EmissionError } from '../shared/errors/emission-error';
 
 import { Pipe } from './pipe';
 
@@ -20,7 +21,13 @@ export class Filter extends Pipe {
   constructor(_filter: FilterFunc) {
     super(
       (_filter.length <= 1)?
-      ([filter(emission => (_filter as FilterFuncSync)(emission.value))]):
+      ([filter(emission => {
+        try {
+          return (_filter as FilterFuncSync)(emission.value);
+        } catch(error) {
+          throw new EmissionError(error, emission);
+        }
+      })]):
       ([
         mergeMap(emission =>
           new Observable(subscriber => {
@@ -29,7 +36,7 @@ export class Filter extends Pipe {
               subscriber.complete();
             },
             (error: Error | string) => {
-              subscriber.error(error);
+              subscriber.error(new EmissionError(error, emission));
             },
             emission.context);
           })

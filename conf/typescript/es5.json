@@ -1,8 +1,6 @@
 {
-  "extends": "./base",
+  "extends": "./build",
   "compilerOptions": {
-    "declaration": true,
-    "sourceMap": true,
     "target": "es5",
     "outDir": "../../dist/es5/"
   }
