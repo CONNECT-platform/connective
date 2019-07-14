@@ -185,7 +185,7 @@ describe('Sequence', () => {
   });
 });
 
-describe('.sequence()', () => {
+describe('sequence()', () => {
   it('should give out a sequence based on given sequence tokens.', () => {
     let s = seq(1, 2, '+', '*');
     s.should.be.instanceof(Sequence);

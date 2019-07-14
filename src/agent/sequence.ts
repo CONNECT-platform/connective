@@ -6,7 +6,7 @@ import { Control } from '../pin/control';
 import { Pin } from '../pin/pin';
 import group from '../pin/group';
 import _map from '../pin/map';
-import filter from '../pin/filter';
+import filter, { block } from '../pin/filter';
 import pipe from '../pin/pipe';
 
 import { Agent } from './agent';
@@ -97,7 +97,7 @@ export class Sequence extends Agent {
     return true;
   }
 
-  public get complete(): boolean {
+  private get _complete(): boolean {
     return this._seq.every((e, index) => this.tokens[index].complete(e));
   }
 
@@ -109,8 +109,8 @@ export class Sequence extends Agent {
 
   protected createOutput() {
     return group(
-      this._control.to(_map(() => this.reset())).to(filter(() => false)),
-      this._relay.to(filter(() => this.complete))
+      this._control.to(_map(() => this.reset())).to(block()),
+      this._relay.to(filter(() => this._complete))
     ).to(pipe(map(() => {
       let _vals = this._seq.map(_comp => (_comp.length==1)?(_comp[0].value):(_comp.map(_ => _.value)));
       let _emission = Emission.from(this._seq.reduce((all, list) => all.concat(list), [])

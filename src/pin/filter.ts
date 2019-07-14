@@ -52,3 +52,4 @@ export class Filter extends Pipe {
 
 
 export default function(filter: FilterFunc) { return new Filter(filter); }
+export function block() { return new Filter(() => false); }

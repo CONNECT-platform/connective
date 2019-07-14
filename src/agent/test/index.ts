@@ -8,5 +8,6 @@ describe('agent', () => {
   require('./composition.test');
   require('./node-wrap.test');
   require('./sequence.test');
-  require('./handle-error.test.ts');
+  require('./handle-error.test');
+  require('./join.test');
 });

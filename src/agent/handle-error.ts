@@ -8,7 +8,7 @@ import pin from '../pin/pin';
 import group from '../pin/group';
 import source, { Source } from '../pin/source';
 import pipe from '../pin/pipe';
-import filter from '../pin/filter';
+import { block } from '../pin/filter';
 
 import { Agent } from './agent';
 
@@ -37,7 +37,7 @@ export class HandleError extends Agent {
 
   protected createOutput(label: string) {
     if (label == 'error')
-      return group(this._err, this._gate.to(filter(() => false))).to(pin());
+      return group(this._err, this._gate.to(block())).to(pin());
     else
       return this._gate;
   }

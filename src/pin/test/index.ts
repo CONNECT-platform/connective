@@ -10,4 +10,5 @@ describe('pin', () => {
   require('./pin-map.test');
   require('./sink.test');
   require('./value.test');
+  require('./fork.test');
 });
