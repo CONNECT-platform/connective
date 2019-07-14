@@ -11,9 +11,10 @@ import { Signature } from './signature';
 import state, { State } from './state';
 import _switch, { Switch } from './switch';
 import sequence, { Sequence } from './sequence';
+import join, { peekJoin, Join } from './join';
 
 export {
-  expr, gate, nodeWrap, proxy, state, _switch, sequence,
-  Expr, Gate, NodeWrap, Proxy, State, Switch, Sequence,
+  expr, gate, nodeWrap, proxy, state, _switch, sequence, join, peekJoin,
+  Expr, Gate, NodeWrap, Proxy, State, Switch, Sequence, Join,
   AgentLike, Agent, Composition, NodeLike, Node, Signature,
 }
