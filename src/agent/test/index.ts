@@ -10,4 +10,6 @@ describe('agent', () => {
   require('./sequence.test');
   require('./handle-error.test');
   require('./join.test');
+  require('./invoke.test');
+  require('./call.test');
 });

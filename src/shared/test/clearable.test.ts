@@ -5,7 +5,7 @@ import { isClearable } from '../clearable';
 
 describe('clearable', () => {
   describe('.isClearable()', () => {
-    it('should return if something satisfies bindable interface.', () => {
+    it('should return if something satisfies clearable interface.', () => {
       class X { clear(): this { return this; } }
       class Y {}
       let Z = { clear: () => {} };

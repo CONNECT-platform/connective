@@ -28,7 +28,7 @@ export class Pack extends Pin {
                       _map[entry[0]] = emissions[index].value;
                       return _map;
                     }
-                    , <{[label: string]: Emission}>{}))
+                    , <{[label: string]: any}>{}))
               ))
     }
     else

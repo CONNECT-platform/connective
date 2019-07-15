@@ -6,6 +6,7 @@ import group from '../group';
 import { Source } from '../source';
 import { Control } from '../control';
 import { Pin } from '../pin';
+import { PinMap } from '../pin-map';
 
 
 describe('Control', () => {
@@ -47,6 +48,21 @@ describe('Control', () => {
 
     a.send(1);
     b.send(2);
+  });
+
+  it('should wait for all instantiated pins of a pin map and send their data in a key-value object', done => {
+    let pm = new PinMap();
+    let c = new Control(pm);
+    let a = new Source(); a.to(pm.get('x'));
+    let b = new Source(); b.to(pm.get('y'));
+    c.subscribe(data => {
+      data.x.should.equal(2);
+      data.y.should.equal(3);
+      done();
+    });
+
+    a.send(2);
+    b.send(3);
   });
 
   it('should merge the context of incoming emissions.', done => {
