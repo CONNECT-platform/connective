@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="../../dist/bundles/connective.es5.min.js"></script>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('load', () => {
+        let { wrap, sequence, map, pipe, filter, group } = connective;
+        let { fromEvent } = rxjs;
+        let { delay } = rxjs.operators;
+
+        let buffer = sequence('+', 1);
+        let click = wrap(fromEvent(document, 'click'));
+
+        click.to(buffer.in(0));
+        click.to(pipe(delay(200))).to(buffer.in(1));
+
+        let count = buffer.output.to(map(l => l[0].length || 1));
+        group(
+          count.to(filter(n => n < 2)).to(map(() => 'single')),
+          count.to(filter(n => n >= 2)).to(map(() => 'double'))
+        ).subscribe(console.log);
+      });
+    </script>
+  </body>
+</html>

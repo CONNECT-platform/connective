@@ -2,7 +2,7 @@
   <head>
     <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
-    <script src="../../../dist/bundles/connective.es5.min.js"></script>
+    <script src="../../dist/bundles/connective.es5.min.js"></script>
   </head>
   <body>
     <input id="a" type="text"/>
@@ -19,8 +19,8 @@
         let p = document.getElementById('p');
         let s = state();
 
-        wrap(fromEvent(a, 'keyup')).to(map(() => a.value)).to(s.input);
-        wrap(fromEvent(b, 'keyup')).to(map(() => b.value)).to(s.input);
+        wrap(fromEvent(a, 'input')).to(map(() => a.value)).to(s.input);
+        wrap(fromEvent(b, 'input')).to(map(() => b.value)).to(s.input);
         s.output.subscribe(v => {
           a.value = v;
           b.value = v;

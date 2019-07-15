@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="../../dist/bundles/connective.es5.min.js"></script>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('load', () => {
+        let { wrap, sequence, map } = connective;
+        let { fromEvent } = rxjs;
+
+        let click = sequence(1, 0, 1);
+        let drag = sequence(1, '+', 1);
+
+        wrap(fromEvent(document, 'mousedown')).to(click.in(0), drag.in(0));
+        wrap(fromEvent(document, 'mousemove')).to(click.in(1), drag.in(1));
+        wrap(fromEvent(document, 'mouseup')).to(click.in(2), drag.in(2));
+
+        click.output.to(map(() => 'click')).subscribe(console.log);
+        drag.output.to(map(() => 'drag')).subscribe(console.log);
+      });
+    </script>
+  </body>
+</html>

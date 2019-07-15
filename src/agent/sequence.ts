@@ -1,4 +1,4 @@
-import { map } from 'rxjs/operators';
+import { map, share } from 'rxjs/operators';
 
 import { Emission } from '../shared/emission';
 
@@ -117,7 +117,7 @@ export class Sequence extends Agent {
         , (this.tokens.length == 1)?_vals[0]:_vals);
 
       return _emission;
-    })));
+    }), share()));
   }
 
   public clear() {
