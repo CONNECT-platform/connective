@@ -7,7 +7,7 @@ import source from '../source';
 import pin from '../pin';
 
 
-describe.only('reduce()', () => {
+describe('reduce()', () => {
   it('should reduce incoming values based on given starting value and reduce function.', () => {
     let res = <number[]>[];
 
