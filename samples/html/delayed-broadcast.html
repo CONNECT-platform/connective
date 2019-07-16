@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="../../dist/bundles/connective.es5.min.js"></script>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('load', () => {
+        let { wrap, gate, control, pin, pipe, group  } = connective;
+        let { from } = rxjs;
+        let { delay } = rxjs.operators;
+
+        let g = gate();
+        
+        wrap(from([1, 2, 3])).to(g.input);
+        group(control(), g.output)
+          .to(pin())
+          .to(pipe(delay(1000)))
+          .to(g.control);
+        g.output.subscribe(console.log);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="../../dist/bundles/connective.es5.min.js"></script>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('load', () => {
+        let { value, control, pin, group, pipe } = connective;
+        let { delay, scan } = rxjs.operators;
+
+        let v = value(1);
+
+        group(control(), v)
+          .to(pipe(delay(1000)))
+          .to(v)
+          .subscribe(console.log);
+      });
+    </script>
+  </body>
+</html>
