@@ -11,4 +11,5 @@ describe('pin', () => {
   require('./sink.test');
   require('./value.test');
   require('./fork.test');
+  require('./reduce.test');
 });
