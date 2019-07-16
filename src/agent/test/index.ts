@@ -12,4 +12,5 @@ describe('agent', () => {
   require('./join.test');
   require('./invoke.test');
   require('./call.test');
+  require('./singleton.test');
 });
