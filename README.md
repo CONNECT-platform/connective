@@ -34,6 +34,6 @@ wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
 
 **CONNECTIVE** itself is a (mostly) thin layer on top of [**rxjs**](https://github.com/ReactiveX/rxjs). It adds:
 - Easier creation of complex and large flows by decoupling `Observable` instantiation and flow-description,
-- Re-use of flow sub-graphs, so you can easily define parts of your data/event flow in terms of `Agent`s and `Composition`s and re-use them in the rest of your flow(s),
+- Re-use of flow sub-graphs, so you can easily define parts of your data/event flow in terms of `Agent`s and `Composition`s and re-use them later on.
 
 In other words **CONNECTIVE** allows easier developing and maintaining of complex, large and long-living data/event streams, while **rxjs** excels at small and short-lived streams/flows.
