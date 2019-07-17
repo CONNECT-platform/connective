@@ -13,3 +13,10 @@ export interface PinLike extends Clearable {
   subscribe(observer?: PartialObserver<any>): Subscription;
   subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Subscription;
 }
+
+
+export function isPinLike(whatever: any): whatever is PinLike {
+  return whatever !== undefined && (typeof whatever.from == 'function') && (typeof whatever.to == 'function')
+      && whatever.observable instanceof Observable &&
+      (typeof whatever.subscribe == 'function');
+}

@@ -1,4 +1,5 @@
 describe('pin', () => {
+  require('./pin-like.test');
   require('./group.test');
   require('./source.test');
   require('./pin.test');

@@ -1,4 +1,7 @@
 describe('agent', () => {
+  require('./signature.test');
+  require('./agent-like.test');
+  require('./node-like.test');
   require('./switch.test');
   require('./state.test');
   require('./node.test');
