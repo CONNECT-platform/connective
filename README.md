@@ -22,10 +22,10 @@ let p = document.getElementById('p');
 // For obvious reasons.
 //
 
-wrap(fromEvent(a, 'input'))
-.to(map(() => a.value))
-.to(filter(name => name != 'Donald'))
-.to(map(name => 'hellow ' + name))
-.subscribe(msg => p.innerHTML = msg);
+wrap(fromEvent(a, 'input'))           // --> wrap the `Observable in a Pin`
+.to(map(() => a.value))               // --> map the event to value of the input
+.to(filter(name => name != 'Donald')) // --> filter 'Donald' out
+.to(map(name => 'hellow ' + name))    // --> add 'hellow' to the name
+.subscribe(msg => p.innerHTML = msg); // --> write it to the <p> element
 ```
 [check it on Stackblitz](https://stackblitz.com/edit/connective-hellow-world)
