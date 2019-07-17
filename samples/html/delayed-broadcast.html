@@ -5,20 +5,32 @@
     <script src="../../dist/bundles/connective.es5.min.js"></script>
   </head>
   <body>
+    <p>type a sentence and wait (around 2 seconds) to see what happens.</p>
+    <input id="a" type="text"/>
+    <p id="p"></p>
     <script>
       window.addEventListener('load', () => {
-        let { wrap, gate, control, pin, pipe, group  } = connective;
-        let { from } = rxjs;
-        let { delay } = rxjs.operators;
+        let { wrap, gate, control, map, pin, pipe, group, spread  } = connective;
+        let { fromEvent } = rxjs;
+        let { delay, debounceTime } = rxjs.operators;
+
+        let a = document.getElementById('a');
+        let p = document.getElementById('p');
 
         let g = gate();
-        
-        wrap(from([1, 2, 3])).to(g.input);
+
+        wrap(fromEvent(a, 'input'))
+          .to(pipe(debounceTime(2000)))
+          .to(map(() => a.value.split(' ')))
+          .to(spread())
+          .to(g.input);
+
         group(control(), g.output)
           .to(pin())
-          .to(pipe(delay(1000)))
+          .to(pipe(delay(500)))
           .to(g.control);
-        g.output.subscribe(console.log);
+
+        g.output.subscribe(v => p.innerHTML = v);
       });
     </script>
   </body>

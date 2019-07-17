@@ -5,17 +5,21 @@
     <script src="../../dist/bundles/connective.es5.min.js"></script>
   </head>
   <body>
+    <p id="p" style="font-size: 48px"></p>
     <script>
       window.addEventListener('load', () => {
-        let { value, control, pin, group, pipe } = connective;
+        let { value, control, pin, group, pipe, reduce } = connective;
         let { delay, scan } = rxjs.operators;
+
+        let p = document.getElementById('p');
 
         let v = value(1);
 
         group(control(), v)
           .to(pipe(delay(1000)))
           .to(v)
-          .subscribe(console.log);
+          .to(reduce((t, v) => t + v))
+          .subscribe(v => p.innerHTML = v);
       });
     </script>
   </body>
