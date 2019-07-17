@@ -76,3 +76,20 @@ export abstract class Node extends Agent implements NodeLike {
     return super.clear();
   }
 }
+
+
+export type NodeRunFunc = (inputs: NodeInputs, output: NodeOutput, error: ErrorCallback, context: ContextType) => void;
+
+
+class _CodeNode extends Node {
+  constructor(signature: Signature, private _run: NodeRunFunc) { super(signature); }
+
+  protected run(inputs: NodeInputs, output: NodeOutput,
+    error: ErrorCallback, context: ContextType)
+    { this._run.apply(this, [inputs, output, error, context])};
+}
+
+export function node(signature: Signature, run: NodeRunFunc) { return () => new _CodeNode(signature, run); }
+
+
+export default node;

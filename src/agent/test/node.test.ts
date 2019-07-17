@@ -5,10 +5,11 @@ import { ErrorCallback, ContextType } from '../../shared/types';
 
 import { Source } from '../../pin/source';
 import { Control } from '../../pin/control';
-import { Group } from '../../pin/group';
+import { group, Group } from '../../pin/group';
 import pin from '../../pin/pin';
+import map from '../../pin/map';
 
-import { Node, NodeInputs, NodeOutput } from '../node';
+import { node, Node, NodeInputs, NodeOutput } from '../node';
 
 
 describe('Node', () => {
@@ -223,5 +224,44 @@ describe('Node', () => {
       class _N extends Node { constructor(){super({outputs:[]})} run() {}}
       new _N().control.should.be.instanceOf(Control);
     });
+  });
+});
+
+
+describe('node()', () => {
+  it('should return a `Node` factory.', () => {
+    node({outputs: []}, () => {})().should.be.instanceof(Node);
+  });
+
+  it('should return a factory that creates `Nodes` with given signature.', () => {
+    let sig = { inputs: ['a', 'b'], outputs: ['c', 'd'] };
+    node(sig, () => {})().signature.should.eql(sig);
+  });
+
+  it('should return a factory that creates `Nodes` running given run function.', () => {
+    let n = node({
+      inputs: ['a'],
+      outputs: ['odd', 'even']},
+    (inputs, output) => {
+      if (inputs.a % 2 == 0) output('even');
+      else output('odd');
+    })();
+
+    let res = <string[]>[];
+    let a = new Source();
+
+    a.to(n.in('a'));
+    group(
+      n.out('odd').to(map(() => 'X')),
+      n.out('even').to(map(() => 'Y'))
+    ).subscribe(v => res.push(v));
+
+    a.send(2);
+    a.send(3);
+    a.send(4);
+    a.send(5);
+    a.send(6);
+
+    res.should.eql(['Y', 'X', 'Y', 'X', 'Y']);
   });
 });
