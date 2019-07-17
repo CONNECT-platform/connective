@@ -22,7 +22,7 @@ let p = document.getElementById('p');
 // For obvious reasons.
 //
 
-wrap(fromEvent(a, 'input'))           // --> wrap the `Observable in a Pin`
+wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
 .to(map(() => a.value))               // --> map the event to value of the input
 .to(filter(name => name != 'Donald')) // --> filter 'Donald' out
 .to(map(name => 'hellow ' + name))    // --> add 'hellow' to the name
