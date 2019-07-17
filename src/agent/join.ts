@@ -83,5 +83,8 @@ export class Join extends Agent {
 }
 
 
-export default function(...keys: string[]) { return new Join(keys); }
+export function join(...keys: string[]) { return new Join(keys); }
 export function peekJoin(...keys: string[]) { return new Join(keys, false); }
+
+
+export default join;

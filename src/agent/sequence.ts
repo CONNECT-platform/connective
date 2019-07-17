@@ -132,4 +132,7 @@ export class Sequence extends Agent {
 }
 
 
-export default function(...tokens: SequenceTokenIndicator[]) { return new Sequence(tokens); }
+export function sequence(...tokens: SequenceTokenIndicator[]) { return new Sequence(tokens); }
+
+
+export default sequence;

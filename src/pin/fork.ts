@@ -30,4 +30,7 @@ export class Fork extends Pipe {
 }
 
 
-export default function(len: number = _DefaultForkTagLength) { return new Fork(len); }
+export function fork(len: number = _DefaultForkTagLength) { return new Fork(len); }
+
+
+export default fork;

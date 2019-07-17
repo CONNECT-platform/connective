@@ -21,4 +21,7 @@ class Wrapper extends BasePin {
 }
 
 
-export default function(observable: Observable<any>) { return new Wrapper(observable); }
+export function wrap(observable: Observable<any>) { return new Wrapper(observable); }
+
+
+export default wrap;

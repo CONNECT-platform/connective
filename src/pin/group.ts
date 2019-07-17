@@ -60,4 +60,7 @@ export class Group implements PinLike, Bindable {
 }
 
 
-export default function(...pins: PinLike[]) { return new Group(pins); }
+export function group(...pins: PinLike[]) { return new Group(pins); }
+
+
+export default group;

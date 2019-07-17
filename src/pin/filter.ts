@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { filter, map, mergeMap, share } from 'rxjs/operators';
+import { filter as _filter, map, mergeMap, share } from 'rxjs/operators';
 
 import { ResolveCallback, ErrorCallback, ContextType } from '../shared/types';
 import { EmissionError } from '../shared/errors/emission-error';
@@ -18,12 +18,12 @@ export type FilterFunc = FilterFuncSync | FilterFuncAsync;
 export class Filter extends Pipe {
   readonly filter: FilterFunc;
 
-  constructor(_filter: FilterFunc) {
+  constructor(_func: FilterFunc) {
     super(
-      (_filter.length <= 1)?
-      ([filter(emission => {
+      (_func.length <= 1)?
+      ([_filter(emission => {
         try {
-          return (_filter as FilterFuncSync)(emission.value);
+          return (_func as FilterFuncSync)(emission.value);
         } catch(error) {
           throw new EmissionError(error, emission);
         }
@@ -31,7 +31,7 @@ export class Filter extends Pipe {
       ([
         mergeMap(emission =>
           new Observable(subscriber => {
-            _filter(emission.value, (res: boolean) => {
+            _func(emission.value, (res: boolean) => {
               subscriber.next(res);
               subscriber.complete();
             },
@@ -40,16 +40,19 @@ export class Filter extends Pipe {
             },
             emission.context);
           })
-          .pipe(filter(_ => !!_), map(_ => emission))
+          .pipe(_filter(_ => !!_), map(_ => emission))
         ),
         share()
       ])
     );
 
-    this.filter = _filter;
+    this.filter = _func;
   }
 }
 
 
-export default function(filter: FilterFunc) { return new Filter(filter); }
+export function filter(filter: FilterFunc) { return new Filter(filter); }
 export function block() { return new Filter(() => false); }
+
+
+export default filter;

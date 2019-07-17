@@ -23,4 +23,7 @@ export class Pin extends Connectible {
 }
 
 
-export default function() { return new Pin(); }
+export function pin() { return new Pin(); }
+
+
+export default pin;

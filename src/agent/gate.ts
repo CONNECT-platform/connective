@@ -34,4 +34,7 @@ export class Gate extends Agent implements NodeLike {
 }
 
 
-export default function() { return new Gate(); }
+export function gate() { return new Gate(); }
+
+
+export default gate;

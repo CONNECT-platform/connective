@@ -28,4 +28,7 @@ export class Pipe extends Pin {
 }
 
 
-export default function(...pipes: PipeFunc[]) { return new Pipe(pipes); }
+export function pipe(...pipes: PipeFunc[]) { return new Pipe(pipes); }
+
+
+export default pipe;

@@ -38,4 +38,7 @@ export class Control extends Pin {
 }
 
 
-export default function(val?: any) { return new Control(val); }
+export function control(val?: any) { return new Control(val); }
+
+
+export default control;

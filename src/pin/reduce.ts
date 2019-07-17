@@ -71,4 +71,7 @@ export class Reduce extends Pipe {
 }
 
 
-export default function(reduce: ReduceFunc, start: any = _Unset) { return new Reduce(reduce, start); }
+export function reduce(reduce: ReduceFunc, start: any = _Unset) { return new Reduce(reduce, start); }
+
+
+export default reduce;

@@ -9,7 +9,7 @@ import { Pipe } from './pipe';
 export class Spread extends Pipe {
   constructor() {
     super([
-      mergeMap(emission => 
+      mergeMap(emission =>
         (emission.value.map)?
         <Observable<Emission>>from(emission.value.map((v: any) => emission.fork(v))):
         of(emission)
@@ -19,4 +19,7 @@ export class Spread extends Pipe {
 }
 
 
-export default function() { return new Spread(); }
+export function spread() { return new Spread(); }
+
+
+export default spread;

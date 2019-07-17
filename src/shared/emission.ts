@@ -56,6 +56,9 @@ export class Emission {
 }
 
 
-export default function(value?: any, context?: ContextType) {
+export function emission(value?: any, context?: ContextType) {
   return new Emission(value, context);
 }
+
+
+export default emission;

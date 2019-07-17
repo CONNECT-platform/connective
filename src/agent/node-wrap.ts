@@ -61,7 +61,10 @@ export class NodeWrap extends Agent implements NodeLike {
 }
 
 
-export default function(agent: AgentLike): NodeLike {
+export function nodeWrap(agent: AgentLike): NodeLike {
   if (agent instanceof Node) return agent;
   return new NodeWrap(agent);
 }
+
+
+export default nodeWrap;

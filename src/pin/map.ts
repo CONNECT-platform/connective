@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { map, mergeMap, share } from 'rxjs/operators';
+import { map as _map, mergeMap, share } from 'rxjs/operators';
 
 import { ResolveCallback, ErrorCallback, ContextType } from '../shared/types';
 import { Emission } from '../shared/emission';
@@ -19,12 +19,12 @@ export type MapFunc = MapFuncSync | MapFuncAsync;
 export class Map extends Pipe {
   readonly map: MapFunc;
 
-  constructor(_map: MapFunc) {
+  constructor(_func: MapFunc) {
     super(
-      (_map.length <= 1)?
-      ([map(emission => {
+      (_func.length <= 1)?
+      ([_map(emission => {
         try {
-          return emission.fork((_map as MapFuncSync)(emission.value));
+          return emission.fork((_func as MapFuncSync)(emission.value));
         } catch(error) {
           throw new EmissionError(error, emission);
         }
@@ -32,7 +32,7 @@ export class Map extends Pipe {
       ([
         mergeMap(emission =>
           new Observable<Emission>(subscriber => {
-            _map(emission.value, (res: any) => {
+            _func(emission.value, (res: any) => {
               subscriber.next(emission.fork(res));
               subscriber.complete();
             },
@@ -46,9 +46,12 @@ export class Map extends Pipe {
       ])
     );
 
-    this.map = _map;
+    this.map = _func;
   }
 }
 
 
-export default function(map: MapFunc) { return new Map(map); }
+export function map(map: MapFunc) { return new Map(map); }
+
+
+export default map;

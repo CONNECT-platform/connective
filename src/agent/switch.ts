@@ -31,4 +31,7 @@ export class Switch extends Agent {
 }
 
 
-export default function(...cases: any[]) { return new Switch(...cases); }
+export function _switch(...cases: any[]) { return new Switch(...cases); }
+
+
+export default _switch;

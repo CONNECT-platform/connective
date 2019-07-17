@@ -37,9 +37,9 @@ export class Expr extends Node {
 }
 
 
-function expr(func: ExprFunc): Expr;
-function expr(inputs: string[], func: ExprFunc): Expr;
-function expr(inputsOrFunc?: string[] | ExprFunc, func?: ExprFunc): Expr {
+export function expr(func: ExprFunc): Expr;
+export function expr(inputs: string[], func: ExprFunc): Expr;
+export function expr(inputsOrFunc?: string[] | ExprFunc, func?: ExprFunc): Expr {
   if (func) return new Expr(inputsOrFunc as string[], func);
   else {
     let func = inputsOrFunc as ExprFunc;
@@ -49,5 +49,6 @@ function expr(inputsOrFunc?: string[] | ExprFunc, func?: ExprFunc): Expr {
     );
   }
 }
+
 
 export default expr;

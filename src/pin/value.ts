@@ -1,4 +1,7 @@
 import control from './control';
 
 
-export default function(val: any) { return control(val); }
+export function value(val: any) { return control(val); }
+
+
+export default value;

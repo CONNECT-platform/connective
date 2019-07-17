@@ -38,4 +38,7 @@ export class State extends Agent implements Bindable {
 }
 
 
-export default function(compare: EqualityFunc = isequal) { return new State(compare); }
+export function state(compare: EqualityFunc = isequal) { return new State(compare); }
+
+
+export default state;

@@ -53,4 +53,7 @@ export class HandleError extends Agent {
 }
 
 
-export default function() { return new HandleError(); }
+export function handleError() { return new HandleError(); }
+
+
+export default handleError;

@@ -45,4 +45,7 @@ export class Source extends Connectible {
 }
 
 
-export default function() { return new Source(); }
+export function source() { return new Source(); }
+
+
+export default source;

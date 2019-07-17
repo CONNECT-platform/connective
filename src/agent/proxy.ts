@@ -33,4 +33,7 @@ export class Proxy extends Agent {
 }
 
 
-export default function(signature: Signature) { return new Proxy(signature); }
+export function proxy(signature: Signature) { return new Proxy(signature); }
+
+
+export default proxy;

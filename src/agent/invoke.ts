@@ -52,4 +52,7 @@ export class Invoke extends Agent implements NodeLike {
 }
 
 
-export default function(ref: AgentFactory, signature?: Signature) { return new Invoke(ref, signature); }
+export function invoke(ref: AgentFactory, signature?: Signature) { return new Invoke(ref, signature); }
+
+
+export default invoke;

@@ -22,4 +22,7 @@ export class Sink extends Pipe implements Bindable {
 }
 
 
-export default function(func?: SinkFunc) { return new Sink(func); }
+export function sink(func?: SinkFunc) { return new Sink(func); }
+
+
+export default sink;
