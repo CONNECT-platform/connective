@@ -2,15 +2,20 @@
   <head>
     <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
-    <script src="../../dist/bundles/connective.es5.min.js"></script>
+    <script src="https://unpkg.com/@connective.js/core@0.0.1/dist/bundles/connective.es5.min.js"></script>
   </head>
   <body>
+    <style>
+      #p { transition: opacity .15s; font-size: 32px; }
+      .faded { opacity: 0; }
+    </style>
+
     <p>type a sentence and wait (around 2 seconds) to see what happens.</p>
     <input id="a" type="text"/>
     <p id="p"></p>
     <script>
       window.addEventListener('load', () => {
-        let { wrap, gate, control, map, pin, pipe, group, spread  } = connective;
+        let { wrap, gate, control, map, pin, pipe, group, spread, sink  } = connective;
         let { fromEvent } = rxjs;
         let { delay, debounceTime } = rxjs.operators;
 
@@ -30,7 +35,12 @@
           .to(pipe(delay(500)))
           .to(g.control);
 
-        g.output.subscribe(v => p.innerHTML = v);
+        g.output
+          .to(sink(() => p.classList.add('faded')))
+          .to(pipe(delay(100)))
+          .to(sink(v => p.innerHTML = v))
+          .to(sink(() => p.classList.remove('faded')))
+          .bind();
       });
     </script>
   </body>

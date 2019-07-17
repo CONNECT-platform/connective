@@ -2,13 +2,16 @@
   <head>
     <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
-    <script src="../../dist/bundles/connective.es5.min.js"></script>
+    <script src="https://unpkg.com/@connective.js/core@0.0.1/dist/bundles/connective.es5.min.js"></script>
   </head>
   <body>
+    <p id="p" style="font-size: 32px"></p>
     <script>
       window.addEventListener('load', () => {
-        let { wrap, sequence, map } = connective;
+        let { wrap, sequence, map, group } = connective;
         let { fromEvent } = rxjs;
+
+        let p = document.getElementById('p');
 
         let click = sequence(1, 0, 1);
         let drag = sequence(1, '+', 1);
@@ -17,8 +20,10 @@
         wrap(fromEvent(document, 'mousemove')).to(click.in(1), drag.in(1));
         wrap(fromEvent(document, 'mouseup')).to(click.in(2), drag.in(2));
 
-        click.output.to(map(() => 'click')).subscribe(console.log);
-        drag.output.to(map(() => 'drag')).subscribe(console.log);
+        group(
+          click.output.to(map(() => 'click')),
+          drag.output.to(map(() => 'drag'))
+        ).subscribe(v => p.innerHTML = v);
       });
     </script>
   </body>

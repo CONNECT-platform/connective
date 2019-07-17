@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="https://unpkg.com/@connective.js/core@0.0.1/dist/bundles/connective.es5.min.js"></script>
+  </head>
+  <body>
+    <p>Enter a number</p>
+    <input id="a" type="number"/>
+    <p id="p" style="font-size: 48px"></p>
+    <script>
+      window.addEventListener('load', () => {
+        let { wrap, pipe, map, filter } = connective;
+        let { fromEvent } = rxjs;
+        let { delay, debounceTime } = rxjs.operators;
+
+        let a = document.getElementById('a');
+        let p = document.getElementById('p');
+
+        let m = map(([c, p, l]) => [c + p, c, l - 1]);
+
+        wrap(fromEvent(a, 'input'))
+          .to(pipe(debounceTime(1000)))
+          .to(map(() => parseInt(a.value)))
+          .to(map(n => [1, 0, n - 1]))
+          .to(filter(([_, __, l]) => l >= 0))
+          .to(m)
+          .to(pipe(delay(200)))
+          .to(filter(([_, __, l]) => l > 0))
+          .to(m)
+          .to(map(([_, f, __]) => f))
+          .subscribe(v => p.innerHTML = v);
+      });
+    </script>
+  </body>
+</html>

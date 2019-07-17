@@ -1,7 +1,22 @@
 {
-  "name": "connective",
-  "version": "0.0.1",
-  "description": "",
+  "name": "@connective.js/core",
+  "version": "0.1.0",
+  "description": "agent-based reactive programming library for typescript/javascript",
+  "keywords": [
+    "connective",
+    "react", "reactive", "rx", "rxjs",
+    "agent", "actor", "actor model",
+    "async", "asynchronous", "event", "events", "stream",
+    "flow", "event-flow", "event flow", "data flow", "data-flow"
+  ],
+  "homepage": "https://connective.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CONNECT-platform/connective.git"
+  },
+  "author": "Eugene Ghanizadeh Khoub <eugene@connect-platform.com>",
+  "license": "MIT",
+  "bugs": "https://github.com/CONNECT-platform/connective/issues",
   "main": "dist/es5/index.js",
   "types": "dist/es5/index.d.ts",
   "scripts": {
@@ -11,10 +26,9 @@
   },
   "files": [
     "dist/es5",
-    "dist/bundles"
+    "dist/bundles",
+    "logo.svg"
   ],
-  "author": "Eugene Ghanizadeh Khoub <ghanizadeh.eugene@gmail.com>",
-  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
