@@ -1,6 +1,6 @@
 {
   "name": "@connective.js/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "agent-based reactive programming library for typescript/javascript",
   "keywords": [
     "connective",
