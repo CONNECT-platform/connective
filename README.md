@@ -2,4 +2,30 @@
 <img src="https://raw.githubusercontent.com/CONNECT-platform/connective/master/logo.svg?sanitize=true" width="320px"/>
 </p>
 
-**CONNECTIVE** is a library for _Agent_ (or _Actor_) based [reactive programming](https://en.wikipedia.org/wiki/Reactive_programming) in Type(Java)Script. It is a thin layer on top of [rxjs](https://github.com/ReactiveX/rxjs), enabling further modularization of data/event stream management by decoupling description of the data flow and actual creation of streams (i.e. `Observer`s), and introducing _Agent_ based concepts for organizing various parts of a data/event flow.
+```
+npm i @connective.js/core
+```
+
+**CONNECTIVE** facilitates large-scale [reactive programming](https://en.wikipedia.org/wiki/Reactive_programming) in Type(Java)Script. It enables intuitive declarative creation of large and complex data-flow graphs and encourages re-use of sub-graphs via abtraction through the concept of 'Agents'.
+
+Example:
+
+```typescript
+import { wrap, map, filter } from '@connective.js/core';
+import { fromEvent } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+//
+// Will say hello to everyone but 'Donald'.
+// For obvious reasons.
+//
+
+wrap(fromEvent(a, 'input'))
+.to(map(() => a.value))
+.to(filter(name => name != 'Donald'))
+.to(map(name => 'hellow ' + name))
+.subscribe(msg => p.innerHTML = msg);
+```
+[check it on Stackblitz](https://stackblitz.com/edit/connective-hellow-world)
