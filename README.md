@@ -36,4 +36,4 @@ wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
 - Easier creation of complex and large flows by decoupling `Observable` instantiation and flow-description,
 - Re-use of flow sub-graphs, so you can easily define parts of your data/event flow in terms of `Agent`s and `Composition`s and re-use them in the rest of your flow(s),
 
-E.G. **CONNECTIVE** allows easier developing and maintaining of complex, large and long-living data/event streams, while **rxjs** excels at small and short-lived streams/flows.
+In other words **CONNECTIVE** allows easier developing and maintaining of complex, large and long-living data/event streams, while **rxjs** excels at small and short-lived streams/flows.
