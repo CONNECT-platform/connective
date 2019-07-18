@@ -1,0 +1,122 @@
+body {
+  font-family: 'Hind', sans-serif;
+  background: #f5f5f5;
+  color: #424242;
+  width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none !important;
+  outline: none !important;
+  color: #4A90E2;
+  position: relative;
+}
+
+a::after {
+  content: ' ';
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 4px;
+  height: 1px;
+  background: #4A90E2;
+  z-index: -1;
+  transform: scaleX(0);
+  transition: transform .1s;
+}
+
+a:hover::after {
+  transform: scaleX(1);
+}
+
+.container {
+  max-width: 768px;
+  padding: 32px;
+  margin: 0 auto;
+}
+
+.logo {
+  max-width: 380px;
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+/*********** footer ***********/
+
+.footer {
+  position: fixed;
+  background: #f5f5f5;
+  left: 0; right: 0; bottom: 0; height: 64px;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.footer hr {
+  width: 2px;
+  height: 24px;
+  background: #e0e0e0;
+  margin: 0 32px;
+  border: none;
+}
+
+/*********** overlays ***********/
+
+.overlay {
+  position: fixed; display: flex;
+  z-index: -1000; opacity: 0;
+  background: rgba(0, 0, 0, .85); color: white;
+  align-items: center; justify-content: center; text-align: center;
+  font-size: 48px;
+  left: 0; top: 0; bottom: 0; right: 0;
+  user-select: none;
+  transition: opacity 0s;
+}
+
+.overlay.active {
+  opacity: 1; z-index: 1000; transition: opacity .15s;
+}
+
+/*********** hljs overrides ***********/
+
+pre[copy] {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+pre[copy]::after {
+  position: absolute;
+  right: 0; top: 0; height: 48px;
+  content: '< click to copy';
+  color: #4A90E2; border-radius: 3px;
+  background: #212121;
+  font-family: 'Hind', sans-serif;
+  font-size: 14px; font-weight: bold;
+  display: flex; justify-content: center; align-items: center;
+  padding: 0 16px;
+  transform: translateX(100%);
+  transition: all .15s;
+}
+
+pre[copy]:hover::after {
+  transform: translateX(0);
+}
+
+.hljs {
+  background: #212121;
+  color: #e0e0e0;
+  padding: 16px;
+  border-radius: 3px;
+}
+
+.hljs-attr {
+  color: #B765FF;
+}
+
+.hljs-string {
+  color: #B8E986;
+}
