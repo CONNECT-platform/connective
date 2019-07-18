@@ -36,6 +36,7 @@ a:hover::after {
   max-width: 768px;
   padding: 32px;
   margin: 0 auto;
+  margin-bottom: 64px;
 }
 
 .logo {
