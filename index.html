@@ -23,22 +23,236 @@
   </head>
   <body>
     <div class="container">
+
+      <!---------- LOGO ---------->
+
       <img class="logo" src="logo.svg"/>
 
-      <p>
-        <b>CONNECTIVE</b> facilitates large-scale
-        <a href="https://en.wikipedia.org/wiki/Reactive_programming" target="_blank">reactive programming</a>
-        in Javascript/Typescript.
-        It enables declarative creation of large and complex data/event flows and supports re-use of flows.
-      </p>
+      <b>CONNECTIVE</b> facilitates large-scale
+      <a href="https://en.wikipedia.org/wiki/Reactive_programming" target="_blank">reactive programming</a>
+      in Javascript/Typescript.
+      It enables declarative creation of large and complex data/event flows and supports re-use of flows.
 
       <pre copy><code class="bash">npm i @connectv/core</code></pre>
+      <br><br>
+
+      <!---------- EXAMPLES ---------->
+
+      A <i>Hellow World!</i> example:
+      <pre>
+<code class="typescript">import { wrap, map, filter } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+//
+// Will say hello to everyone but 'Donald'.
+// For obvious reasons.
+//
+
+wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
+.to(map(() => a.value))               // --> map the event to value of the input
+.to(filter(name => name != 'Donald')) // --> filter 'Donald' out
+.to(map(name => 'hellow ' + name))    // --> add 'hellow' to the name
+.subscribe(msg => p.innerHTML = msg); // --> write it to the &lt;p&gt; element</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-hellow-world" target="_blank">TRY IT!</a>
+      </div>
+
+      A more elaborate example:
+      <pre>
+<code class="typescript">import { wrap, pipe, map, filter, sink } from '@connectv/core';
+import { fromEvent, timer } from 'rxjs';
+import { delay, debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a');
+let p = document.getElementById('p');
+
+//
+// Will calculate fibonacci sequence up to given index, displaying every number in the
+// sequence along the way.
+//
+
+// --> calculate next iteration step on fibonacci sequence
+let m = map(([next, prev, l]) => [next + prev, next, l - 1]);
+
+wrap(fromEvent(a, 'input'))                    // --> wrap the `Observable` in a `Pin`
+  .to(pipe(debounceTime(1000)))                // --> wait for people to type in the number
+  .to(map(() => parseInt((a as any).value)))   // --> map the input event to value of the input
+  .to(map(n => [1, 0, n]))                     // --> map the number to start iteration
+  .to(filter(([_, __, l]) => l >= 0))          // --> check if we should do any iteration
+  .to(m)                                       // --> calculate next step
+  .to(pipe(delay(300)))                        // --> take a breath
+  .to(filter(([_, __, l]) => l > 0))           // --> check if we should continue
+  .to(m)                                       // --> back to the loop
+  .to(map(([_, f, __]) => f))                  // --> btw, lets take each number in the sequence
+  .to(sink(v => p.innerHTML = v))              // --> set the text of &lt;p&gt; to the fib number
+  .subscribe();                                // --> bind the whole thing.</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-sample-fib" target="_blank">TRY IT!</a>
+      </div>
+      <br>
+
+      <!---------- RXJS ---------->
+      <b>CONNECTIVE</b> is a thin layer on top of
+      <a href="https://github.com/ReactiveX/rxjs" target="_blank">RxJS</a>.
+      While <b>RxJS</b>'s API excels at short-lived and small reactive flows, <b>CONNECTIVE</b> provides
+      an API that makes creating long-living and large and/or complex reactive flows easy and intuitive.
+      <br><br>
+
+      <!---------- INSTALLATION ---------->
+
+      <h1>How To Install</h1>
+      Using <b>NPM</b>:
+      <pre copy><code class="bash">npm i @connectv/core</code></pre>
+      <br>
+      Getting it via a CDN:
       <pre copy><code class="html">&lt;script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"&gt;&lt;/script&gt;</code></pre>
+      <br><br>
+
+      <!---------- USAGE ---------->
+
+      <h1>How To Use</h1>
+      I would highly recommend
+      <a href="https://connective.dev/docs/">reading the docs</a>
+      for properly utilizing <b>CONNECTIVE</b>. A
+      <a href="https://www.learnrxjs.io/" target="_blank">basic knowledge of <b>RxJS</b></a>
+      would also help, though it is not mandatory.
+
+      <br><br>
+
+      However, if you need some cheatsheet to remind you of some stuff, or just want some starter tips
+      to dive in and play around a bit first, then here you go:
+
+      <h2>Cheatsheet</h2>
+      Most important concepts in <b>CONNECTIVE</b> are <i>Pins</i> and <i>Agents</i>. <i>Pins</i> can be thought of
+      as lazy <i>Observables</i>, they represents the sources, the sinks or any intermediate node in your reactive flow
+      (like transformations). You can connect <i>Pins</i> via their <span code>to()</span> and
+      <span code>from()</span> methods:
+
+      <pre>
+<code class="typescript">import { source, sink, pin } from '@connectv/core';
+
+let a = source();
+let b = pin();
+let c = sink(value => console.log(value));
+
+a.to(b).to(c);
+
+c.bind();
+
+a.send('hellow!');
+a.send('world!');</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-1" target="_blank">TRY IT!</a>
+      </div>
+
+      <pre>
+<code class="typescript">import { source, sink, pin } from '@connectv/core';
+
+let a = source();
+let b = pin();
+let c = sink(value => console.log(value));
+
+c.from(b).from(a);
+
+c.bind();
+
+a.send('hellow!');
+a.send('world!');</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-2" target="_blank">TRY IT!</a>
+      </div>
+
+      You can pass multiple parameters to <span code>to()</span> and <span code>from()</span>, causing the <i>Pin</i>
+      to be connected to multiple pins:
+
+      <pre>
+<code class="typescript">import { source, sink } from '@connectv/core';
+
+let a = source();
+let b = sink(value => console.log('B::' + value));
+let c = sink(value => console.log('C::' + value));
+
+a.to(b, c);
+b.bind(); c.bind();
+
+a.send('hellow!');
+a.send('world!');</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-3" target="_blank">TRY IT!</a>
+      </div>
+
+      <pre>
+<code class="typescript">import { source, sink } from '@connectv/core';
+
+let a = source();
+let b = source();
+let c = sink(value => console.log(value));
+
+c.from(a, b); c.bind();
+
+a.send('hellow!');
+b.send('world!');</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-4" target="_blank">TRY IT!</a>
+      </div>
+
+      You can directly subscribe on any <i>Pin</i> using its <span code>subscribe()</span> method, so you don't need to use <span code>sink()</span> all the time.
+      You can also use <span code>group()</span> to work with a multitude of <i>Pins</i> at once:
+
+      <pre>
+<code class="typescript">import { source, pin, group } from '@connectv/core';
+
+let a = source();
+let b = source();
+
+group(a, b).to(pin()).subscribe(console.log);
+
+a.send('hellow!');
+b.send('world!');</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-5" target="_blank">TRY IT!</a>
+      </div>
+
+      Note that:
+      <ul>
+        <li>the <span code>bind()</span> method is not present on all pin types.</li>
+        <li>when you call <span code>subscribe()</span> or <span code>bind()</span> methods of a pin, the pin
+      becomes <i>locked</i>. You cannot connect any new pin to a locked pin.</li>
+        <li>if a pin is connected to another locked pin, it will become locked as well.</li>
+        <li>you can check if a pin is locked via its <span code>.locked</span> property.</li>
+      </ul>
+
+      <pre>
+<code class="typescript">import { pin } from '@connectv/core';
+
+let a = pin();
+let b = pin();
+a.to(b);
+
+console.log('A:: ' + a.locked + ' B:: ' + b.locked);
+
+b.subscribe();
+console.log('A:: ' + a.locked + ' B:: ' + b.locked);</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-5" target="_blank">TRY IT!</a>
+      </div>
+
     </div>
 
     <div class="footer">
-      <a href="https://connective.dev">Docs</a> <hr>
-      <a href="https://github.com/CONNECT-platform/connective">GitHub</a>
+      <a href="https://connective.dev/docs/">Docs</a> <hr>
+      <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
     </div>
 
     <div id="copy-confirm" class="overlay">

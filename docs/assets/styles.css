@@ -8,6 +8,13 @@ body {
   padding: 0;
 }
 
+.container {
+  max-width: 768px;
+  padding: 32px;
+  margin: 0 auto;
+  margin-bottom: 64px;
+}
+
 a {
   text-decoration: none !important;
   outline: none !important;
@@ -15,28 +22,46 @@ a {
   position: relative;
 }
 
-a::after {
+a.button {
+  color: white;
+  background: #4A90E2;
+  padding: 4px 16px;
+  border-radius: 3px;
+  border: 2px solid #4A90E2;
+  min-width: 96px;
+  display: inline-flex; justify-content: center; align-items: center;
+  transition: background .15s, color .15s;
+}
+
+a.button:hover {
+  background: transparent;
+  color: #4A90E2;
+}
+
+a:not(.button)::after {
   content: ' ';
   position: absolute;
   left: 0px;
   right: 0px;
   bottom: 4px;
-  height: 1px;
+  height: 2px;
   background: #4A90E2;
   z-index: -1;
   transform: scaleX(0);
   transition: transform .1s;
 }
 
-a:hover::after {
+a:not(.button):hover::after {
   transform: scaleX(1);
 }
 
-.container {
-  max-width: 768px;
-  padding: 32px;
-  margin: 0 auto;
-  margin-bottom: 64px;
+.buttons {
+  text-align: right;
+}
+
+pre + .buttons {
+  margin-top: -24px;
+  margin-bottom: 24px;
 }
 
 .logo {
@@ -83,6 +108,14 @@ a:hover::after {
 
 /*********** hljs overrides ***********/
 
+span[code] {
+  background: #212121;
+  color: #e0e0e0;
+  font-family: monospace;
+  padding: 4px;
+  border-radius: 3px;
+}
+
 pre[copy] {
   cursor: pointer;
   position: relative;
@@ -112,6 +145,20 @@ pre[copy]:hover::after {
   color: #e0e0e0;
   padding: 16px;
   border-radius: 3px;
+  font-size: 12px;
+}
+
+.hljs-keyword {
+  color: #4A90E2;
+  font-weight: normal;
+}
+
+.hljs-built_in {
+  color: #B765FF;
+}
+
+.hljs-number {
+  color: #F5A623;
 }
 
 .hljs-attr {
