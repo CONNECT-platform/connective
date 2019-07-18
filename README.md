@@ -31,3 +31,34 @@ wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
 ```
 
 **CONNECTIVE** is a thin layer on top of [**rxjs**](https://github.com/ReactiveX/rxjs), so it provides all the toolset of **rxjs** by proxy. However, while **rxjs**'s API is better suited for short-lived and small flows, **CONNECTIVE** adds tools better suiting long-living and large/complex flows.
+
+Example ([Stackblitz](https://stackblitz.com/edit/connective-delayed-broadcast)):
+
+```typescript
+import { wrap, gate, control, map, pin, pipe, group, spread, sink  } from '@connective.js/core';
+import { fromEvent } from 'rxjs';
+import { delay, debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+let g = gate();                       // --> gate helps us control the flow of the words
+
+wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
+  .to(pipe(debounceTime(2000)))       // --> debounce for 2 seconds so people are done typing
+  .to(map(() => a.value.split(' ')))  // --> map the event to value of input, splitted
+  .to(spread())                       // --> spread the array to multiple emissions
+  .to(g.input);                       // --> pass those emissions to the gate
+
+group(control(), g.output)            // --> open the gate every time it outputs something (also initially)
+  .to(pin())                          // --> this relays either gate output or initial `control()` emit
+  .to(pipe(delay(500)))               // --> but wait 500ms before opening the gate
+  .to(g.control);                     // --> controls when the gate opens up.
+
+g.output
+  .to(sink(() => p.classList.add('faded')))    // --> fade the <p> when something comes out of the gate.
+  .to(pipe(delay(100)))                        // --> wait 100 ms
+  .to(sink(v => p.innerHTML = v))              // --> write the new word
+  .to(sink(() => p.classList.remove('faded'))) // --> show the <p> again
+  .subscribe();                                // --> bind everything.
+```
