@@ -3,7 +3,7 @@
 </p>
 
 ```
-npm i @connective.js/core
+npm i @connectv/core
 ```
 <br>
 
@@ -12,7 +12,7 @@ npm i @connective.js/core
 Example ([Stackblitz](https://stackblitz.com/edit/connective-hellow-world)):
 
 ```typescript
-import { wrap, map, filter } from '@connective.js/core';
+import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
@@ -35,7 +35,7 @@ wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
 Example ([Stackblitz](https://stackblitz.com/edit/connective-delayed-broadcast)):
 
 ```typescript
-import { wrap, gate, control, map, pin, pipe, group, spread, sink  } from '@connective.js/core';
+import { wrap, gate, control, map, pin, pipe, group, spread, sink  } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
 
