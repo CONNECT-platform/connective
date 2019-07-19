@@ -208,6 +208,10 @@ code .line:hover:before {
   color: #B765FF;
 }
 
+.hljs-subst {
+  color: #B8E986;
+}
+
 .hljs-number {
   color: #F5A623;
 }

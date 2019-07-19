@@ -421,7 +421,7 @@ class EvenOdd extends Composition {
 
   build() {
     //
-    // --&gt; build all the elements of the flow
+    // build all the elements of the flow
     //
     this.add('oddFilter', filter(x =&gt; x % 2 == 1));
     this.add('evenFilter', filter(x =&gt; x % 2 == 0));
@@ -429,7 +429,7 @@ class EvenOdd extends Composition {
 
   wire() {
     //
-    // --&gt; wire the flow together
+    // wire the flow together
     //
     this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
     this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
@@ -452,7 +452,114 @@ a.send(3);
 a.send(4);</code>
       </pre>
       <div class="buttons">
-        <a class="button" href="https://stackblitz.com/edit/connective-cheat-12" target="_blank">TRY IT!</a>
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-13" target="_blank">TRY IT!</a>
+      </div>
+
+      <!---------- QUICK-DIVE : AGENT ---------->
+      <h3 id="agent">Agent</h3>
+
+      Compositions are sub-classes of
+      <a
+        href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/agent.ts"
+        target="_blank">Agent</a>
+      class. This base class represents all re-usable reactive flows. <b>CONNECTIVE</b> comes with a number
+      of useful agents that you can use in creating your own flows and compositions.
+
+      <br><br>
+
+      The main property of an Agent is its <i>Signature</i>. A signature is simply an object with a list of
+      strings named <span code>inputs</span> and a list of strings named <span code>outputs</span>. These two lists
+      denote the possible names of the incoming and outgoing pins of the Agent.
+
+      <br><br>
+
+      <!---------- QUICK-DIVE : EXPR ---------->
+      <h3 id="expr">Expr</h3>
+
+      <a
+        href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/expr.ts"
+        target="_blank">Expr</a> allows you to convert any function into an agent:
+
+
+      <pre>
+<code class="typescript">import { source, expr } from '@connectv/core';
+
+let a = source();
+let b = source();
+let e = expr((a, b) =&gt; `${a} + ${b} = ${a + b}`);
+
+a.to(e.in(0));
+b.to(e.in(1));
+e.result.subscribe(v =&gt; console.log(v));  // --&gt; this is a short-hand for `e.out('result')`
+
+a.send(2); b.send(3);
+a.send(42); b.send(30);</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-14" target="_blank">TRY IT!</a>
+      </div>
+
+      Notice how the expr is called for every new value provided by the sources after the two initial values.
+
+      <br><br>
+
+      <!---------- QUICK-DIVE : NODE ---------->
+      <h3 id="node">Node</h3>
+      A <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/node.ts"target="_blank">Node</a>
+      is basically a more complex version of an Expr, allowing you to emit to any outputs denoted in the signature
+      (instead of just <span code>"result"</span> pin). You can create nodes easily using <span code>node()</span> function:
+
+      <pre>
+<code class="typescript">import { source, node } from '@connectv/core';
+
+let N = node({ inputs: ['a'], outputs: ['even', 'odd']}, // --&gt; set the signature
+  (input, output) =&gt; {
+    if (input.a % 2 == 0) output('even', input.a);
+    else output('odd', input.a);
+  });
+
+
+let a = source();
+let n = N(); // --&gt; create a new instance of the agent we defined above
+
+a.to(n.in('a'));
+n.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
+n.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
+
+a.send(3);
+a.send(4);
+a.send(5);</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-15" target="_blank">TRY IT!</a>
+      </div>
+
+      <!---------- QUICK-DIVE : GATE ---------->
+      <h3 id="gate">Gate</h3>
+
+      You can control when some emission passes through via another emission using <span code>gate()</span>
+
+      <pre>
+<code class="typescript">import { source, gate, map, spread, pipe, group, control } from '@connectv/core';
+import { delay } from 'rxjs/operators';
+
+let a = source();
+let g = gate();
+
+a.to(map(v =&gt; v.split(' '))) // --&gt; get all the words
+.to(spread())                // --&gt; spread them
+.to(g.input);                // --&gt; this is shorthand for `g.in('value')`
+
+group(g.output, control())   // --&gt; the `control()` causes a signal to be sent before the first output of the gate   
+.to(pipe(delay(1000)))       // --&gt; wait one second after each word comes out
+.to(g.control);              // --&gt; open the gate again (letting next word through)
+
+g.output.subscribe(v =&gt; console.log(v));
+
+a.send("Hellow darkness my old friend I've come to talk with you again");</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-16" target="_blank">TRY IT!</a>
       </div>
 
     </div>
