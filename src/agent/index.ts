@@ -4,7 +4,7 @@ import { expr } from './expr';
 import { gate } from './gate';
 import { NodeLike } from './node-like';
 import { nodeWrap } from './node-wrap';
-import { Node } from './node';
+import { node } from './node';
 import { proxy } from './proxy';
 import { Signature } from './signature';
 import { state } from './state';
@@ -15,6 +15,6 @@ import { join, peekJoin} from './join';
 import { invoke } from './invoke';
 
 export {
-  expr, gate, nodeWrap, proxy, state, _switch, handleError, sequence, join, peekJoin, invoke,
-  AgentLike, Composition, NodeLike, Node, Signature,
+  expr, gate, nodeWrap, proxy, state, _switch, handleError, sequence, join, peekJoin, invoke, node,
+  AgentLike, Composition, NodeLike, Signature,
 }
