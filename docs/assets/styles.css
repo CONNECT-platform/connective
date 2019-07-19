@@ -139,6 +139,14 @@ pre[copy]:hover::after {
   transform: translateX(0);
 }
 
+code .line {
+  cursor: pointer;
+}
+
+code .line:hover {
+  background: #424242;
+}
+
 .hljs {
   background: #212121;
   color: #e0e0e0;
