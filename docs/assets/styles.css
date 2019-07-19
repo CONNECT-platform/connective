@@ -109,8 +109,7 @@ pre + .buttons {
 /*********** hljs overrides ***********/
 
 span[code] {
-  background: #212121;
-  color: #e0e0e0;
+  background: #e0e0e0;
   font-family: monospace;
   padding: 4px;
   border-radius: 3px;

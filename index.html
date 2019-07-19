@@ -51,11 +51,11 @@ let p = document.getElementById('p');
 // For obvious reasons.
 //
 
-wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
-.to(map(() => a.value))               // --> map the event to value of the input
-.to(filter(name => name != 'Donald')) // --> filter 'Donald' out
-.to(map(name => 'hellow ' + name))    // --> add 'hellow' to the name
-.subscribe(msg => p.innerHTML = msg); // --> write it to the &lt;p&gt; element</code>
+wrap(fromEvent(a, 'input'))           // --&gt; wrap the `Observable` in a `Pin`
+.to(map(() =&gt; a.value))               // --&gt; map the event to value of the input
+.to(filter(name =&gt; name != 'Donald')) // --&gt; filter 'Donald' out
+.to(map(name =&gt; 'hellow ' + name))    // --&gt; add 'hellow' to the name
+.subscribe(msg =&gt; p.innerHTML = msg); // --&gt; write it to the &lt;p&gt; element</code>
       </pre>
       <div class="buttons">
         <a class="button" href="https://stackblitz.com/edit/connective-hellow-world" target="_blank">TRY IT!</a>
@@ -75,21 +75,21 @@ let p = document.getElementById('p');
 // sequence along the way.
 //
 
-// --> calculate next iteration step on fibonacci sequence
-let m = map(([next, prev, l]) => [next + prev, next, l - 1]);
+// --&gt; calculate next iteration step on fibonacci sequence
+let m = map(([next, prev, l]) =&gt; [next + prev, next, l - 1]);
 
-wrap(fromEvent(a, 'input'))                    // --> wrap the `Observable` in a `Pin`
-  .to(pipe(debounceTime(1000)))                // --> wait for people to type in the number
-  .to(map(() => parseInt((a as any).value)))   // --> map the input event to value of the input
-  .to(map(n => [1, 0, n]))                     // --> map the number to start iteration
-  .to(filter(([_, __, l]) => l >= 0))          // --> check if we should do any iteration
-  .to(m)                                       // --> calculate next step
-  .to(pipe(delay(300)))                        // --> take a breath
-  .to(filter(([_, __, l]) => l > 0))           // --> check if we should continue
-  .to(m)                                       // --> back to the loop
-  .to(map(([_, f, __]) => f))                  // --> btw, lets take each number in the sequence
-  .to(sink(v => p.innerHTML = v))              // --> set the text of &lt;p&gt; to the fib number
-  .subscribe();                                // --> bind the whole thing.</code>
+wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` in a `Pin`
+  .to(pipe(debounceTime(1000)))                // --&gt; wait for people to type in the number
+  .to(map(() =&gt; parseInt((a as any).value)))   // --&gt; map the input event to value of the input
+  .to(map(n =&gt; [1, 0, n]))                     // --&gt; map the number to start iteration
+  .to(filter(([_, __, l]) =&gt; l &gt;= 0))          // --&gt; check if we should do any iteration
+  .to(m)                                       // --&gt; calculate next step
+  .to(pipe(delay(300)))                        // --&gt; take a breath
+  .to(filter(([_, __, l]) =&gt; l &gt; 0))           // --&gt; check if we should continue
+  .to(m)                                       // --&gt; back to the loop
+  .to(map(([_, f, __]) =&gt; f))                  // --&gt; btw, lets take each number in the sequence
+  .to(sink(v =&gt; p.innerHTML = v))              // --&gt; set the text of &lt;p&gt; to the fib number
+  .subscribe();                                // --&gt; bind the whole thing.</code>
       </pre>
       <div class="buttons">
         <a class="button" href="https://stackblitz.com/edit/connective-sample-fib" target="_blank">TRY IT!</a>
@@ -116,31 +116,26 @@ wrap(fromEvent(a, 'input'))                    // --> wrap the `Observable` in a
       <!---------- USAGE ---------->
 
       <h1>How To Use</h1>
-      I would highly recommend
-      <a href="https://connective.dev/docs/">reading the docs</a>
+      <a href="https://connective.dev/docs/">Reading the docs</a>
       for properly utilizing <b>CONNECTIVE</b>. A
       <a href="https://www.learnrxjs.io/" target="_blank">basic knowledge of <b>RxJS</b></a>
-      would also help, though it is not mandatory.
+      would also help, though it is not mandatory. For basic usage and/or for getting started, here is a quick-dive:
 
       <br><br>
 
-      However, if you need some cheatsheet to remind you of some stuff, or just want some starter tips
-      to dive in and play around a bit first, then here you go:
-
-      <h2>Cheatsheet</h2>
-      Most important concepts in <b>CONNECTIVE</b> are <i>Pins</i> and <i>Agents</i>. <i>Pins</i> can be thought of
-      as lazy <i>Observables</i>, they represents the sources, the sinks or any intermediate node in your reactive flow
-      (like transformations). You can connect <i>Pins</i> via their <span code>to()</span> and
-      <span code>from()</span> methods:
+      <h2>Quick Dive</h2>
+      <b>CONNECTIVE</b> is about creating reactive flows. A reactive flow typically starts with some source of data/events,
+      leading to some sinks for those data/events which would consume them, possibly going through and being transformed by
+      some other nodes along the way:
 
       <pre>
 <code class="typescript">import { source, sink, pin } from '@connectv/core';
 
 let a = source();
 let b = pin();
-let c = sink(value => console.log(value));
+let c = sink(value =&gt; console.log(value));
 
-a.to(b).to(c);
+a.to(b).to(c); // --&gt; data/events go from a to b then to c.
 
 c.bind();
 
@@ -156,9 +151,9 @@ a.send('world!');</code>
 
 let a = source();
 let b = pin();
-let c = sink(value => console.log(value));
+let c = sink(v =&gt; console.log(v));
 
-c.from(b).from(a);
+c.from(b).from(a); // --&gt; data/events that c receives come from b which in turn come from a.
 
 c.bind();
 
@@ -169,17 +164,23 @@ a.send('world!');</code>
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-2" target="_blank">TRY IT!</a>
       </div>
 
-      You can pass multiple parameters to <span code>to()</span> and <span code>from()</span>, causing the <i>Pin</i>
+      Every node of such a flow is represented by a
+      <a href="src/pin/pin.ts" target="_blank">Pin</a> (or some <a href="src/pin/pin-like.ts" target="_blank">PinLike</a> object). The <span code>pin()</span>, <span code>source()</span> and <span code>sink()</span> functions all return a <i>Pin</i>.
+
+      <br><br>
+
+      You can connect pins to each other using their <span code>.to()</span> and <span code>.from()</span> methods.
+      You can pass multiple parameters to <span code>.to()</span> and <span code>.from()</span>, causing the <i>Pin</i>
       to be connected to multiple pins:
 
       <pre>
 <code class="typescript">import { source, sink } from '@connectv/core';
 
 let a = source();
-let b = sink(value => console.log('B::' + value));
-let c = sink(value => console.log('C::' + value));
+let b = sink(value =&gt; console.log('B::' + value));
+let c = sink(value =&gt; console.log('C::' + value));
 
-a.to(b, c);
+a.to(b, c); // --&gt; stuff from a goes to both b and c
 b.bind(); c.bind();
 
 a.send('hellow!');
@@ -194,9 +195,9 @@ a.send('world!');</code>
 
 let a = source();
 let b = source();
-let c = sink(value => console.log(value));
+let c = sink(value =&gt; console.log(value));
 
-c.from(a, b); c.bind();
+c.from(a, b); c.bind(); // --&gt; c's stuff come from both a and b
 
 a.send('hellow!');
 b.send('world!');</code>
@@ -205,7 +206,7 @@ b.send('world!');</code>
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-4" target="_blank">TRY IT!</a>
       </div>
 
-      You can directly subscribe on any <i>Pin</i> using its <span code>subscribe()</span> method, so you don't need to use <span code>sink()</span> all the time.
+      You can directly subscribe on any <i>Pin</i> using its <span code>.subscribe()</span> method, so you don't need to use <span code>sink()</span> all the time.
       You can also use <span code>group()</span> to work with a multitude of <i>Pins</i> at once:
 
       <pre>
@@ -214,7 +215,7 @@ b.send('world!');</code>
 let a = source();
 let b = source();
 
-group(a, b).to(pin()).subscribe(console.log);
+group(a, b).to(pin()).subscribe(v =&gt; console.log(v));
 
 a.send('hellow!');
 b.send('world!');</code>
@@ -225,11 +226,12 @@ b.send('world!');</code>
 
       Note that:
       <ul>
-        <li>the <span code>bind()</span> method is not present on all pin types.</li>
-        <li>when you call <span code>subscribe()</span> or <span code>bind()</span> methods of a pin, the pin
+        <li>the <span code>.bind()</span> method is not present on all pin types.</li>
+        <li>when you call <span code>.subscribe()</span> or <span code>.bind()</span> methods of a pin, the pin
       becomes <i>locked</i>. You cannot connect any new pin to a locked pin.</li>
         <li>if a pin is connected to another locked pin, it will become locked as well.</li>
         <li>you can check if a pin is locked via its <span code>.locked</span> property.</li>
+        <li><span code>source()</span> never gets locked, so you can use it for injecting sub-flows late into your flow.</li>
       </ul>
 
       <pre>
@@ -240,13 +242,125 @@ let b = pin();
 a.to(b);
 
 console.log('A:: ' + a.locked + ' B:: ' + b.locked);
+// &gt; 'A:: false B:: false'
 
 b.subscribe();
-console.log('A:: ' + a.locked + ' B:: ' + b.locked);</code>
+console.log('A:: ' + a.locked + ' B:: ' + b.locked);
+// &gt; 'A:: true B:: true'</code>
       </pre>
       <div class="buttons">
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-6" target="_blank">TRY IT!</a>
       </div>
+
+      You can also create sources from plain values or from <i>Observables</i>:
+
+      <pre>
+<code class="typescript">import { wrap, value, pin, group } from '@connectv/core';
+import { interval } from 'rxjs';
+
+let a = value('hellow world!'); // --&gt; a emits 'hellow world!' once
+let b = wrap(interval(1000));   // --&gt; b emits a number every 1000ms
+
+group(a, b).to(pin()).subscribe(v =&gt; console.log(v));</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-7" target="_blank">TRY IT!</a>
+      </div>
+
+      Note that you cannot connect any pin to <span code>wrap()</span>.
+      <br><br>
+      You can use <span code>spread()</span> to turn incoming values into multiple emissions:
+
+      <pre>
+<code class="typescript">import { spread, value } from '@connectv/core';
+
+value([1, 2, 3, 4, 5, 6])
+.to(spread())
+.subscribe(v =&gt; console.log(v));</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-8" target="_blank">TRY IT!</a>
+      </div>
+
+      You can change incoming values using <span code>map()</span>, and let them through or block them using
+      <span code>filter()</span>:
+
+      <pre>
+<code class="typescript">import { spread, value, filter, map } from '@connectv/core';
+
+value([1, 2, 3, 4, 5, 6])
+.to(spread())
+.to(filter(v =&gt; v % 2 == 0)) // --&gt; only allow even ones through
+.to(map(v =&gt; v * 10))        // --&gt; multiply each value by 10
+.subscribe(v =&gt; console.log(v));</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-9" target="_blank">TRY IT!</a>
+      </div>
+
+      You can break your flow into multiple branches and join them back using <span code>control()</span>:
+
+      <pre>
+<code class="typescript">import { spread, value, map, control } from '@connectv/core';
+
+value([1, 2, 3, 4, 5, 6])
+.to(spread())
+.to(
+  map(v =&gt; v * 10),
+  map(v =&gt; v * 100),
+)
+.to(control()) // --&gt; will wait for all incoming emissions and join them pair-wise
+.subscribe(v =&gt; console.log(v));</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-10" target="_blank">TRY IT!</a>
+      </div>
+
+      You can even create loops in your flow:
+
+      <pre>
+<code class="typescript">import { source, map, filter } from '@connectv/core';
+
+let a = source();
+let m = map(x =&gt; x + 1); // --&gt; lets give this pin a name so we can loop back to it
+
+a.to(m)
+.to(filter(x =&gt; x &lt; 10)) // --&gt; keep looping until we reach 10
+.to(m)                   // --&gt; looping back to m
+.subscribe(v =&gt; console.log(v));
+
+a.send(0);</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-11" target="_blank">TRY IT!</a>
+      </div>
+
+      Note that the order is not necessarily preserved. You can for example enforce the order by using
+      <b>RxJS</b>'s <span code>delay()</span> operator:
+
+      <pre>
+<code class="typescript">import { source, map, filter, pipe } from '@connectv/core';
+import { delay } from 'rxjs';
+
+let a = source();
+let m = map(x =&gt; x + 1); // --&gt; lets give this pin a name so we can loop back to it
+
+a.to(m)
+.to(filter(x =&gt; x &lt; 10)) // --&gt; keep looping until we reach 10
+.to(pipe(delay(1)))      // --&gt; wait a bit
+.to(m)                   // --&gt; looping back to m
+.subscribe(v =&gt; console.log(v));
+
+a.send(0);</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-12" target="_blank">TRY IT!</a>
+      </div>
+
+      <span code>pipe()</span> allows you to use any <b>RxJS</b> pipeable operator.
+      Note that values are not passed directly to pipeable operators, they are wrapped in
+      <a href="src/shared/emission.ts" target="_blank">Emission</a> objects, and their return value should
+      also be of that type.
 
     </div>
 
