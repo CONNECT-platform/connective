@@ -141,10 +141,29 @@ pre[copy]:hover::after {
 
 code .line {
   cursor: pointer;
+  background: transparent;
+  transition: background .15s;
+  position: relative;
+}
+
+code .line:before {
+  content: ' ';
+  position: absolute;
+  left: -10px;
+  width: 2px;
+  top: 0;
+  bottom: 0;
+  border-left: 2px dotted #313131;
+  border-right: 2px dotted #313131;
+  transition: border-color .15s;
 }
 
 code .line:hover {
   background: #424242;
+}
+
+code .line:hover:before {
+  border-color: #4A90E2;
 }
 
 .hljs {
