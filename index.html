@@ -105,7 +105,7 @@ wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` i
 
       <!---------- INSTALLATION ---------->
 
-      <h1>How To Install</h1>
+      <h1 id="install">How To Install</h1>
       Using <b>NPM</b>:
       <pre copy><code class="bash">npm i @connectv/core</code></pre>
       <br>
@@ -115,7 +115,7 @@ wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` i
 
       <!---------- USAGE ---------->
 
-      <h1>How To Use</h1>
+      <h1 id="usage">How To Use</h1>
       <a href="https://connective.dev/docs/">Reading the docs</a>
       for properly utilizing <b>CONNECTIVE</b>. A
       <a href="https://www.learnrxjs.io/" target="_blank">basic knowledge of <b>RxJS</b></a>
@@ -125,7 +125,7 @@ wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` i
 
       <!---------- QUICK-DIVE ---------->
 
-      <h2>Quick Dive</h2>
+      <h2 id="quick-dive">Quick Dive</h2>
       <b>CONNECTIVE</b> is about creating reactive flows. A reactive flow typically starts with some source of data/events,
       leading to some sinks for those data/events which would consume them, possibly going through and being transformed by
       some other nodes along the way:
@@ -213,6 +213,8 @@ b.send('world!');</code>
 
       <!---------- QUICK-DIVE : SUBSCRIBE ---------->
 
+      <h3 id="subscribe">Subscribing</h3>
+
       You can directly subscribe on any <i>Pin</i> using its <span code>.subscribe()</span> method, so you don't need to use <span code>sink()</span> all the time.
       You can also use <span code>group()</span> to work with a multitude of <i>Pins</i> at once:
 
@@ -260,6 +262,8 @@ console.log('A:: ' + a.locked + ' B:: ' + b.locked);
 
       <!---------- QUICK-DIVE : OTHER SOURCES ---------->
 
+      <h3 id="other-sources">Sources</h3>
+
       You can also create sources from plain values or from <i>Observables</i>:
 
       <pre>
@@ -280,6 +284,8 @@ group(a, b).to(pin()).subscribe(v =&gt; console.log(v));</code>
 
       <!---------- QUICK-DIVE : SPREAD ---------->
 
+      <h3 id="spread">Spread</h3>
+
       You can use <span code>spread()</span> to turn incoming values into multiple emissions:
 
       <pre>
@@ -294,6 +300,8 @@ value([1, 2, 3, 4, 5, 6])
       </div>
 
       <!---------- QUICK-DIVE : FILTER & MAP ---------->
+
+      <h3 id="filter-n-map">Filter & Map</h3>
 
       You can change incoming values using <span code>map()</span>, and let them through or block them using
       <span code>filter()</span>:
@@ -312,6 +320,8 @@ value([1, 2, 3, 4, 5, 6])
       </div>
 
       <!---------- QUICK-DIVE : CONTROL ---------->
+
+      <h3 id="control">Control</h3>
 
       You can break your flow into multiple branches and join them back using <span code>control()</span>:
 
@@ -332,6 +342,8 @@ value([1, 2, 3, 4, 5, 6])
       </div>
 
       <!---------- QUICK-DIVE : LOOP ---------->
+
+      <h3 id="loop">Loops</h3>
 
       You can even create loops in your flow:
 
@@ -354,7 +366,9 @@ a.send(0);</code>
 
       <!---------- QUICK-DIVE : PIPE ---------->
 
-      Note that the order is not necessarily preserved. You can for example enforce the order by using
+      <h3 id="pipe">Pipe</h3>
+
+      In the example above, the order is not necessarily preserved. You can for example enforce the order by using
       <b>RxJS</b>'s <span code>delay()</span> operator:
 
       <pre>
@@ -381,6 +395,65 @@ a.send(0);</code>
       <a href="https://github.com/CONNECT-platform/connective/blob/master/src/shared/emission.ts" target="_blank">Emission</a>
       objects, and their return value should
       also be of that type.
+
+      <br><br>
+
+      <!---------- QUICK-DIVE : COMPOSITION ---------->
+
+      <h3 id="composition">Composition</h3>
+
+      You can re-use parts of your reactive flows using the
+      <a
+        href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/composition.ts"
+        target="_blank">Composition</a>
+      class:
+
+      <pre>
+<code class="typescript">import { Composition, source, filter } from '@connectv/core';
+
+class EvenOdd extends Composition {
+  constructor() {
+    super({
+      inputs: ['a'],            // --&gt; marks pins that go into the flow
+      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
+    });
+  }
+
+  build() {
+    //
+    // --&gt; build all the elements of the flow
+    //
+    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
+    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
+  }
+
+  wire() {
+    //
+    // --&gt; wire the flow together
+    //
+    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
+    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
+  }
+}
+
+//
+// now using the composition:
+//
+
+let a = source();
+let eo = new EvenOdd();
+
+a.to(eo.in('a'));
+eo.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
+eo.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
+
+a.send(2);
+a.send(3);
+a.send(4);</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-12" target="_blank">TRY IT!</a>
+      </div>
 
     </div>
 

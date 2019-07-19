@@ -71,6 +71,31 @@ pre + .buttons {
   margin: 0 auto;
 }
 
+h1[id], h2[id], h3[id] {
+  position: relative;
+  cursor: pointer;
+}
+
+h1[id]::before, h2[id]::before, h3[id]::before {
+  content: ' ';
+  position: absolute;
+  top: -4px;
+  bottom: 0;
+  left: -32px;
+  width: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./link.svg');
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity .15s, transform .15s;
+}
+
+h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
+  opacity: .5;
+  transform: translateX(0px);
+}
+
 /*********** footer ***********/
 
 .footer {
@@ -185,6 +210,11 @@ code .line:hover:before {
 
 .hljs-number {
   color: #F5A623;
+}
+
+.hljs-title {
+  color: #ffffff;
+  font-weight: normal;
 }
 
 .hljs-attr {

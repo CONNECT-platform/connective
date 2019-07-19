@@ -39,4 +39,11 @@ window.addEventListener('load', function() {
         return trigger.textContent;
       }
   });
+
+  new ClipboardJS('h1[id], h2[id], h3[id]', {
+    text: function(trigger) {
+      showOverlay(copyConfirm, 2000);
+      return location.protocol+'//'+location.host+location.pathname+'#'+trigger.getAttribute('id');
+    }
+  })
 });
