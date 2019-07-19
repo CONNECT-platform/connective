@@ -123,6 +123,8 @@ wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` i
 
       <br><br>
 
+      <!---------- QUICK-DIVE ---------->
+
       <h2>Quick Dive</h2>
       <b>CONNECTIVE</b> is about creating reactive flows. A reactive flow typically starts with some source of data/events,
       leading to some sinks for those data/events which would consume them, possibly going through and being transformed by
@@ -206,6 +208,8 @@ b.send('world!');</code>
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-4" target="_blank">TRY IT!</a>
       </div>
 
+      <!---------- QUICK-DIVE : SUBSCRIBE ---------->
+
       You can directly subscribe on any <i>Pin</i> using its <span code>.subscribe()</span> method, so you don't need to use <span code>sink()</span> all the time.
       You can also use <span code>group()</span> to work with a multitude of <i>Pins</i> at once:
 
@@ -231,7 +235,6 @@ b.send('world!');</code>
       becomes <i>locked</i>. You cannot connect any new pin to a locked pin.</li>
         <li>if a pin is connected to another locked pin, it will become locked as well.</li>
         <li>you can check if a pin is locked via its <span code>.locked</span> property.</li>
-        <li><span code>source()</span> never gets locked, so you can use it for injecting sub-flows late into your flow.</li>
       </ul>
 
       <pre>
@@ -252,6 +255,8 @@ console.log('A:: ' + a.locked + ' B:: ' + b.locked);
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-6" target="_blank">TRY IT!</a>
       </div>
 
+      <!---------- QUICK-DIVE : OTHER SOURCES ---------->
+
       You can also create sources from plain values or from <i>Observables</i>:
 
       <pre>
@@ -269,6 +274,9 @@ group(a, b).to(pin()).subscribe(v =&gt; console.log(v));</code>
 
       Note that you cannot connect any pin to <span code>wrap()</span>.
       <br><br>
+
+      <!---------- QUICK-DIVE : SPREAD ---------->
+
       You can use <span code>spread()</span> to turn incoming values into multiple emissions:
 
       <pre>
@@ -281,6 +289,8 @@ value([1, 2, 3, 4, 5, 6])
       <div class="buttons">
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-8" target="_blank">TRY IT!</a>
       </div>
+
+      <!---------- QUICK-DIVE : FILTER & MAP ---------->
 
       You can change incoming values using <span code>map()</span>, and let them through or block them using
       <span code>filter()</span>:
@@ -297,6 +307,8 @@ value([1, 2, 3, 4, 5, 6])
       <div class="buttons">
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-9" target="_blank">TRY IT!</a>
       </div>
+
+      <!---------- QUICK-DIVE : CONTROL ---------->
 
       You can break your flow into multiple branches and join them back using <span code>control()</span>:
 
@@ -316,6 +328,8 @@ value([1, 2, 3, 4, 5, 6])
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-10" target="_blank">TRY IT!</a>
       </div>
 
+      <!---------- QUICK-DIVE : LOOP ---------->
+
       You can even create loops in your flow:
 
       <pre>
@@ -334,6 +348,8 @@ a.send(0);</code>
       <div class="buttons">
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-11" target="_blank">TRY IT!</a>
       </div>
+
+      <!---------- QUICK-DIVE : PIPE ---------->
 
       Note that the order is not necessarily preserved. You can for example enforce the order by using
       <b>RxJS</b>'s <span code>delay()</span> operator:
