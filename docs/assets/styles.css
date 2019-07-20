@@ -96,6 +96,36 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   transform: translateX(0px);
 }
 
+/*********** toc ***********/
+
+#toc {
+  position: fixed;
+  top: 0;
+  bottom: 64px;
+  right: 0;
+  width: calc(50% - 384px);
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+#toc>div {
+  padding-left: 48px;
+  margin-left: 64px;
+  border-left: 1px dashed #cacaca;
+}
+
+#toc a { color: #bdbdbd; transition: color .15s; }
+#toc a.visible { color: #4A90E2; }
+#toc a.h2 { margin-left: 16px; }
+#toc a.h3 { margin-left: 32px; }
+#toc a:hover { color: #4A90E2; }
+
+@media screen and (max-width: 1200px) {
+  #toc { display: none; }
+}
+
 /*********** footer ***********/
 
 .footer {
@@ -213,6 +243,10 @@ code .line:hover:before {
 }
 
 .hljs-number {
+  color: #F5A623;
+}
+
+.hljs-literal {
   color: #F5A623;
 }
 

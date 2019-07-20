@@ -534,8 +534,6 @@ a.send(5);</code>
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-15" target="_blank">TRY IT!</a>
       </div>
 
-      <br><br>
-
       <!---------- QUICK-DIVE : GATE ---------->
       <h3 id="gate">Gate</h3>
 
@@ -630,6 +628,102 @@ b.bind();</code>
         <a class="button" href="https://stackblitz.com/edit/connective-cheat-17" target="_blank">TRY IT!</a>
       </div>
 
+      <!---------- QUICK-DIVE : SEQUENCE ---------->
+      <h3 id="sequence">Sequence</h3>
+
+      The <span code>sequence()</span> agent allows you to distinguish specific sequences of events
+      coming from various sources:
+
+      <pre>
+<code class="javascript">import { wrap, map, sequence, group } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let click = sequence(1, 0, 1);  // --&gt; a click is one mousedown, no mousemove, and one mouseup
+let drag = sequence(1, '+', 1); // --&gt; a drag is one mousedown, some mousemove, and one mouseup
+
+wrap(fromEvent(document, 'mousedown')).to(click.in(0), drag.in(0));
+wrap(fromEvent(document, 'mousemove')).to(click.in(1), drag.in(1));
+wrap(fromEvent(document, 'mouseup'))  .to(click.in(2), drag.in(2));
+
+group(
+  click.output.to(map(() =&gt; 'CLICK!!')),
+  drag.output.to(map(() =&gt; 'DRAG!!'))
+).subscribe(v => console.log(v));</code>
+      </pre>
+      <div class="buttons">
+        <a class="button" href="https://stackblitz.com/edit/connective-cheat-18" target="_blank">TRY IT!</a>
+      </div>
+
+      <!---------- QUICK-DIVE : MEMORY ---------->
+
+      <h3 id="memory">Memory Management</h3>
+
+      All pins and agents in <b>CONNECTIVE</b> come with a <span code>.clear()</span> method that will dispose
+      all of their internal references. The <span code>.clear()</span> method of a <i>Composition</i> will also
+      clear all of its child nodes.
+      <br><br>
+      <b>WARNING</b>: Calling <span code>.clear()</span> will make the pin or the agent completely unusable afterwards,
+      so you should call it only when you are done with the object.
+
+      <pre>
+<code class="javascript">let myPin = ...;
+let myAgent = ...;
+
+//
+// do your stuff
+//
+
+myPin.clear();
+myAgent.clear();</code>
+      </pre>
+
+      Additionally, every <span code>.subscribe()</span> method returns an instance of
+      <a href="https://rxjs-dev.firebaseapp.com/guide/subscription" target="_blank">
+        <b>RxJS</b>'s Subscription
+      </a>
+      , which is equiped with a <span code>.unsubscribe()</span> method. You should maintain the references
+      for subscribptions that you would want to dispose of later, and call their <span code>.unsubscribe()</span>
+      method.
+
+      <pre>
+<code class="javascript">let myPin = ...;
+//
+// do whatever
+//
+
+let sub = myPin.subscribe(...);
+
+//
+// some other stuff
+//
+
+sub.unsubscribe();</code>
+      </pre>
+
+      If you need to call your clearing logic when some other flow is finished/cleared, call it on
+      <i>complete</i> notification of your subscription to the flow:
+
+      <pre>
+<code class="javascript">mySource
+  .to(...)
+  .to(...)
+  .subscribe(
+    value =&gt; do_something_with_value(value),
+    undefined,
+    () =&gt; clear_everything_up()
+  );</code>
+      </pre>
+
+      <br><br>
+
+      <!---------- UNDER THE HOOD ---------->
+      <h1 id="under-the-hood">Under the Hood</h1>
+
+      As stated above, <b>CONNECTIVE</b> is just a thin layer on top of <b>RxJS</b>. This means that <b>CONNECTIVE</b>
+      constructs <b>RxJS</b> observable sequences for you based on the description of the reactive flow you have provided.
+    </div>
+
+    <div id="toc">
     </div>
 
     <div class="footer">
