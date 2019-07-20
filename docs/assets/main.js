@@ -24,7 +24,7 @@ window.addEventListener('load', function() {
     node.addEventListener('click', function(){hideOverlay(node)});
   });
 
-  document.querySelectorAll('code.typescript').forEach(function(node) {
+  document.querySelectorAll('code.javascript').forEach(function(node) {
     let lines = node.innerHTML.split('\n');
     node.innerHTML = '';
     for (var i = 0; i < lines.length; i++)
