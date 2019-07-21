@@ -1,3 +1,7 @@
+* {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Hind', sans-serif;
   background: #f5f5f5;
