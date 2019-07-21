@@ -75,6 +75,13 @@ pre + .buttons {
   margin: 0 auto;
 }
 
+.bottom-logo {
+  max-width: 128px;
+  width: 100%;
+  display: block;
+  margin: 64px auto;
+}
+
 h1[id], h2[id], h3[id] {
   position: relative;
   cursor: pointer;
