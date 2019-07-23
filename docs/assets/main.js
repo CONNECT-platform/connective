@@ -87,4 +87,20 @@ window.addEventListener('load', function() {
         tocel.classList.remove('visible');
     });
   });
+
+  //
+  // nav stuff
+  //
+  var navtoggle = document.getElementById('navtoggle');
+  var nav = document.getElementById('nav');
+  navtoggle.addEventListener('click', function() {
+    if (navtoggle.classList.contains('active')) {
+      navtoggle.classList.remove('active');
+      nav.classList.remove('active');
+    }
+    else {
+      navtoggle.classList.add('active');
+      nav.classList.add('active');
+    }
+  });
 });
