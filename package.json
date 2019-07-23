@@ -4,10 +4,23 @@
   "description": "agent-based reactive programming library for typescript/javascript",
   "keywords": [
     "connective",
-    "react", "reactive", "rx", "rxjs",
-    "agent", "actor", "actor model",
-    "async", "asynchronous", "event", "events", "stream",
-    "flow", "event-flow", "event flow", "data flow", "data-flow"
+    "react",
+    "reactive",
+    "rx",
+    "rxjs",
+    "agent",
+    "actor",
+    "actor model",
+    "async",
+    "asynchronous",
+    "event",
+    "events",
+    "stream",
+    "flow",
+    "event-flow",
+    "event flow",
+    "data flow",
+    "data-flow"
   ],
   "homepage": "https://connective.dev",
   "repository": {
@@ -22,7 +35,8 @@
   "scripts": {
     "build": "tsc -p conf/typescript/es5.json && tsc -p conf/typescript/es6.json",
     "pack": "rollup -c conf/rollup/es6.js && rollup -c conf/rollup/es5.js",
-    "test": "ts-node --project conf/typescript/es5.json test.ts"
+    "test": "ts-node --project conf/typescript/es5.json test.ts",
+    "serve-docs": "node ./serve-docs.js"
   },
   "files": [
     "dist/es5",
@@ -36,6 +50,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.0.7",
     "chai": "^4.2.0",
+    "express": "^4.17.1",
     "mocha": "^6.1.4",
     "rollup": "^1.16.7",
     "rollup-plugin-babel": "^4.3.3",

@@ -62,7 +62,7 @@ window.addEventListener('load', function() {
   // make the toc
   //
   var div = document.createElement('div');
-  var titles = document.querySelectorAll('h1, h2, h3');
+  var titles = document.querySelectorAll('h1[id], h2[id], h3[id]');
   var tocels = {};
   titles.forEach(function(node) {
     var a = document.createElement('a');
