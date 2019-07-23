@@ -1,0 +1,5 @@
+{
+  "watch": "templates/",
+  "ext": "njk",
+  "verbose": true
+}

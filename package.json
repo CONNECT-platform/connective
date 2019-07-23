@@ -36,7 +36,7 @@
     "build": "tsc -p conf/typescript/es5.json && tsc -p conf/typescript/es6.json",
     "pack": "rollup -c conf/rollup/es6.js && rollup -c conf/rollup/es5.js",
     "test": "ts-node --project conf/typescript/es5.json test.ts",
-    "serve-docs": "node ./serve-docs.js"
+    "docs": "nodemon ./docs/serve.js --config ./docs/nodemon.json"
   },
   "files": [
     "dist/es5",
@@ -52,6 +52,8 @@
     "chai": "^4.2.0",
     "express": "^4.17.1",
     "mocha": "^6.1.4",
+    "nodemon": "^1.19.1",
+    "nunjucks": "^3.2.0",
     "rollup": "^1.16.7",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-terser": "^5.1.1",

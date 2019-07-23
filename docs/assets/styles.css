@@ -64,7 +64,6 @@ a:not(.button):hover::after {
 }
 
 pre + .buttons {
-  margin-top: -24px;
   margin-bottom: 24px;
 }
 
@@ -80,6 +79,18 @@ pre + .buttons {
   width: 100%;
   display: block;
   margin: 64px auto;
+}
+
+.animation {
+  max-width: 320px;
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+h1[main] {
+  font-weight: normal;
+  font-size: 48px;
 }
 
 h1[id], h2[id], h3[id] {

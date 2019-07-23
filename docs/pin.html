@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CONNECTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="subject" content='Reactive Programming At Scale'/>
+    <meta name="robots" content='index,follow'/>
+    <meta name="description" content='A thin library enabling large-scale, efficient reactive programming in Javascript/Typescript.'/>
+    <meta name="keywords" content="reactive, rxjs, programming, asynchronous, async, agent, actor, library, asynchronous programming, javascript, typescript, rx"/>
+
+    <link rel="shortcut icon" href="/docs/assets/favicon.ico"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+    <link href="/docs/assets/styles.css" rel="stylesheet">
+    <script src="/docs/assets/main.js"></script>
+  </head>
+  <body>
+    <div class="container">
+
+      
+<h1 id="">Pin</h1>
+
+<span code>pin()</span> is a relay for incoming events/data:
+<img src="/docs/assets/animations/pin.svg" class="animation"/>
+
+<i>Pin</i> is the parent class of most of more elaborate types of pins in <b>CONNECTIVE</b>. It is the most
+fundamental element of a reactive flow. Different pin types
+exhibit different behaviors, for example <span code>control()</span> waits for all incoming connections
+before each emission, <span code>pack()</span> waits for all incoming connections before the first emission
+and will combine the latest emission from each from that point on, <span code>filter()</span> will only let
+specific emissions through, etc.
+
+<br><br>
+
+<h2 id="connecting">Connecting Pins</h2>
+
+You can connect pins together using their <span code>.from()</span> and <span code>.to()</span> methods:
+
+<pre>
+<code class="javascript">import { pin } from '@connectv/core';
+
+let a = pin();
+let b = pin();
+let c = pin();
+
+a.to(b);   //--&gt; anything that comes through a will be passed to b
+c.from(a); //--&gt; anything that comes through a will be passed to c as well</code>
+</pre>
+
+You can also pass multiple arguments to <span code>.to()</span> and <span code>.from()</span> methods:
+
+<pre>
+<code class="javascript">import { pin } from '@connectv/core';
+
+let a = pin();
+let b = pin();
+let c = pin();
+
+a.to(b, c); //--&gt; anything going through a will be passed to b and c</code>
+</pre>
+
+<span code>.to()</span> and <span code>.from()</span> return the pin passed to them, so that you can easily chain them:
+
+<pre>
+<code class="javascript">import { pin } from '@connectv/core';
+
+let a = pin();
+let b = pin();
+let c = pin();
+
+console.log(a.to(b) == b); //&gt; true
+
+a.to(b).to(c);  //--&gt; a is connected to b, b is connected to c.</code>
+</pre>
+
+When you pass multiple pins to <span code>.to()</span> or <span code>.from()</span> methods, the return
+value is a <i>group</i> of pins, containing the pins you passed to the method:
+
+<pre>
+<code class="javascript">import { pin } from '@connectv/core';
+
+let a = pin();
+let b = pin();
+let c = pin();
+let d = pin();
+
+a.to(b, c).to(d);  //--&gt; a is connected to b and c, b and c are connected to d.</code>
+</pre>
+
+You can start a sequence of connections with such a group, using <span code>group()</span>:
+
+<pre>
+<code class="javascript">import { pin, group } from '@connectv/core';
+
+let a = pin();
+let b = pin();
+let c = pin();
+
+group(b, c).from(a); //--&gt; a is connected to b and c.</code>
+</pre>
+
+<h2 id="usage">Usage</h2>
+Mostly you would use some other pin type in your reactive flows. However, you could use
+the basic relay function of <span code>pin()</span> to <i>OR</i> multiple control signals:
+
+<pre>
+<code class="javascript">import { source, pin, gate, group } from '@connectv/core';
+
+let a = source();
+let b = source();
+let c = source();
+
+let g1 = gate();
+let g2 = gate();
+
+group(a, b).to(g1.control);           //--&gt; g1 will let data through when a AND b emit
+group(a, b).to(pin()).to(g2.control); //--&gt; g2 will let data through when a OR b emit
+
+c.to(g1.input, g2.input);
+g1.output.subscribe(v =&gt; console.log('G1:: ' + v));
+g2.output.subscribe(v =&gt; console.log('G2:: ' + v));
+
+c.send(1); a.send(true); b.send(true);
+c.send(2); a.send(true);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-pin-example" target="_blank">TRY IT!</a>
+</div>
+
+
+      <br><br>
+
+      <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
+    </div>
+
+    <div id="toc">
+    </div>
+
+    <div class="footer">
+  <a href="/docs/overview">Docs</a> <hr>
+  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+</div>
+
+
+    <div id="copy-confirm" class="overlay">
+      Copied to Clipboard!
+    </div>
+  </body>
+</html>

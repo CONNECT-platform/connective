@@ -1,0 +1,71 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+
+<img class="logo" src="/logo.svg"/>
+
+<b>CONNECTIVE</b> facilitates large-scale
+<a href="https://en.wikipedia.org/wiki/Reactive_programming" target="_blank">reactive programming</a>
+in Javascript/Typescript.
+It enables declarative creation of large and complex data/event flows and supports re-use of flows.
+
+{% include 'chunks/_install-npm.njk' %}
+<br><br>
+
+{% include 'chunks/main/_examples.njk' %}
+
+<br>
+
+<b>CONNECTIVE</b> is a thin layer on top of
+<a href="https://github.com/ReactiveX/rxjs" target="_blank">RxJS</a>.
+While <b>RxJS</b>'s API excels at short-lived and small reactive flows, <b>CONNECTIVE</b> provides
+an API that makes creating long-living and large and/or complex reactive flows easy and intuitive.
+<br><br>
+
+<h1 id="install">How To Install</h1>
+Using <b>NPM</b>:
+{% include 'chunks/_install-npm.njk' %}
+<br>
+Getting it via a CDN:
+{% include 'chunks/_install-cdn.njk' %}
+<br><br>
+
+<h1 id="usage">How To Use</h1>
+<a href="https://connective.dev/docs/">Reading the docs</a>
+for properly utilizing <b>CONNECTIVE</b>. A
+<a href="https://www.learnrxjs.io/" target="_blank">basic knowledge of <b>RxJS</b></a>
+would also help, though it is not mandatory. For basic usage and/or for getting started, here is a quick-dive:
+
+<br><br>
+
+<h2 id="quick-dive">Quick Dive</h2>
+{% include 'chunks/_quick-dive.njk' %}
+
+<br><br>
+
+<h1 id="under-the-hood">Under the Hood</h1>
+
+As stated above, <b>CONNECTIVE</b> is just a thin layer on top of <b>RxJS</b>. This means that <b>CONNECTIVE</b>
+constructs <b>RxJS</b> observable sequences for you based on the description of the reactive flow you have provided.
+
+<br><br>
+
+More precisely, each <i>Pin</i> is basically a lazy <i>Observable</i>. When you connect it to other pins or connect pins
+to it the <i>Observable</i> is still not realized, and when the <i>Observable</i> is accessed, for example through
+<span code>.subscribe()</span> method or through <span code>.observable</span> property, the <i>Observable</i> will be
+created and the <i>Pin</i> will be locked.
+
+<br><br>
+
+Generally <b>CONNECTIVE</b> masks the API of <b>RxJS</b> so for simpler use cases you do not need to work with
+<b>RxJS</b> directly, that's why knowledge of <b>RxJS</b> is not mandatory to get started with <b>CONNECTIVE</b>.
+However, none of the functionality of <b>RxJS</b> is masked just for masking it, so for more advanced usage
+you would definitely need to be familiar with <b>RxJS</b>.
+
+<br><br>
+<br><br>
+
+<h1 id="contact">Contact</h1>
+
+{% include 'chunks/main/_contact.njk' %}
+{% endblock %}
