@@ -191,11 +191,10 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   font-size: 14px;
   padding: 4px 0;
   padding-left: 8px;
-
   border: 1px solid #e0e0e0;
   background: white;
-
   border-radius: 32px;
+  outline: none;
 }
 
 #nav .search input::placeholder {
