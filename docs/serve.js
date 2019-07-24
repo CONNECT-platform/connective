@@ -9,7 +9,9 @@ const root = path.join(__dirname, '../');
 app.use(express.static('.'));
 
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(root, req.originalUrl + '.html'));
+  res.sendFile(path.join(root, req.originalUrl + '.html'), {}, err => {
+    if (err) res.sendFile(path.join(root, '404.html'));
+  });
 });
 
 generate();

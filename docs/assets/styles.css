@@ -122,6 +122,14 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   transform: translateX(0px);
 }
 
+/*********** 404 ***********/
+
+.not-found img {
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
 /*********** toc ***********/
 
 #toc {

@@ -23,12 +23,13 @@ const render = (filename, outfile) => {
 module.exports = () => {
   console.log('GENERATING DOCS ...');
   render('index', path.join(root, 'index.html'));
+  render('404', path.join(root, '404.html'));
 
   let files = fs.readdirSync(templatePath)
-    .filter(file => file.endsWith('.njk'))        // only get templates
-    .filter(file => !file.startsWith('_'))        // remove the parent templates
-    .map(file => file.substr(0, file.length - 4)) // remove the extension
-    .filter(file => file != 'index')              // index is already rendered
+    .filter(file => file.endsWith('.njk'))            // only get templates
+    .filter(file => !file.startsWith('_'))            // remove the parent templates
+    .map(file => file.substr(0, file.length - 4))     // remove the extension
+    .filter(file => file != 'index' && file != '404') // index and 404 are already rendered
     ;
 
   files.forEach(file => render(file, path.join(targetPath, file + '.html')));
