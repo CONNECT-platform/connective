@@ -32,7 +32,7 @@ window.addEventListener('load', function() {
   // break javascript code into distinct lines
   // make each line copiable
   //
-  document.querySelectorAll('code.javascript').forEach(function(node) {
+  document.querySelectorAll('pre:not([copy]) code').forEach(function(node) {
     let lines = node.innerHTML.split('\n');
     node.innerHTML = '';
     for (var i = 0; i < lines.length; i++)
@@ -89,7 +89,7 @@ window.addEventListener('load', function() {
   });
 
   //
-  // nav stuff
+  // nav toggle
   //
   var navtoggle = document.getElementById('navtoggle');
   var nav = document.getElementById('nav');
@@ -103,4 +103,79 @@ window.addEventListener('load', function() {
       nav.classList.add('active');
     }
   });
+
+  //
+  // nav search
+  //
+  (function() {
+    var navlinks = document.querySelectorAll('#nav a');
+    var navsearchicon = document.getElementById('navsearchicon');
+
+    var ajax = rxjs.ajax.ajax;
+    var debounceTime = rxjs.operators.debounceTime;
+    var fromEvent = rxjs.fromEvent;
+    var wrap = connective.wrap;
+    var pipe = connective.pipe;
+    var map = connective.map;
+    var filter = connective.filter;
+    var value = connective.value;
+
+    var res = connective.pin();
+    var inp = document.getElementById('navsearch');
+    var cache = {};
+
+    var url = 'https://api.github.com/search/code?';
+    var params = '+in:file+path:docs+language:html+repo:CONNECT-platform/connective';
+
+    var q = wrap(fromEvent(inp, 'input'))
+    .to(map(function() {
+      navsearchicon.classList.add('loading');
+      return inp.value;
+    }))
+    .to(pipe(debounceTime(1000)));
+
+    q.to(filter(function(q) { return q == ''; })).to(value('no-search')).to(res);
+    q.to(filter(function(q) { return q.length > 0}))
+      .to(map(function(q, done, error) {
+        if (cache[q]) done(cache[q]);
+        else {
+          ajax.getJSON(url + 'q=' + encodeURIComponent(q) + params)
+            .subscribe(
+              function(resp) { cache[q] = resp; done(resp); },
+              function(err) { error(err); }
+            );
+        }
+      }))
+      .to(map(function(res) {
+        var list = [];
+        var items = res.items || [];
+        for (var i = 0; i < items.length; i++) {
+          var path = items[i].path;
+          list.push('/' + path.substr(0, path.length - 5));
+        }
+
+        return list;
+      }))
+      .to(res);
+
+    res.subscribe(function(list) {
+      navsearchicon.classList.remove('loading');
+      navlinks.forEach(function(node) {
+        if (list == 'no-search') {
+          node.classList.remove('highlight');
+          node.classList.remove('faded');
+        }
+        else {
+          if (list.indexOf(node.getAttribute('href')) != -1) {
+            node.classList.add('highlight');
+            node.classList.remove('faded');
+          }
+          else {
+            node.classList.remove('highlight');
+            node.classList.add('faded');
+          }
+        }
+      });
+    });
+  })();
 });
