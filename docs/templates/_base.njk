@@ -32,6 +32,10 @@
       {% endblock %}
       <br><br>
 
+      {% block prevnext %}
+      {% include 'chunks/_prevnext.njk' %}
+      {% endblock %}
+
       {% block bottomlogo %}
       <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
       {% endblock %}

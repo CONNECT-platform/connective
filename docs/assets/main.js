@@ -10,6 +10,18 @@ function hideOverlay(overlay) {
   overlay.classList.remove('active');
 }
 
+//
+// a minor polyfill
+//
+if (window.NodeList && !NodeList.prototype.forEach) {
+    NodeList.prototype.forEach = function (callback, thisArg) {
+        thisArg = thisArg || window;
+        for (var i = 0; i < this.length; i++) {
+            callback.call(thisArg, this[i], i, this);
+        }
+    };
+}
+
 window.addEventListener('load', function() {
   var copyConfirm = document.getElementById('copy-confirm');
 
@@ -105,10 +117,43 @@ window.addEventListener('load', function() {
   });
 
   //
+  // nav prev/next
+  //
+  var navlinks = document.querySelectorAll('#nav a');
+  var prevnext = document.getElementById('prevnext');
+  if (prevnext) {
+    (function() {
+      var prev = document.getElementById('prev');
+      var next = document.getElementById('next');
+
+      navlinks.forEach(function(node, index, list) {
+        if (node.getAttribute('href') == location.pathname) {
+          if (index > 0) {
+            var preva = list[index - 1];
+            prev.innerHTML = '<a href="' + preva.getAttribute('href') + '">' + preva.textContent + '</a>';
+            prev.classList.add('active');
+            prev.addEventListener('click', function() {
+              preva.click();
+            });
+          }
+
+          if (index < list.length - 1) {
+            var nexta = list[index + 1];
+            next.innerHTML = '<a href="' + nexta.getAttribute('href') + '">' + nexta.textContent + '</a>';
+            next.classList.add('active');
+            next.addEventListener('click', function() {
+              nexta.click();
+            });
+          }
+        }
+      });
+    })();
+  }
+
+  //
   // nav search
   //
   (function() {
-    var navlinks = document.querySelectorAll('#nav a');
     var navsearchicon = document.getElementById('navsearchicon');
 
     var ajax = rxjs.ajax.ajax;

@@ -1,0 +1,261 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Overview</h1>
+
+<b>CONNECTIVE</b> is a library to help you create large-scale, complex and long-living reactive flows, in
+Javascript/Typescript.
+
+If you are completely new here, it is a good idea to take a glance at the <a href="/#quick-dive">Quick Dive</a>
+to get yourself familiar a little bit.
+
+For instructions on how to install <b>CONNECTIVE</b>, take a look at the
+<a href="/#install">How to Install</a> section of the home page.
+
+<br><br>
+
+<h2 id="reactive-flows">What is a reactive flow?</h2>
+
+A reactive flow is a general form of any asynchronous program. A reactive flow starts with some
+sources of events/data. For example, the sources of your flow might be DOM events (user clicks, input change),
+incoming requests to http end-points, a web-socket, etc. The events/data then can go through some transformation,
+for example you might extract the actual value of the input changed, or the request body from incoming request.
+The events/data can also go through some sinks, which will do something according to the incoming event/data.
+For example a sink might show some text on the DOM in response to a button-click, another one might save
+a record in some database, etc.
+
+<pre>
+  <code class="javascript">import { source, map, sink } from '@connectv/core';
+
+let a = source();                    //--&gt; creates a source
+let b = map(x =&gt; 'hellow ' + x);     //--&gt; says hellow to incoming strings
+let c = sink(x =&gt; console.log(x));   //--&gt; will log the incoming values
+
+a.to(b).to(c);                       //--&gt; data from a will go to b then to c
+c.bind();                            //--&gt; lets bind the sink
+
+a.send('world');                     //--&gt; send 'world' to our flow</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-overview-ex1" target="_blank">TRY IT!</a>
+</div>
+
+The sources of a reactive flow might send events/data at any given time. For example, the user might change the value
+of an input or click on a button at any given time, multiple times even, or a http request might come to your code
+at any moment. However, the actual code of the flow does not care when the source emits something (or most of time even
+how many times):
+
+<pre>
+  <code class="javascript">import { source, map, sink } from '@connectv/core';
+
+let a = source();                         //--&gt; creates a source
+let b = map(x =&gt; 'hellow ' + x);          //--&gt; says hellow to incoming strings
+let c = sink(x =&gt; console.log(x));        //--&gt; will log the incoming values
+
+a.to(b).to(c);                            //--&gt; data from a will go to b then to c
+c.bind();                                 //--&gt; lets bind the sink
+
+setInterval(() => a.send('world'), 1000); //--&gt; send 'world' to our flow every second.</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-overview-ex2" target="_blank">TRY IT!</a>
+</div>
+
+Each node in a reactive flow might also do its thing either in sync or asynchronously, without the rest of the flow
+being affected:
+
+<pre>
+  <code class="javascript">import { source, map, sink } from '@connectv/core';
+
+let a = source();                             //--&gt; creates a source
+let b = map((x, done) =&gt; {                    //--&gt; says hellow to incoming strings ...
+  setTimeout(() =&gt; done('hellow ' + x), 500); //--&gt; but after a brief wait
+});
+let c = sink(x =&gt; console.log(x));            //--&gt; will log the incoming values
+
+a.to(b).to(c);                                //--&gt; data from a will go to b then to c
+c.bind();                                     //--&gt; lets bind the sink
+
+setInterval(() => a.send('world'), 1000);     //--&gt; send 'world' to our flow every second.</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-overview-ex3" target="_blank">TRY IT!</a>
+</div>
+
+<br><br>
+
+<h2 id="pins">Pins: declarative flows</h2>
+
+The first way that <b>CONNECTIVE</b> helps with creating large-scale reactive flows is through the conecpt of
+<a href="/docs/pin">Pins</a>. Each <i>Pin</i> is a node on your reactive flow: it might be the source, it might be
+the sink, or any node in between. In the examples above, all the elements of the flow (<i>a, b, c</i>)
+are pins.
+
+<br><br>
+
+Pins allow for declarative description of your flow. You can define them and connect them to each other
+in any manner you see fit. You can connect multiple pins to one pin or one to multiple other pins, or even
+create loops of pins:
+
+<pre>
+  <code class="javascript">// so assume a, b, c, d and e are pins ...
+
+//
+// you can connect them together like this:
+//
+a.to(b).to(c).to(d).to(e);
+
+//
+// or like this (which is equivalent):
+//
+e.from(d).from(c).from(b).from(a);
+
+//
+// you can do stuff like this,
+// which means a goes to b and c,
+// and both b and c go to d, and then to e:
+//
+a.to(b, c).to(d).to(e);
+
+//
+// even crazier stuff, which means
+// a is connected to b and c,
+// b is connected to d and e and
+// c is connected to d and e:
+//
+a.to(b, c).to(d, e);
+
+//
+// the same thing in reverse:
+//
+group(d, e).from(b, c).from(a);
+
+//
+// or even loop back if you need to:
+//
+a.to(b).to(c).to(b).to(d).to(e);</code>
+</pre>
+
+When you are done declaring your flow(s), you should then bind the pins (for example using <span code>.bind()</span> on sinks,
+or using <span code>.subscribe()</span> on any type of pin). This will cause the pins to form the necessary subscriptions
+and internal connections that would result in the described behavior of your flow in a really performant and efficient manner.
+
+<br><br>
+
+You can read about pins in more detail <a href="/docs/pin">here</a>. <b>CONNECTIVE</b> comes with a host of various
+pin types that allow you to achieve all sorts of complex reactive behaviors easily, and you can find the list in the
+left-side table of contents, which you can access by clicking on the
+<a href="javascript:void()" onclick="document.getElementById('navtoggle').click()">
+hamburger menu icon in the footer
+</a>.
+
+<br><br>
+
+You can also easily create your own custom pin types using <a href="/docs/pipe"><span code>pipe()</span></a> and
+<b>RxJS</b>'s pipeable operators.
+If you are curious on how
+<b>CONNECTIVE</b> creates the internal machinery of your reactive flows, take a look at
+<a href="/docs/under-the-hood">this entry</a>.
+
+<br><br><br><br>
+
+<h2 id="agents">Agents: flow re-use</h2>
+
+Just like synchronous programming, when a reactive flow grows in size, it needs some abstraction for re-using repeated
+parts of the flow instead of repeating them all over. In <b>CONNECTIVE</b>, that abstraction is an
+<a href="/docs/agent">Agent</a>: it is a partial reactive flow with some input pins and some output pins. It is called
+<i>Agent</i>, as it can be seen as a black-box that responds to incoming events/data/messages by processing them somehow
+and then emitting some other events/data/messages.
+
+<br><br>
+
+The main way to define your own custom agent is the <a href="/docs/composition">Composition</a> class. It is called
+<i>Composition</i> as it directly represents a part of a reactive flow (while other agents might not even utilize reactive
+flows in their description):
+
+<pre>
+<code class="javascript">import { Composition, source, filter } from '@connectv/core';
+
+class EvenOdd extends Composition {
+  constructor() {
+    super({
+      inputs: ['a'],            // --&gt; marks pins that go into the flow
+      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
+    });
+  }
+
+  build() {
+    //
+    // build all the elements of the flow
+    //
+    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
+    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
+  }
+
+  wire() {
+    //
+    // wire the flow together
+    //
+    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
+    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
+  }
+}
+
+//
+// now using the composition:
+//
+
+let a = source();
+let eo = new EvenOdd();
+
+a.to(eo.in('a'));
+eo.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
+eo.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
+
+a.send(2);
+a.send(3);
+a.send(4);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-cheat-13" target="_blank">TRY IT!</a>
+</div>
+
+Besides full-fledged compositions, you can also utilize <a href="/docs/expr"><span code>expr()</span></a>
+to turn simpler functions into agents or <a href="/docs/node"><span code>node()</span></a> to turn much
+more complex functions into agents.
+
+<br><br>
+
+Similar to pins, <b>CONNECTIVE</b> offers different pre-built agents for creating powerful flows. You
+can find the list of these agents in the left-side table of contents, and you can access the table of contents
+by clicking on the sweet
+<a href="javascript:void()" onclick="document.getElementById('navtoggle').click()">
+hamburger menu icon in the footer
+</a>.
+
+<br><br><br><br>
+
+<h2 id="this-doc">About this document</h2>
+
+This document is intended as an intuitive guide of concepts and usage of the toolset offered by
+<b>CONNECTIVE</b>. It does not cover features that are still under consideration, nor does it features
+that are yet to be fully covered by tests.
+
+<br><br>
+
+Each class or function is similarly in an intuitive and guide-like manner, rather than a precise specification.
+The precise specification of each class or function is the test-suites designed to outline and ensure its intended
+properties and behaviors. The link(s) to the test suites for each function or class can be found on the end of its
+corresponding entry.
+
+<br><br>
+
+Note that you might find further classes/functions/properties/methods/etc in the code than
+in this documentation and/or in the test-suites, which means for whatever reason they are not yet part of
+<b>CONNECTIVE</b>'s specification and are potentially subject to change. This holds true even for functionality
+that might be outlined in this documentation but not yet guaranteed by the test suite, though usually
+this corresponds to a relatively stable functionality that is missing sufficient test coverage.
+
+{% endblock %}
