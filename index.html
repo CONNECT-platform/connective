@@ -35,7 +35,7 @@
 <b>CONNECTIVE</b> facilitates large-scale
 <a href="https://en.wikipedia.org/wiki/Reactive_programming" target="_blank">reactive programming</a>
 in Javascript/Typescript.
-It enables declarative creation of large and complex data/event flows and supports re-use of flows.
+It enables declarative creation of large and complex data/event flows and encourages re-use of flows.
 
 <pre copy><code class="bash">npm i @connectv/core</code></pre>
 
@@ -173,14 +173,18 @@ a.send('world!');</code>
 </div>
 
 Every node of such a flow is represented by a
-<a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/pin.ts" target="_blank">Pin</a>
+<a href="/docs/pin">Pin</a>
 (or some
 <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/pin-like.ts" target="_blank">PinLike</a>
-object). The <span code>pin()</span>, <span code>source()</span> and <span code>sink()</span> functions all return a <i>Pin</i>.
+object). The
+<a href="/docs/pin"><span code>pin()</span></a>,
+<a href="/docs/source"><span code>source()</span></a> and
+<a href="/docs/sink"><span code>sink()</span></a> functions all return a <i>Pin</i>.
 
 <br><br>
 
-You can connect pins to each other using their <span code>.to()</span> and <span code>.from()</span> methods.
+You can connect pins to each other using their
+<a href="/docs/pin#connecting"><span code>.to()</span></a> and <span code>.from()</span> methods.
 You can pass multiple parameters to <span code>.to()</span> and <span code>.from()</span>, causing the <i>Pin</i>
 to be connected to multiple pins:
 
@@ -221,8 +225,8 @@ b.send('world!');</code>
 
 <h3 id="subscribe">Subscribing</h3>
 
-You can directly subscribe on any <i>Pin</i> using its <span code>.subscribe()</span> method, so you don't need to use <span code>sink()</span> all the time.
-You can also use <span code>group()</span> to work with a multitude of <i>Pins</i> at once:
+You can directly subscribe on any <i>Pin</i> using its <a href="/docs/pin#subscribe"><span code>.subscribe()</span></a> method, so you don't need to use <span code>sink()</span> all the time.
+You can also use <a href="/docs/group"><span code>group()</span></a> to work with a multitude of <i>Pins</i> at once:
 
 <pre>
 <code class="javascript">import { source, pin, group } from '@connectv/core';
@@ -285,14 +289,14 @@ group(a, b).to(pin()).subscribe(v =&gt; console.log(v));</code>
   <a class="button" href="https://stackblitz.com/edit/connective-cheat-7" target="_blank">TRY IT!</a>
 </div>
 
-Note that you cannot connect any pin to <span code>wrap()</span>.
+Note that you cannot connect any pin to <a href="/docs/wrap"><span code>wrap()</span></a>.
 <br><br>
 
 <!---------- QUICK-DIVE : SPREAD ---------->
 
 <h3 id="spread">Spread</h3>
 
-You can use <span code>spread()</span> to turn incoming values into multiple emissions:
+You can use <a href="/docs/spread"><span code>spread()</span></a> to turn incoming values into multiple emissions:
 
 <pre>
 <code class="javascript">import { spread, value } from '@connectv/core';
@@ -309,8 +313,8 @@ value([1, 2, 3, 4, 5, 6])
 
 <h3 id="filter-n-map">Filter & Map</h3>
 
-You can change incoming values using <span code>map()</span>, and let them through or block them using
-<span code>filter()</span>:
+You can change incoming values using <a href="/docs/map"><span code>map()</span></a>, and let them through or block them using
+<a href="/docs/filter"><span code>filter()</span></a>:
 
 <pre>
 <code class="javascript">import { spread, value, filter, map } from '@connectv/core';
@@ -329,7 +333,7 @@ value([1, 2, 3, 4, 5, 6])
 
 <h3 id="control">Control</h3>
 
-You can break your flow into multiple branches and join them back using <span code>control()</span>:
+You can break your flow into multiple branches and join them back using <a href="/docs/control"><span code>control()</span></a>:
 
 <pre>
 <code class="javascript">import { spread, value, map, control } from '@connectv/core';
@@ -396,9 +400,9 @@ a.send(0);</code>
   <a class="button" href="https://stackblitz.com/edit/connective-cheat-12" target="_blank">TRY IT!</a>
 </div>
 
-<span code>pipe()</span> allows you to use any <b>RxJS</b> pipeable operator.
+<a href="/docs/pipe"><span code>pipe()</span></a> allows you to use any <b>RxJS</b> pipeable operator.
 Note that values are not passed directly to pipeable operators, they are wrapped in
-<a href="https://github.com/CONNECT-platform/connective/blob/master/src/shared/emission.ts" target="_blank">Emission</a>
+<a href="/docs/emission">Emission</a>
 objects, and their return value should
 also be of that type.
 
@@ -409,37 +413,35 @@ also be of that type.
 <h3 id="composition">Composition</h3>
 
 You can re-use parts of your reactive flows using the
-<a
-  href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/composition.ts"
-  target="_blank">Composition</a>
+<a href="/docs/composition">Composition</a>
 class:
 
 <pre>
 <code class="javascript">import { Composition, source, filter } from '@connectv/core';
 
 class EvenOdd extends Composition {
-constructor() {
-super({
-inputs: ['a'],            // --&gt; marks pins that go into the flow
-outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
-});
-}
+  constructor() {
+    super({
+    inputs: ['a'],            // --&gt; marks pins that go into the flow
+    outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
+    });
+  }
 
-build() {
-//
-// build all the elements of the flow
-//
-this.add('oddFilter', filter(x =&gt; x % 2 == 1));
-this.add('evenFilter', filter(x =&gt; x % 2 == 0));
-}
+  build() {
+    //
+    // build all the elements of the flow
+    //
+    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
+    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
+  }
 
-wire() {
-//
-// wire the flow together
-//
-this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
-this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
-}
+  wire() {
+    //
+    // wire the flow together
+    //
+    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
+    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
+  }
 }
 
 //
@@ -465,9 +467,7 @@ a.send(4);</code>
 <h3 id="agent">Agent</h3>
 
 Compositions are sub-classes of
-<a
-  href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/agent.ts"
-  target="_blank">Agent</a>
+<a href="/docs/agent">Agent</a>
 class. This base class represents all re-usable reactive flows. <b>CONNECTIVE</b> comes with a number
 of useful agents that you can use in creating your own flows and compositions.
 
@@ -482,9 +482,7 @@ denote the possible names of the incoming and outgoing pins of the Agent.
 <!---------- QUICK-DIVE : EXPR ---------->
 <h3 id="expr">Expr</h3>
 
-<a
-  href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/expr.ts"
-  target="_blank">Expr</a> allows you to convert any function into an agent:
+<a href="/docs/expr"><span code>expr()</span></a> allows you to convert any function into an agent:
 
 
 <pre>
@@ -511,7 +509,7 @@ Notice how the expr is called for every new value provided by the sources after 
 
 <!---------- QUICK-DIVE : NODE ---------->
 <h3 id="node">Node</h3>
-A <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/node.ts"target="_blank">Node</a>
+A <a href="/docs/node">Node</a>
 is basically a more complex version of an Expr, allowing you to emit to any outputs denoted in the signature
 (instead of just <span code>"result"</span> pin). You can create nodes easily using <span code>node()</span> function:
 
@@ -543,7 +541,7 @@ a.send(5);</code>
 <!---------- QUICK-DIVE : GATE ---------->
 <h3 id="gate">Gate</h3>
 
-You can control when some emission passes through via another emission using <span code>gate()</span>
+You can control when some emission passes through via another emission using <a href="/docs/gate"><span code>gate()</span></a>
 
 <pre>
 <code class="javascript">import { source, gate, map, spread, pipe, group, control } from '@connectv/core';
@@ -568,7 +566,7 @@ a.send("Hellow darkness my old friend I've come to talk with you again");</code>
   <a class="button" href="https://stackblitz.com/edit/connective-cheat-16" target="_blank">TRY IT!</a>
 </div>
 
-In this example, <span code>g.control</span> is a <span code>control()</span> pin that will cause the
+In this example, <span code>g.control</span> is a <a href="/docs/control">control pin</a> that will cause the
 gate to let emissions through when it receives a value itself. This pin is not mentioned in the gate's
 signature. Alongside gate, some other agent types (such as <span code>node()</span> and <span code>expr()</span>)
 also have this controlling pin (always accessible via <span code>.control</span>) which allows controlling
@@ -578,7 +576,7 @@ the behavior of the agent.
 
 <!---------- QUICK-DIVE : STATE ---------->
 <h3 id="state">State</h3>
-You can keep reactive state values within your flows using <span code>state()</span>. For example, the following code
+You can keep reactive state values within your flows using <a href="/docs/state"><span code>state()</span></a>. For example, the following code
 introduces a composition that represents the state of a <i>html input</i>, which is built on top of
 <span code>state()</span>,
 and then uses that composition to bind two inputs together:
@@ -588,36 +586,38 @@ and then uses that composition to bind two inputs together:
 import { fromEvent } from 'rxjs';
 
 class InputState extends Composition {
-constructor(readonly el: HTMLInputElement) {
-super({
-inputs: ['value'],
-outputs: ['value']
-});
+  constructor(readonly el: HTMLInputElement) {
+    super({
+      inputs: ['value'],
+      outputs: ['value']
+    });
 
-//
-// we need access to `this.el` in wire(), but if parent class calls it,
-// we will not get that access. as a result we need to call them ourselves.
-//
-this.build();
-this.wire();
-}
+    //
+    // we need access to `this.el` in wire(), but if parent class calls it,
+    // we will not get that access. as a result we need to call them ourselves.
+    //
+    this.build();
+    this.wire();
+  }
 
-init() {}       // --&gt; prevent parent class from calling build() and wire()
+  init() {}       // --&gt; prevent parent class from calling build() and wire()
 
-build() {
-this.add('model', state());
-this.add('sink', sink(val =&gt; this.el.value = val));
-}
+  build() {
+    this.add('model', state());
+    this.add('sink', sink(val =&gt; this.el.value = val));
+  }
 
-wire() {
-this.in('value').to(this.agent('model').in('value'));
-wrap(fromEvent(this.el, 'input'))
-.to(map(() =&gt; this.el.value))
-.to(this.agent('model').in('value'));
-this.agent('model').out('value')
-.to(this.pin('sink'))
-.to(this.out('value'));
-}
+  wire() {
+    this.in('value').to(this.agent('model').in('value'));
+
+    wrap(fromEvent(this.el, 'input'))
+    .to(map(() =&gt; this.el.value))
+    .to(this.agent('model').in('value'));
+
+    this.agent('model').out('value')
+    .to(this.pin('sink'))
+    .to(this.out('value'));
+  }
 }
 
 
@@ -637,7 +637,7 @@ b.bind();</code>
 <!---------- QUICK-DIVE : SEQUENCE ---------->
 <h3 id="sequence">Sequence</h3>
 
-The <span code>sequence()</span> agent allows you to distinguish specific sequences of events
+The <a href="/docs/sequence"><span code>sequence()</span></a> agent allows you to distinguish specific sequences of events
 coming from various sources:
 
 <pre>
@@ -720,6 +720,8 @@ undefined,
 );</code>
 </pre>
 
+You can find more details about memory management in <b>CONNECTIVE</b> <a href="/docs/memory">here</a>.
+
 
 <br><br>
 
@@ -741,6 +743,11 @@ Generally <b>CONNECTIVE</b> masks the API of <b>RxJS</b> so for simpler use case
 <b>RxJS</b> directly, that's why knowledge of <b>RxJS</b> is not mandatory to get started with <b>CONNECTIVE</b>.
 However, none of the functionality of <b>RxJS</b> is masked just for masking it, so for more advanced usage
 you would definitely need to be familiar with <b>RxJS</b>.
+
+<br><br>
+
+You can read more in detail on how <b>CONNECTIVE</b> creates observable sequences based on your flows
+<a href="/docs/under-the-hood">here</a>.
 
 <br><br>
 <br><br>
@@ -818,7 +825,7 @@ you would definitely need to be familiar with <b>RxJS</b>.
     <hr>
     <a href="/docs/gate">gate</a>
     <hr>
-    <a href="/docs/handleError">handleError</a>
+    <a href="/docs/handle-error">handleError</a>
     <hr>
     <a href="/docs/composition">Composition</a>
     <hr>
