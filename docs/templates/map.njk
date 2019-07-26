@@ -1,0 +1,133 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<h1 id="">Map</h1>
+
+<span code>map()</span> transforms incoming data using the provided function.
+<img src="/docs/assets/animations/map.svg" class="animation"/>
+
+The function can be a simple synchronous function, in which case it should take only one argument:
+
+<pre>
+  <code class="javascript">import { source, spread, map } from '@connectv/core';
+
+let a = source();
+
+a.to(spread())             //--&gt; spread incoming array as multiple emissions
+ .to(map(x =&gt; x * 2))      //--&gt; multiply each number by 2
+ .subscribe(console.log);  //--&gt; log it
+
+a.send([1, 2, 3, 4]);
+a.send([10, 20, 30, 40]);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-map-ex1" target="_blank">TRY IT!</a>
+</div>
+
+Or it can be an asynchronous function, in which case it should take a callback as second argument:
+
+<pre>
+  <code class="javascript">import { source, spread, map } from '@connectv/core';
+
+let a = source();
+
+a.to(spread())
+ .to(map((x, done) =&gt; {
+   setTimeout(() =&gt; done(x * 2), x * 100);  //--&gt; multiply by 2 and respond after a bit
+ }))
+ .subscribe(console.log);
+
+a.send([4, 2, 1, 3, 8, 5, 7]);              //--&gt; notice how the order is not preserved</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-map-ex2" target="_blank">TRY IT!</a>
+</div>
+
+<br><br>
+
+<h2 id="error-handling">Error handling</h2>
+
+In a sync map function, you can simply throw the errors that occur:
+
+<pre>
+  <code class="javascript">import { source, map } from '@connectv/core';
+
+let a = source();
+
+a.to(map(x =&gt; {
+   if (x == 2) throw new Error('No 2s pls.');
+   return x + 3;
+ }))
+ .subscribe(
+   console.log,    //--&gt; log the ok values
+   error =&gt; {      //--&gt; handle the errors
+     console.log('ERROR:: ' + error.original.message);
+   }
+ );
+
+a.send(5);
+a.send(2);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-map-ex3" target="_blank">TRY IT!</a>
+</div>
+
+Async map functions are provided with an error callback as their third argument, to which they should pass
+errors that occur:
+
+<pre>
+  <code class="javascript">import { source, map } from '@connectv/core';
+
+let a = source();
+
+let brokenPromise = new Promise((resolve, reject) =&gt; {
+  reject('For no particular reason');
+});
+
+a.to(map((x, done, error) =&gt; {
+  brokenPromise
+    .then(() =&gt; done(x))
+    .catch(e =&gt; error(e));
+}))
+.subscribe(
+  () =&gt; {},                            //--&gt; ignore good values
+  e =&gt; console.log(e.original.message) //--&gt; log the errors
+);
+
+a.send();</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-map-ex4" target="_blank">TRY IT!</a>
+</div>
+
+<br><br>
+
+<h2 id="purity">Function purity</h2>
+
+Sync map functions <b>MUST</b> be pure, i.e. without any side-effects. This simply means that running them with the same
+input should always result in the same output. Impurity of a sync map function might result in unpredictable behavior
+of the flow.
+
+<br><br>
+
+If your transformation is not pure, then wrap it inside an async map function. Fore more details on this, you can read
+<a href="/docs/under-the-hood">this entry</a>.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/map.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/map.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
