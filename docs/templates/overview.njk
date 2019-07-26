@@ -16,7 +16,7 @@ For instructions on how to install <b>CONNECTIVE</b>, take a look at the
 
 <br><br>
 
-<h2 id="reactive-flows">What is a reactive flow?</h2>
+<h2 id="reactive-flow">What is a reactive flow?</h2>
 
 A reactive flow is a general form of any asynchronous program. A reactive flow starts with some
 sources of events/data. For example, the sources of your flow might be DOM events (user clicks, input change),
@@ -245,7 +245,7 @@ that are yet to be fully covered by tests.
 
 <br><br>
 
-Each class or function is similarly in an intuitive and guide-like manner, rather than a precise specification.
+Each class or function is similarly described in an intuitive and guide-like manner, rather than a precise specification.
 The precise specification of each class or function is the test-suites designed to outline and ensure its intended
 properties and behaviors. The link(s) to the test suites for each function or class can be found on the end of its
 corresponding entry.
@@ -257,5 +257,15 @@ in this documentation and/or in the test-suites, which means for whatever reason
 <b>CONNECTIVE</b>'s specification and are potentially subject to change. This holds true even for functionality
 that might be outlined in this documentation but not yet guaranteed by the test suite, though usually
 this corresponds to a relatively stable functionality that is missing sufficient test coverage.
+
+<br><br>
+
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG/SVG_animation_with_SMIL" target="_blank">
+  SVG SMIL
+</a>
+animations are used through-out this documentation to visualize how different pins or agents work. Though almost
+all modern browsers support the format, most of them do so in a half-hearted and generally buggy way. For this reason,
+I would recommend reading these docs on <a href="https://www.mozilla.org/en-US/firefox/" target="_blank">Firefox</a>,
+as per our limited testing, it offers the smoothest and most bug-free support for the format.
 
 {% endblock %}
