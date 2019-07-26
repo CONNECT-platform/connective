@@ -1,0 +1,69 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<h1 id="">Source</h1>
+
+You can use <span code>source()</span> to manually send events/data to your reactive flows:
+
+<pre>
+  <code class="javascript">import { source, map, group } from '@connectv/core';
+
+let a = source();
+let b = source();
+
+group(a, b).to(map(v =&gt; 'from:: ' + v)).subscribe(console.log);
+
+a.send('A');
+b.send('B');
+
+setInterval(() =&gt; a.send('A'), 1000);
+document.addEventListener('click', () =&gt; b.send('B'));</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-src-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="clear">Clearing up</h2>
+
+Like other pin types, <span code>source()</span> has a <span code>.clear()</span> method that you should
+call when you are done with your source. This will clean up the flow and send the <i>complete</i> signal down
+the line for <a href="/docs/pin/#error-and-complete">any such callback</a> to handle:
+
+<pre>
+  <code class="javascript">import { source, pin } from '@connectv/core';
+
+let a = source();
+
+a.to(pin())
+ .subscribe(
+   v =&gt; { console.log('GOT:: ' + v); },  //--&gt; this is the usual callback
+   error =&gt; { console.log('ERROR!'); },  //--&gt; this is the error callback
+   () =&gt; { console.log('COMPLETE!'); }   //--&gt; this will be called when the flow is closed off
+ );
+
+a.send(12);
+a.send('YOLO!');
+a.clear();</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex7" target="_blank">TRY IT!</a>
+</div>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/source.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/source.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
