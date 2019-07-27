@@ -389,6 +389,15 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   transform: rotate(-45deg);
 }
 
+/*********** header ***********/
+
+#header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 24px;
+}
 
 
 /*********** footer ***********/
