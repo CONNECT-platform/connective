@@ -1,0 +1,49 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<h1 id="">Filter</h1>
+
+Filter blocks some emissions while letting some others true utilizng the provided function.
+<img src="/docs/assets/animations/filter.svg" class="animation"/>
+
+Similar to <a href="/docs/map"><span code>map()</span></a>, this function can be a simple sync function, in which case
+it needs to take one argument:
+
+<pre>
+  <code class="javascript">import { source, spread, filter } from '@connectv/core';
+
+let a = source();
+
+a.to(spread())                     //--&gt; spread incoming array as multiple emissions
+ .to(filter(x => x % 2 == 0))      //--&gt; filter for even numbers
+ .subscribe(console.log);          //--&gt; log it
+
+a.send([1, 2, 3, 4, 5, 6, 7]);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex1" target="_blank">TRY IT!</a>
+</div>
+
+Or it can be an asynchronous one, in which case it needs to take a callback as its second argument:
+
+<pre>
+  <code class="javascript">import { source, spread, filter } from '@connectv/core';
+
+let a = source();
+
+a.to(spread())
+ .to(filter((x, done) =&gt; {
+   //
+   //--&gt; lets also reverse the order by waiting weirdly
+   //
+   setTimeout(() =&gt; done(x % 2 == 0), 1000 - x * 100);
+ }))
+ .subscribe(console.log);
+
+a.send([1, 2, 3, 4, 5, 6, 7]);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex1" target="_blank">TRY IT!</a>
+</div>
+
+{% endblock %}

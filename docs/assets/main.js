@@ -170,7 +170,7 @@ window.addEventListener('load', function() {
     var cache = {};
 
     var url = 'https://api.github.com/search/code?';
-    var params = '+in:file+path:docs+language:html+repo:CONNECT-platform/connective';
+    var params = '+in:file+path:docs/templates+extension:njk+repo:CONNECT-platform/connective';
 
     var q = wrap(fromEvent(inp, 'input'))
     .to(map(function() {
@@ -192,11 +192,12 @@ window.addEventListener('load', function() {
         }
       }))
       .to(map(function(res) {
+        console.log(res);
         var list = [];
         var items = res.items || [];
         for (var i = 0; i < items.length; i++) {
           var path = items[i].path;
-          list.push('/' + path.substr(0, path.length - 5));
+          list.push('/' + path.substr(0, path.length - 4).replace('/templates', ''));
         }
 
         return list;
