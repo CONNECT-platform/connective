@@ -1,0 +1,69 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Sink</h1>
+
+A <span code>sink()</span> acts as a consumer of incoming events/data:
+
+<pre>
+  <code class="javascript">import { source, map, filter, sink } from '@connectv/core';
+
+let a = source();
+let b = sink(x =&gt; console.log(x));
+
+a.to(map(x =&gt; x * 2)).to(b);
+a.to(filter(x =&gt; x % 2 == 0)).to(map(x =&gt; x * 10)).to(b);
+
+b.bind();
+a.send(2);
+a.send(3);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-sink-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<span code>sink()</span> has a <span code>.bind()</span> method which will lock the sink and cause it to receive
+events/data from the rest of the flow. <span code>.bind()</span> will lock the portion of the flow that the sink is reliant
+on, much like <span code>.subscribe()</span> method.
+
+<br><br>
+
+You can also place a sink in the middle of your reactive flow to do something according to incoming data/events without
+transforming them:
+
+<pre>
+  <code class="javascript">import { wrap, group, map, filter, sink } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+wrap(fromEvent(a, 'input'))
+.to(map(() =&gt; a.value))             //--&gt; get the input value
+.to(sink(x =&gt; console.log(x)))      //--&gt; log it
+.to(filter(x =&gt; x % 2 == 1))        //--&gt; filter for odd ones
+.subscribe(v =&gt; p.innerHTML = v);   //--&gt; put them on the page</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-sink-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/sink.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/sink.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+
+{% endblock %}
