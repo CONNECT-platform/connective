@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CONNECTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="subject" content='Reactive Programming At Scale'/>
+    <meta name="robots" content='index,follow'/>
+    <meta name="description" content='A thin library enabling large-scale, efficient reactive programming in Javascript/Typescript.'/>
+    <meta name="keywords" content="reactive, rxjs, programming, asynchronous, async, agent, actor, library, asynchronous programming, javascript, typescript, rx"/>
+
+    <link rel="shortcut icon" href="/docs/assets/favicon.ico"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
+
+    <link href="/docs/assets/styles.css" rel="stylesheet">
+    <script src="/docs/assets/main.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      
+      <a class="github-button" href="https://github.com/connect-platform/connective" data-icon="octicon-star" data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star</a>
+      
+    </div>
+    <div class="container">
+
+      
+<h1 id="">Value</h1>
+
+<span code>value()</span> is like <span code><a href="/docs/control">control()</span></a>,
+except it will emit the given value:
+
+<pre>
+  <code class="javascript">import { wrap, value } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let btn = document.getElementById('btn');
+
+wrap(fromEvent(btn, 'click')).to(value('HELLOW!')).subscribe(console.log);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-val-ex1" target="_blank">TRY IT!</a>
+</div>
+
+A <span code>value()</span> can also be the source of a flow:
+
+<pre>
+  <code class="javascript">import { value, spread, pipe } from '@connectv/core';
+import { timer } from 'rxjs';
+import { delayWhen } from 'rxjs/operators';
+
+value([1, 2, 3, 4, 5])                 //--&gt; start with this array
+.to(spread())                          //--&gt; spread it
+.to(pipe(                              //--&gt; delay based on value
+  delayWhen(                           //--&gt; note that in pipe(), you get
+    e =&gt; timer(1000 - e.value * 100))  //... emissions not values,
+  )                                    //... hence 'e.value'
+)
+.subscribe(console.log);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-val-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/value.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/value.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+
+      <br><br>
+
+      
+      <div id="prevnext">
+  <div id="prev">Prev</div>
+  <hr>
+  <div id="next">Next</div>
+</div>
+
+      
+
+      
+      <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
+      
+    </div>
+
+    <div id="toc">
+    </div>
+
+    <div id="nav">
+  <div class="contents">
+    <a href="/">Home</a>
+    <hr>
+    <a href="/docs/overview">Overview</a>
+
+    <br><br>
+
+    <h3>Pins</h3>
+    <a href="/docs/pin">pin</a>
+    <hr>
+    <a href="/docs/source">source</a>
+    <hr>
+    <a href="/docs/wrap">wrap</a>
+    <hr>
+    <a href="/docs/map">map</a>
+    <hr>
+    <a href="/docs/filter">filter</a>
+    <hr>
+    <a href="/docs/control">control</a>
+    <hr>
+    <a href="/docs/value">value</a>
+    <hr>
+    <a href="/docs/pack">pack</a>
+    <hr>
+    <a href="/docs/spread">spread</a>
+    <hr>
+    <a href="/docs/pipe">group</a>
+    <hr>
+    <a href="/docs/sink">sink</a>
+    <hr>
+    <a href="/docs/pipe">pipe</a>
+    <hr>
+    <a href="/docs/fork-join">fork/join</a>
+    <hr>
+    <a href="/docs/reduce">reduce</a>
+
+    <br><br>
+
+    <h3>Agents</h3>
+    <a href="/docs/agent">Agent</a>
+    <hr>
+    <a href="/docs/expr">expr</a>
+    <hr>
+    <a href="/docs/state">state</a>
+    <hr>
+    <a href="/docs/gate">gate</a>
+    <hr>
+    <a href="/docs/handle-error">handleError</a>
+    <hr>
+    <a href="/docs/composition">Composition</a>
+    <hr>
+    <a href="/docs/node">node</a>
+    <hr>
+    <a href="/docs/invoke">invoke</a>
+    <hr>
+    <a href="/docs/sequence">sequence</a>
+    <hr>
+    <a href="/docs/switch">switch</a>
+    <hr>
+    <a href="/docs/proxy">proxy</a>
+    <hr>
+    <a href="/docs/fork-join">fork/join</a>
+
+    <br><br>
+
+    <h3>Advanced</h3>
+    <a href="/docs/memory">Memory management</a>
+    <hr>
+    <a href="/docs/emission">Emission and context</a>
+    <hr>
+    <a href="/docs/pin-map">PinMap</a>
+    <hr>
+    <a href="/docs/interfaces">Interfaces</a>
+    <hr>
+    <a href="/docs/under-the-hoold">Under the hood</a>
+
+  </div>
+  <div class="search">
+    <input id="navsearch" type="text" placeholder="Search..."/>
+    <p><b>NOTE:</b> GitHub limits the rate for searching to 10 queries per minute.</p>
+    <div id="navsearchicon" class="icon">
+      <img class="handle" src="/docs/assets/search-handle.svg"/>
+      <img class="ring" src="/docs/assets/search-ring.svg"/>
+    </div>
+  </div>
+</div>
+
+
+    <div class="footer">
+  <a href="/docs/overview">Docs</a>
+  <hr>
+  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+
+  <a href="/" class="no-underline home"><img src="/docs/assets/logo-notype.svg"/></a>
+  <a id="navtoggle" class="nav no-underline">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </a>
+</div>
+
+
+    <div id="copy-confirm" class="overlay">
+      Copied to Clipboard!
+    </div>
+  </body>
+</html>
