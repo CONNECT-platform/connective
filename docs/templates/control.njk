@@ -1,0 +1,144 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<h1 id="">Control</h1>
+
+<span code>control()</span> waits for all incoming connections to emit.
+<img src="/docs/assets/animations/control.svg" class="animation"/>
+
+The main usage of <span code>control()</span> is as an <i>AND</i> gate between multiple sources:
+
+<pre>
+  <code class="javascript">import { wrap, control, group } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+
+let b1 = document.getElementById('b1');
+let b2 = document.getElementById('b2');
+
+group(
+  wrap(fromEvent(b1, 'click')),
+  wrap(fromEvent(b2, 'click'))
+)
+.to(control())
+.subscribe(() =&gt; console.log('BOTH CLICKED!'));</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="queueing">Queueing</h2>
+
+If one source emits multiple times, <span code>control()</span> will queue incoming emissions and pair them
+with emissions of other sources:
+
+<pre>
+  <code class="javascript">import { source, control, group } from '@connectv/core';
+
+
+let a = source();
+let b = source();
+
+group(a, b)
+.to(control())
+.subscribe(console.log);
+
+a.send('a1'); //--&gt; queued
+a.send('a2'); //--&gt; queued
+a.send('a3'); //--&gt; queued
+b.send('b1'); //--&gt; paired with 'a1'
+b.send('b2'); //--&gt; paired with 'a2'
+b.send('b3'); //--&gt; paired with 'a3'</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex2" target="_blank">TRY IT!</a>
+</div>
+
+As you can see, <span code>control()</span> will emit an array of all paired values.
+
+<br><br>
+
+<h2 id="agents">Agents</h2>
+
+Some <a href="/docs/agent">agent</a>s can have a control pin accessible on their <span code>.control</span>
+property. This pin is not mentioned in their <a href="/docs/agent#signature">signature</a>, and allows you
+to control behavior of an agent, for example by blocking it from responding until some conditions are met,
+etc.
+
+<br><br>
+
+<h3 id="gate">Gate</h3>
+
+In a <a href="/docs/gate"><span code>gate()</span></a> agent, the <span code>.control</span>
+is used to allow something through or
+drop it:
+
+<pre>
+  <code class="javascript">import { wrap, map, group, gate } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let i = document.getElementById('i') as HTMLInputElement;
+let submitGate = gate();
+
+//
+//--&gt; so this validator checks if the length of input is proper
+//
+let validator = map(v =&gt; v.length &gt; 5 && v.length &lt; 10);
+
+wrap(fromEvent(i, 'input'))
+.to(map(() =&gt; i.value))
+.to(submitGate.input, validator);         //--&gt; the value goes both to the gate and validator
+
+validator.to(submitGate.control);         //--&gt; the validator controls the gate
+
+submitGate.output.subscribe(console.log); //--&gt; gate submits (to console ;))</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex3" target="_blank">TRY IT!</a>
+</div>
+
+<h3 id="node">Node</h3>
+
+In a <a href="/docs/node"><span code>node()</span></a> agent, such as
+<span code><a href="/docs/expr">expr()</a></span>,
+<span code>.control</span> property controls when the node is going to run:
+
+<pre>
+  <code class="javascript">import { wrap, map, expr } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let b = document.getElementById('b') as HTMLInputElement;
+let btn = document.getElementById('btn');
+
+let e = expr((a, b) =&gt; a + b);
+
+wrap(fromEvent(a, 'input')).to(map(() =&gt; parseInt(a.value))).to(e.in(0));
+wrap(fromEvent(b, 'input')).to(map(() =&gt; parseInt(b.value))).to(e.in(1));
+wrap(fromEvent(btn, 'click')).to(e.control);  //--&gt; so only add when the button is pressed
+
+e.result.subscribe(console.log);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex4" target="_blank">TRY IT!</a>
+</div>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/control.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/control.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+
+{% endblock %}
