@@ -10,15 +10,15 @@ Similar to <a href="/docs/map"><span code>map()</span></a>, this function can be
 it needs to take one argument:
 
 <pre>
-  <code class="javascript">import { source, spread, filter } from '@connectv/core';
+  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
+import { fromEvent } from 'rxjs';
 
-let a = source();
+let a = document.getElementById('a') as HTMLInputElement;
 
-a.to(spread())                     //--&gt; spread incoming array as multiple emissions
- .to(filter(x => x % 2 == 0))      //--&gt; filter for even numbers
- .subscribe(console.log);          //--&gt; log it
-
-a.send([1, 2, 3, 4, 5, 6, 7]);</code>
+wrap(fromEvent(a, 'input'))       //--&gt; get input events on the input
+ .to(map(() =&gt; a.value))          //--&gt; map it to input's value
+ .to(filter(x =&gt; x.length &gt; 3))   //--&gt; only allow long enough text
+ .subscribe(console.log);         //--&gt; log it</code>
 </pre>
 <div class="buttons">
   <a class="button" href="https://stackblitz.com/edit/connective-fil-ex1" target="_blank">TRY IT!</a>
@@ -27,23 +27,112 @@ a.send([1, 2, 3, 4, 5, 6, 7]);</code>
 Or it can be an asynchronous one, in which case it needs to take a callback as its second argument:
 
 <pre>
-  <code class="javascript">import { source, spread, filter } from '@connectv/core';
+  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
+import { fromEvent } from 'rxjs';
 
-let a = source();
+let a = document.getElementById('a') as HTMLInputElement;
 
-a.to(spread())
- .to(filter((x, done) =&gt; {
-   //
-   //--&gt; lets also reverse the order by waiting weirdly
-   //
-   setTimeout(() =&gt; done(x % 2 == 0), 1000 - x * 100);
+wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
+ .to(map(() =&gt; a.value))                //--&gt; map it to input's value
+ .to(filter((x, done) =&gt; {              //--&gt; only allow long enough text
+   setTimeout(() =&gt; done(x.length &gt; 3),
+    10000 - x.length * 200);            //--&gt; also wait a bit
  }))
- .subscribe(console.log);
-
-a.send([1, 2, 3, 4, 5, 6, 7]);</code>
+ .subscribe(console.log);               //--&gt; log it</code>
 </pre>
 <div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex1" target="_blank">TRY IT!</a>
+  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex2" target="_blank">TRY IT!</a>
 </div>
+
+<br><br>
+
+<h2 id="error-handling">Error handling</h2>
+
+<span code>filter()</span> supports error handling exactly the same way that
+<a href="/docs/map#error-handling"><span code>map()</span></a>
+does, i.e. in sync filter functions you can just throw the errors:
+
+<pre>
+  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+
+wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
+ .to(map(() =&gt; a.value))                //--&gt; map it to input's value
+ .to(filter(x =&gt; {                      //--&gt; only allow long enough text
+   if (x == 'end')
+     throw new Error('END!');           //--&gt; throw error when 'end' is nigh
+   return x.length &gt; 3;
+ }))
+ .subscribe(
+   console.log,                         //--&gt; log values
+   (err) =&gt;
+     console.log(err.original.message)  //--&gt; ERROR!
+ );</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex3" target="_blank">TRY IT!</a>
+</div>
+
+and in async filter functions, you have to catch the error and pass it to the <i>error callback</i>, which
+will be the third argument passed to the filter function:
+
+<pre>
+  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
+import { fromEvent, throwError } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+
+let $badObs = throwError('END IS NIGH!');
+
+
+wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
+ .to(map(() =&gt; a.value))                //--&gt; map it to input's value
+ .to(filter((x, done, err) =&gt; {         //--&gt; only allow long enough text
+   $badObs.subscribe(
+     () =&gt; done(x.length &gt; 3),
+     error =&gt; err(error),
+   )
+ }))
+ .subscribe(
+   console.log,                         //--&gt; log values
+   (err) =&gt;
+     console.log(err.original.message)  //--&gt; ERROR!
+ );</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex4" target="_blank">TRY IT!</a>
+</div>
+
+<br><br>
+
+<h2 id="purity">Function purity</h2>
+
+Similar to <a href="/docs/map#purity"><span code>map()</span></a>, sync filter functions <b>MUST</b> be
+pure, i.e. they should return the same result for the same input. Non-pure sync functions will lead to
+unpredictable flow behavior, so if you have a non-pure function wrap it in an async filter function.
+
+<br><br>
+
+For more details on how function purity is handled by <b>CONNECTIVE</b>, you can read
+<a href="/docs/under-the-hood">this entry</a>.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/filter.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/filter.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
 
 {% endblock %}
