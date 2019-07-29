@@ -38,122 +38,83 @@
       
 <br><br>
 
-<h1 id="">Filter</h1>
+<h1 id="">Group</h1>
 
-Filter blocks some emissions while letting some others true utilizng the provided function.
-<img src="/docs/assets/animations/filter.svg" class="animation"/>
-
-Similar to <a href="/docs/map"><span code>map()</span></a>, this function can be a simple sync function, in which case
-it needs to take one argument:
-
-<pre>
-  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
-import { fromEvent } from 'rxjs';
-
-let a = document.getElementById('a') as HTMLInputElement;
-
-wrap(fromEvent(a, 'input'))       //--&gt; get input events on the input
- .to(map(() =&gt; a.value))          //--&gt; map it to input's value
- .to(filter(x =&gt; x.length &gt; 3))   //--&gt; only allow long enough text
- .subscribe(console.log);         //--&gt; log it</code>
-</pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex1" target="_blank">TRY IT!</a>
-</div>
-
-Or it can be an asynchronous one, in which case it needs to take a callback as its second argument:
-
-<pre>
-  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
-import { fromEvent } from 'rxjs';
-
-let a = document.getElementById('a') as HTMLInputElement;
-
-wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
- .to(map(() =&gt; a.value))                //--&gt; map it to input's value
- .to(filter((x, done) =&gt; {              //--&gt; only allow long enough text
-   setTimeout(() =&gt; done(x.length &gt; 3),
-    10000 - x.length * 200);            //--&gt; also wait a bit
- }))
- .subscribe(console.log);               //--&gt; log it</code>
-</pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex2" target="_blank">TRY IT!</a>
-</div>
+<span code>group()</span> allows you to perform some operations on a group of
+<a href="/docs/pin">pin</a>s instead of just one of them. Because of this,
+a <span code>group()</span> can <a href="/docs/interfaces#pin-like">act like a pin</a> in a lot of cases.
 
 <br><br>
 
-<h2 id="error-handling">Error handling</h2>
-
-<span code>filter()</span> supports error handling exactly the same way that
-<a href="/docs/map#error-handling"><span code>map()</span></a>
-does, i.e. in sync filter functions you can just throw the errors:
-
-<pre>
-  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
-import { fromEvent } from 'rxjs';
-
-let a = document.getElementById('a') as HTMLInputElement;
-
-wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
- .to(map(() =&gt; a.value))                //--&gt; map it to input's value
- .to(filter(x =&gt; {                      //--&gt; only allow long enough text
-   if (x == 'end')
-     throw new Error('END!');           //--&gt; throw error when 'end' is nigh
-   return x.length &gt; 3;
- }))
- .subscribe(
-   console.log,                         //--&gt; log values
-   (err) =&gt;
-     console.log(err.original.message)  //--&gt; ERROR!
- );</code>
-</pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex3" target="_blank">TRY IT!</a>
-</div>
-
-and in async filter functions, you have to catch the error and pass it to the <i>error callback</i>, which
-will be the third argument passed to the filter function:
-
-<pre>
-  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
-import { fromEvent, throwError } from 'rxjs';
-
-let a = document.getElementById('a') as HTMLInputElement;
-
-let $badObs = throwError('END IS NIGH!');
-
-
-wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
- .to(map(() =&gt; a.value))                //--&gt; map it to input's value
- .to(filter((x, done, err) =&gt; {         //--&gt; only allow long enough text
-   $badObs.subscribe(
-     () =&gt; done(x.length &gt; 3),
-     error =&gt; err(error),
-   )
- }))
- .subscribe(
-   console.log,                         //--&gt; log values
-   (err) =&gt;
-     console.log(err.original.message)  //--&gt; ERROR!
- );</code>
-</pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex4" target="_blank">TRY IT!</a>
-</div>
+Whenever you call <span code>.to()</span> and <span code>.from()</span> methods of a pin, the result will
+be a group of pins containing all pins you passed to the method.
 
 <br><br>
 
-<h2 id="purity">Function purity</h2>
+<h2 id="connecting">Connecting</h2>
 
-Similar to <a href="/docs/map#purity"><span code>map()</span></a>, sync filter functions <b>MUST</b> be
-pure, i.e. they should return the same result for the same input. Non-pure sync functions will lead to
-unpredictable flow behavior, so if you have a non-pure function wrap it in an async filter function.
+When you use <span code>.to()</span> or <span code>.from()</span> methods on a group, all the pins in the group
+will be connected to (or receive a connection from) the given pin:
+
+<pre>
+  <code class="javascript">import { source, group, map } from '@connectv/core';
+
+let a = source();
+let g = group(map(x =&gt; 'x' + x), map(x =&gt; 'y' + x));
+a.to(g).subscribe(console.log); //--&gt; a goes to both `map()`s in g
+
+a.send('A');</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-grp-ex1" target="_blank">TRY IT!</a>
+</div>
+
+When you call <span code>.to()</span> on a group passing another group to it (or multiple pins), all pins in the
+first group will be connected to the all pins in the second group:
+
+<pre>
+  <code class="javascript">import { source, group, map, pin } from '@connectv/core';
+
+let a = source();
+let g1 = group(map(x => 'x' + x), map(x => 'y' + x));
+let g2 = group(map(x => 'a' + x), map(x => 'b' + x));
+
+a.to(g1).to(g2).to(pin()).subscribe(console.log);
+
+a.send(1);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-grp-ex2" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="subscribe">Subscribing</h2>
+
+You can use the <span code>.subscribe()</span> method on a group to subscribe to all of its pins:
+
+<pre>
+  <code class="javascript">import { source, group } from '@connectv/core';
+
+let a = source();
+let b = source();
+
+group(a, b).subscribe(console.log);
+
+a.send('hellow');
+b.send('world');</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-grp-ex3" target="_blank">TRY IT!</a>
+</div>
+
+Similarly, you can call <span code>.bind()</span> method on a group. Note that this will only affect pins that
+have a <span code>.bind()</span> method (other pins in the group will remain unaffected).
 
 <br><br>
 
-For more details on how function purity is handled by <b>CONNECTIVE</b>, you can read
-<a href="/docs/under-the-hood">this entry</a>.
+<h2 id="clear">Clearing up</h2>
+
+For clearing up, you can also call <span code>.clear()</span> method on a group, which will simply invoke
+the <span code>.clear()</span> method of all of the pins in it.
 
 <br><br>
 
@@ -161,12 +122,12 @@ For more details on how function purity is handled by <b>CONNECTIVE</b>, you can
 
 <ul>
   <li>
-    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/filter.test.ts" target="_blank">
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/group.test.ts" target="_blank">
       Specification (test suite)
     </a>
   </li>
   <li>
-    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/filter.ts" target="_blank">
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/group.ts" target="_blank">
       Source code
     </a>
   </li>
