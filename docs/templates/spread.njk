@@ -1,0 +1,68 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<h1 id="">Spread</h1>
+
+<span code>spread()</span> will spread an incoming array into multiple emissions:
+
+<pre>
+  <code class="javascript">import { wrap, control, group, spread, gate, pipe, map, filter } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { delay, debounceTime } from 'rxjs/operators';
+
+let i = document.getElementById('i') as HTMLInputElement;
+let p = document.getElementById('p');
+
+let g = gate();
+
+wrap(fromEvent(i, 'input'))
+.to(pipe(debounceTime(1000)))        //--&gt; wait for typing to finish
+.to(map(() =&gt; i.value.split(',')))   //--&gt; split the string
+.to(spread())                        //--&gt; spread the comma separated list
+.to(map(x =&gt; x.trim()))              //--&gt; trim each word
+.to(filter(x =&gt; x.length > 3))       //--&gt; ignore super short ones
+.to(g.input);
+
+group(control(), g.output)           //--&gt; the control() is not connected
+.to(pipe(delay(1000)))               //... to anything, so it will emit initially
+.to(g.control);
+
+g.output.subscribe(v =&gt; p.innerHTML = v);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-sprd-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<span code>spread()</span> will just relay incoming values that are not arrays:
+
+<pre>
+  <code class="javascript">import { source, spread } from '@connectv/core';
+
+let a = source();
+a.to(spread()).subscribe(console.log);
+
+a.send([1, 2, 3]); //--> spread the values
+a.send(4);         //--> just relay 4
+a.send([5, 6]);    //--> spread again
+a.send(7);         //--> relay again</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-sprd-ex2" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/spread.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/spread.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
