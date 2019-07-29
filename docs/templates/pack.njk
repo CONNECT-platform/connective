@@ -1,0 +1,74 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<h1 id="">Pack</h1>
+
+<span code>pack()</span> emits with the latest value of all sources, packed together.
+<img src="/docs/assets/animations/pack.svg" class="animation"/>
+
+You can use <span code>pack()</span> to collect values from multiple sources:
+
+<pre>
+  <code class="javascript">import { wrap, pack, group, map } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let s = document.getElementById('s') as HTMLInputElement;
+let n = document.getElementById('n') as HTMLInputElement;
+let p = document.getElementById('p');
+
+group(
+  wrap(fromEvent(s, 'input')).to(map(() =&gt; s.value)),  //--&gt; pick a salute
+  wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value))   //--&gt; pick a name
+)
+.to(pack())
+.to(map(v =&gt; v.join(' ')))                             //--&gt; pack returns an array, lets join it
+.subscribe(v =&gt; p.innerHTML = v);                      //--&gt; say hi</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-pack-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="initial">First emission</h2>
+
+<span code>pack()</span> waits for all connected sources to emit at least once before its first emission:
+
+<pre>
+  <code class="javascript">import { wrap, pack, filter, map, group } from '@connectv/core';
+import { fromEvent, interval } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let b = document.getElementById('b') as HTMLInputElement;
+let p = document.getElementById('p');
+
+group(
+  wrap(interval(1000)),
+  wrap(fromEvent(a, 'input')).to(map(() =&gt; a.checked)),
+  wrap(fromEvent(b, 'input')).to(map(() =&gt; b.checked))
+)
+.to(pack())
+.to(filter(v =&gt; v[1] && v[2]))       //--&gt; only let values through if both checkboxes are checked
+.to(map(v =&gt; v[0]))                  //--&gt; map to the interval's value
+.subscribe(v =&gt; p.innerHTML = v);    //--&gt; display the beautiful</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-pack-ex2" target="_blank">TRY IT!</a>
+</div>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/pack.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/pack.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
