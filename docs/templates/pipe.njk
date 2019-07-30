@@ -1,0 +1,92 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Pipe</h1>
+
+<span code>pipe()</span> allows you to use any of <b>RxJS</b>'s
+<a href="https://github.com/ReactiveX/rxjs/blob/master/doc/pipeable-operators.md" target="_blank">
+  pipeable operators
+</a>
+in your reactive flows:
+
+<pre>
+  <code class="javascript">import { wrap, pipe, map } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+wrap(fromEvent(a, 'input'))
+.to(map(() =&gt; a.value))             //--&gt; get the input value
+.to(pipe(throttleTime(1000)))       //--&gt; throttle a bit
+.subscribe(v =&gt; p.innerHTML = v);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-pipe-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="emission">Emissions</h2>
+
+The operators are not passed raw emitted data/events, but rather <a href="/docs/emission">Emission</a>
+objects that contain them:
+
+<pre>
+  <code class="javascript">import { value, spread, pipe } from '@connectv/core';
+import { tap } from 'rxjs/operators';
+
+value([1, 2, 3, 4])
+.to(spread())
+.subscribe(console.log);      //--&gt; values are logged
+
+value([1, 2, 3, 4])
+.to(spread())
+.to(pipe(tap(console.log)))   //--&gt; `Emission` objects are logged
+.subscribe();</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-pipe-ex2" target="_blank">TRY IT!</a>
+</div>
+
+In a lot of cases you don't need to work with incoming emissions directly. In cases that you do, you can
+access the actual value of the emission using its <span code>.value</span> property:
+
+<pre>
+  <code class="javascript">import { value, spread, pipe } from '@connectv/core';
+import { timer } from 'rxjs';
+import { delayWhen } from 'rxjs/operators';
+
+value([1, 2, 3, 4])
+.to(spread())
+.to(pipe(delayWhen(e =&gt; timer(1000 - e.value * 10)))) //--&gt; delay proportional to inverse of the value
+                                                      //... so that the array is reversed
+.subscribe(console.log);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-pipe-ex3" target="_blank">TRY IT!</a>
+</div>
+
+The operators should also return observables that will emit emissions (<span code>Observable&lt;Emission&gt;</span>).
+You can use <a href="/docs/emission#fork">.fork()</a> method on an incoming emission to create a new one with a new value,
+or <a href="/docs/emission#from">Emission.from()</a> function to create an emission from multiple incoming emissions.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/pipe.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/pipe.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
