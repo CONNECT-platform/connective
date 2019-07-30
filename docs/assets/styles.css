@@ -495,7 +495,7 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
 /*********** hljs overrides ***********/
 
 span[code] {
-  background: #e0e0e0;
+  background: rgba(128, 128, 128, .12);
   font-family: monospace;
   padding: 4px;
   border-radius: 3px;
