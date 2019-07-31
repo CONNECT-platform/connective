@@ -30,7 +30,7 @@ wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
 .subscribe(msg => p.innerHTML = msg); // --> write it to the <p> element
 ```
 
-**CONNECTIVE** is a thin layer on top of [**rxjs**](https://github.com/ReactiveX/rxjs), so it provides all the toolset of **rxjs** by proxy. However, while **rxjs**'s API is better suited for short-lived and small flows, **CONNECTIVE** adds tools better suiting long-living and large/complex flows.
+**CONNECTIVE** is a thin layer on top of [**RxJS**](https://github.com/ReactiveX/rxjs), so it provides all the toolset of **rxjs** by proxy. However, while **RxJS**'s API is better suited for short-lived and small flows, **CONNECTIVE** adds tools better suiting long-living and large/complex flows.
 
 Example ([Stackblitz](https://stackblitz.com/edit/connective-delayed-broadcast)):
 
