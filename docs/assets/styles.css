@@ -12,6 +12,15 @@ body {
   padding: 0;
 }
 
+body.dark-mode {
+  background: #212121;
+  color: #eeeeee;
+}
+
+body.dark-mode-animate {
+  transition: background .3s, color .3s;
+}
+
 .container {
   max-width: 768px;
   padding: 32px;
@@ -87,6 +96,15 @@ pre + .buttons {
   width: 100%;
   display: block;
   margin: 64px auto;
+  opacity: 1;
+}
+
+body.dark-mode-animate .bottom-logo {
+  transition: opacity .3s;
+}
+
+body.dark-mode .bottom-logo {
+  opacity: .1;
 }
 
 .animation {
@@ -94,6 +112,36 @@ pre + .buttons {
   width: 100%;
   display: block;
   margin: 0 auto;
+  opacity: 1;
+}
+
+body.dark-mode-animate .animation {
+  transition: opacity .3s;
+}
+
+body.dark-mode .animation.light {
+  opacity: 0;
+}
+
+.animation.dark {
+  opacity: 0;
+}
+
+body.dark-mode .animation.dark {
+  opacity: 1;
+}
+
+.animation-group {
+  position: relative;
+  max-width: 320px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.animation-group .animation:not(:first-child) {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 h1[main] {
@@ -152,13 +200,19 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   padding-left: 48px;
   margin-left: 64px;
   border-left: 1px dashed #cacaca;
+  transition: border-color .3s;
+}
+
+body.dark-mode #toc>div {
+  border-color: #424242;
 }
 
 #toc a { color: #bdbdbd; transition: color .15s; }
-#toc a.visible { color: #4A90E2; }
+body.dark-mode #toc a { color: #424242; }
+#toc a.visible, body.dark-mode #toc a.visible { color: #4A90E2; }
 #toc a.h2 { margin-left: 16px; }
 #toc a.h3 { margin-left: 32px; }
-#toc a:hover { color: #4A90E2; }
+#toc a:hover, body.dark-mode #toc a:hover { color: #4A90E2; }
 
 @media screen and (max-width: 1200px) {
   #toc { display: none; }
@@ -174,9 +228,13 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   width: calc(50% - 384px);
   background: #f5f5f5;
   transform: translateX(-110vw);
-  transition: transform .5s;
+  transition: transform .5s, background .3s;
   display: flex;
   flex-direction: column;
+}
+
+body.dark-mode #nav {
+  background: #212121;
 }
 
 #nav.active {
@@ -207,17 +265,34 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   background: white;
   border-radius: 32px;
   outline: none;
+  color: inherit;
+  transition: background .3s, border-color .3s;
+}
+
+body.dark-mode #nav .search input {
+  background: black;
+  border-color: #424242;
 }
 
 #nav .search input::placeholder {
   color: #9e9e9e;
   font-style: italic;
+  transition: color .3s;
+}
+
+body.dark-mode #nav .search input::placeholder {
+  color: #616161;
 }
 
 #nav .search p {
   font-size: 10px;
   color: #9e9e9e;
   margin-left: 8px;
+  transition: color .3s;
+}
+
+body.dark-mode #nav .search p {
+  color: #616161;
 }
 
 #nav .search .icon {
@@ -296,6 +371,11 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
 #nav hr {
   border: none;
   border-top: 1px dashed #bdbdbd;
+  transition: border-color .3s;
+}
+
+body.dark-mode #nav hr {
+  border-color: #424242;
 }
 
 @media screen and (max-width: 1200px) {
@@ -329,6 +409,15 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   background: #e0e0e0;
 }
 
+body.dark-mode-animate #prevnext hr {
+  transition: background .3s;
+}
+
+body.dark-mode #prevnext hr {
+  background: #313131;
+}
+
+
 #prevnext #prev,
 #prevnext #next {
   flex-grow: 1;
@@ -357,13 +446,30 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   position: absolute;
   width: 16px; height: 4px; content: ' ';
   background: #e0e0e0;
+}
+
+body.dark-mode-animate #prevnext #prev::before,
+body.dark-mode-animate #prevnext #prev::after,
+body.dark-mode-animate #prevnext #next::before,
+body.dark-mode-animate #prevnext #next::after {
   transition: background .15s;
+}
+
+body.dark-mode #prevnext #prev::before,
+body.dark-mode #prevnext #prev::after,
+body.dark-mode #prevnext #next::before,
+body.dark-mode #prevnext #next::after {
+  background: #313131;
 }
 
 #prevnext #prev:hover::before,
 #prevnext #prev:hover::after,
 #prevnext #next:hover::before,
-#prevnext #next:hover::after {
+#prevnext #next:hover::after,
+body.dark-mode #prevnext #prev:hover::before,
+body.dark-mode #prevnext #prev:hover::after,
+body.dark-mode #prevnext #next:hover::before,
+body.dark-mode #prevnext #next:hover::after {
   background: #4A90E2;
 }
 
@@ -410,6 +516,14 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   display: flex; align-items: center; justify-content: center;
 }
 
+body.dark-mode-animate .footer {
+  transition: background .3s, color .3s;
+}
+
+body.dark-mode .footer {
+  background: #212121;
+}
+
 .footer hr {
   width: 2px;
   height: 24px;
@@ -418,10 +532,85 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   border: none;
 }
 
-.footer .home {
+body.dark-mode-animate .footer hr {
+  transition: background .3s;
+}
+
+body.dark-mode .footer hr {
+  background: #424242;
+}
+
+.footer #dmtoggle {
+  width: 48px;
   height: 48px;
   position: absolute;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   right: 32px;
+  opacity: .25;
+  cursor: pointer;
+  transition: transform .3s, opacity .15s;
+}
+
+body.dark-mode .footer #dmtoggle {
+  transform: rotate(-45deg);
+}
+
+.footer #dmtoggle:hover {
+  opacity: 1;
+}
+
+.footer #dmtoggle div {
+  position: absolute;
+  background: #424242;
+  transition: transform .3s, background .3s;
+}
+
+body.dark-mode .footer #dmtoggle div {
+  background: #f5f5f5;
+}
+
+.footer #dmtoggle .arc, .footer #dmtoggle .darc {
+  width: 16px;
+  height: 16px;
+  border-radius: 16px;
+}
+
+body.dark-mode .footer #dmtoggle .arc {
+  transform: scale(1.2);
+}
+
+.footer #dmtoggle .darc {
+  background: #f5f5f5;
+  transform: translateX(24px);
+}
+
+body.dark-mode .footer #dmtoggle .darc {
+  transform: translateX(6px);
+  background: #212121;
+}
+
+.footer #dmtoggle .ray {
+  width: 6px;
+  height: 2px;
+  border-radius: 2px;
+  margin-left: 28px;
+  transform-origin: -11px 1px;
+}
+
+.footer #dmtoggle .ray.one { transform: rotate(0deg); }
+.footer #dmtoggle .ray.two { transform: rotate(45deg); }
+.footer #dmtoggle .ray.three { transform: rotate(90deg); }
+.footer #dmtoggle .ray.four { transform: rotate(135deg); }
+.footer #dmtoggle .ray.five { transform: rotate(180deg); }
+.footer #dmtoggle .ray.six { transform: rotate(225deg); }
+.footer #dmtoggle .ray.seven { transform: rotate(270deg); }
+.footer #dmtoggle .ray.eight { transform: rotate(315deg); }
+
+body.dark-mode .footer #dmtoggle .ray {
+  transform: scaleX(0.01);
 }
 
 .footer img {
@@ -449,8 +638,12 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   width: 24px;
   height: 2px;
   background: #424242;
-  transition: opacity .15s, transform .15s;
+  transition: opacity .15s, transform .15s, background .3s;
   transform-origin: 16px 1px;
+}
+
+body.dark-mode .nav .line {
+  background: #eeeeee;
 }
 
 .footer .nav.active .line {
@@ -470,7 +663,7 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
     left: 12px;
   }
 
-  .footer .home {
+  .footer #dmtoggle {
     right: 12px;
   }
 }
@@ -548,6 +741,10 @@ code .line:hover {
   background: #424242;
 }
 
+body.dark-mode code .line:hover {
+  background: #212121;
+}
+
 code .line:hover:before {
   border-color: #4A90E2;
 }
@@ -558,6 +755,10 @@ code .line:hover:before {
   padding: 16px;
   border-radius: 3px;
   font-size: 12px;
+}
+
+body.dark-mode .hljs {
+  background: #000000;
 }
 
 .hljs-keyword {

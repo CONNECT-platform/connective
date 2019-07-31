@@ -101,6 +101,33 @@ window.addEventListener('load', function() {
   });
 
   //
+  // dark mode
+  //
+  var dmtoggle = document.getElementById('dmtoggle');
+  var body = document.body;
+
+  var darkMode = function() { body.classList.add('dark-mode'); localStorage.setItem('dark-mode', 'true'); }
+  var lightMode = function() { body.classList.remove('dark-mode'); localStorage.setItem('dark-mode', 'false'); }
+
+  dmtoggle.addEventListener('click', function() {
+    if (body.classList.contains('dark-mode')) lightMode();
+    else darkMode();
+  });
+
+  if (localStorage.getItem('dark-mode') === 'true') darkMode();
+  if (localStorage.getItem('dark-mode') === 'false') lightMode();
+
+  if (window.matchMedia) {
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) darkMode();
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function(q) { if (q.matches) darkMode(); });
+
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) lightMode();
+    window.matchMedia('(prefers-color-scheme: light)').addListener(function(q) { if (q.matches) lightMode(); });
+  }
+
+  setTimeout(function() { body.classList.add('dark-mode-animate')}, 100);
+
+  //
   // nav toggle
   //
   var navtoggle = document.getElementById('navtoggle');
