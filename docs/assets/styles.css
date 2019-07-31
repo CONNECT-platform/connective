@@ -565,7 +565,7 @@ body.dark-mode .footer #dmtoggle {
 .footer #dmtoggle div {
   position: absolute;
   background: #424242;
-  transition: transform .3s, background .3s;
+  transition: transform .3s, background .3s, opacity .3s;
 }
 
 body.dark-mode .footer #dmtoggle div {
@@ -596,21 +596,20 @@ body.dark-mode .footer #dmtoggle .darc {
   width: 6px;
   height: 2px;
   border-radius: 2px;
-  margin-left: 28px;
-  transform-origin: -11px 1px;
 }
 
-.footer #dmtoggle .ray.one { transform: rotate(0deg); }
-.footer #dmtoggle .ray.two { transform: rotate(45deg); }
-.footer #dmtoggle .ray.three { transform: rotate(90deg); }
-.footer #dmtoggle .ray.four { transform: rotate(135deg); }
-.footer #dmtoggle .ray.five { transform: rotate(180deg); }
-.footer #dmtoggle .ray.six { transform: rotate(225deg); }
-.footer #dmtoggle .ray.seven { transform: rotate(270deg); }
-.footer #dmtoggle .ray.eight { transform: rotate(315deg); }
+.footer #dmtoggle .ray.one { transform: rotate(0deg) translateX(14px); }
+.footer #dmtoggle .ray.two { transform: rotate(45deg) translateX(14px); }
+.footer #dmtoggle .ray.three { transform: rotate(90deg) translateX(14px); }
+.footer #dmtoggle .ray.four { transform: rotate(135deg) translateX(14px); }
+.footer #dmtoggle .ray.five { transform: rotate(180deg) translateX(14px); }
+.footer #dmtoggle .ray.six { transform: rotate(225deg) translateX(14px); }
+.footer #dmtoggle .ray.seven { transform: rotate(270deg) translateX(14px); }
+.footer #dmtoggle .ray.eight { transform: rotate(315deg) translateX(14px); }
 
 body.dark-mode .footer #dmtoggle .ray {
   transform: scaleX(0.01);
+  opacity: 0;
 }
 
 .footer img {
