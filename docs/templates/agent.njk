@@ -1,0 +1,159 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Agent</h1>
+
+<span code>Agent</span> class in <b>CONNECTIVE</b> is the base abstraction of a reactive flow. Regardless of how it works
+internally, any agent (or any reactive flow) can be thought of as something that can respond to some events/data
+(sources, input pins, etc) and its response is typically emitting some other events/data (its sinks, output pins, etc).
+
+<br><br>
+
+Agents are to be used to modularize your reactive flows. For example, any repeating sub-graph of a reactive flow is,
+by definition outlined above, an agent, and so you could replace it with an agent instead of repeating yourself constantly, the
+same way that you would encapsulate repeated logic in a function and/or a class:
+
+<pre>
+  <code class="javascript">import { Agent, sink, map, block } from '@connectv/core';
+
+export class Multi extends Agent {
+  private k = 1;
+
+  constructor() {
+    super({
+      inputs: ['n', 'k'], //--&gt; we have two inputs: 'n', and 'k'
+      outputs: ['o']      //--&gt; and one output: 'o'
+    });
+
+    //
+    //--&gt; get every value from input 'n', multiply it by 'k',
+    //--&gt; and pass it to the output.
+    //
+    this.in('n').to(map(n =&gt; n * this.k)).to(this.out('o'));
+
+    //
+    //--&gt; `block()` is used here to make the output dependent on
+    //--&gt; the input 'k', without the input directly passing any value
+    //--&gt; to the output. basically this just ensures that when the output
+    //--&gt; is bound, so is the input 'k'.
+    //
+    this.in('k').to(sink(k =&gt; this.k = k)).to(block()).to(this.out('o'));
+  }
+}</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-agent-ex1?file=multi.ts" target="_blank">TRY IT!</a>
+</div>
+
+Our custom agent here has two inputs: <span code>'n'</span> and <span code>'k'</span>, and one output, <span code>'o'</span>.
+It will multiply anything that comes through <span code>'n'</span> by <span code>this.k</span> (default 1) and send it
+to <span code>'o'</span>, and values sent to <span code>'k'</span> will update <span code>this.k</span>.
+
+<br><br>
+
+Now that we have our custom agent defined, we can use it in our other reactive flows like this:
+
+<pre>
+  <code class="javascript">import { wrap, map } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { Multi } from './multi';
+
+let n = document.getElementById('n') as HTMLInputElement;
+let k = document.getElementById('k') as HTMLInputElement;
+let p = document.getElementById('p');
+let m = new Multi();
+
+wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value)).to(m.in('n'));
+wrap(fromEvent(k, 'input')).to(map(() =&gt; k.value)).to(m.in('k'));
+m.out('o').subscribe(v =&gt; p.innerHTML = v);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-agent-ex1?file=index.ts" target="_blank">TRY IT!</a>
+</div>
+
+<b>NOTICE</b>: This is just an example of how you could define custom agents and it is <b>NOT</b> the recommended method.
+The recommended way of creating your custom agents is using the <a href="/docs/composition"><span code>Composition</span></a>
+class, as it also takes care of a lot of boilerplate stuff related to custom agents such as memory management.
+
+<br><br>
+
+<h2 id="signature">Signature</h2>
+
+Each agent has a signature, which is an object indicating the name of the input and output pins of the agent.
+In the case of our example custom agent, this bit of code outlines the signature:
+
+<pre>
+  <code class="javascript">  constructor() {
+    super({
+      inputs: ['n', 'k'], //--&gt; we have two inputs: 'n', and 'k'
+      outputs: ['o']      //--&gt; and one output: 'o'
+    });
+
+    ...</code>
+</pre>
+
+The signature object needs to be passed to <span code>Agent</span> constructor. It has two arrays of
+strings:
+<ul>
+  <li><span code>inputs</span> denotes name of all input pins of the agent. It is optional.</li>
+  <li><span code>outputs</span> denotes name of all output pins of the agent. It is required.</li>
+</ul>
+
+So in case of our example, any instance of <span code>Multi</span> will have two inputs, <i>n</i> and <i>k</i>,
+and one output, <i>o</i>. You can access these pins (both from within the agent and from outside) using
+<span code>.in()</span> and <span code>.out()</span> methods:
+
+<pre>
+  <code class="javascript">// within the agent ...
+this.in('k');
+this.out('o');
+
+// from outside ...
+let m = new Multi();
+m.in('n');
+m.out('o');</code>
+</pre>
+
+You can also access the signature object of each agent via its <span code>.signature</span> property.
+
+<br><br>
+
+<h3 id="control">Control</h3>
+
+An agent might have an extra <a href="/docs/control">control pin</a> accessible via its <span code>.control</span>
+property. This pin is typically used to control the behavior of the agent, like prevent it from responding except
+when certain criteria is met, or signal it to reset its internal state.
+
+<br><br>
+
+Note that <span code>.control</span> is not mentioned in an agent's signature.
+
+<br><br>
+
+<h2 id="clear">Clearing up</h2>
+
+All agents are equipped with a <span code>.clear()</span> method that will clear out the internal machinery of the agent.
+It will clear up all internal subscriptions, pins, agents, etc. Similar to <a href="/docs/pin#clear">pin's
+<span code>.clear()</span></a>, this method will render the agent useless, so use it only when you are done with the agent.
+
+<br><br>
+
+For your custom agents, you must also be careful to properly implement <span code>.clear()</span>. It is highly recommended
+to use the <a href="/docs/composition"><span code>Composition</span></a> class as it will manage this (along other stuff)
+for you.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/agent.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
