@@ -713,6 +713,10 @@ pre[copy]::after {
   transition: all .15s;
 }
 
+body.dark-mode pre[copy]::after {
+  background: #000000;
+}
+
 pre[copy]:hover::after {
   transform: translateX(0);
 }
@@ -792,4 +796,13 @@ body.dark-mode .hljs {
 
 .hljs-string {
   color: #B8E986;
+}
+
+.hljs-comment {
+  color: #757575;
+  transition: color .3s;
+}
+
+body.dark-mode .hljs-comment {
+  color: #616161;
 }
