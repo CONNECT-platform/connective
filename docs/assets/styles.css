@@ -91,6 +91,32 @@ pre + .buttons {
   margin: 0 auto;
 }
 
+.logo-group {
+  max-width: 380px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.logo-group .logo.dark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+body.dark-mode-animate .logo {
+  transition: opacity .3s;
+}
+
+body.dark-mode .logo.light {
+  opacity: 0;
+}
+
+body.dark-mode .logo.dark {
+  opacity: 1;
+}
+
 .bottom-logo {
   max-width: 128px;
   width: 100%;
