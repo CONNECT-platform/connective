@@ -1,0 +1,152 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Expr</h1>
+
+<span code>expr()</span> allows you turn a function into an <a href="/docs/agent">agent</a>:
+
+<pre>
+  <code class="javascript">import { wrap, map, expr } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let b = document.getElementById('b') as HTMLInputElement;
+let p = document.getElementById('p');
+
+let e = expr((a, b) =&gt; a + b);
+
+wrap(fromEvent(a, 'input'))           //--&gt; get input from a
+  .to(map(() =&gt; parseInt(a.value)))   //--&gt; map it to a number
+  .to(e.in(0));                       //--&gt; feed it to e
+
+wrap(fromEvent(b, 'input'))           //--&gt; get input from b
+  .to(map(() =&gt; parseInt(b.value)))   //--&gt; map it to a number
+  .to(e.in(1));                       //--&gt; feed it to e
+
+e.result
+ .subscribe(v => p.innerHTML = v);    //--&gt; display the thing</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="async">Async functions</h2>
+
+You can run async operations in an <span code>expr()</span> by returning a function as return value:
+
+<pre>
+  <code class="javascript">import { source, expr } from '@connectv/core';
+
+let a = source();
+let b = source();
+let e = expr((msg, delay) =&gt;
+  done =&gt; {
+    setTimeout(() =&gt; done(`(after ${delay}ms): ${msg}`), delay);
+  });
+
+a.to(e.in(0));
+b.to(e.in(1));
+e.result.subscribe(console.log);
+
+a.send('hellow'); b.send(100); //&gt; `(after 100ms): hellow`
+a.send('world');               //&gt; `(after 100ms): world`
+b.send(1000);                  //&gt; `(after 1000ms): world`</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex2" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="control">Control</h2>
+
+You can control when the function is executed using its <span code>.control</span> property:
+
+<pre>
+  <code class="javascript">import { wrap, map, expr } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let b = document.getElementById('b') as HTMLInputElement;
+let btn = document.getElementById('btn');
+let p = document.getElementById('p');
+
+let e = expr((a, b) =&gt; a + b);
+
+wrap(fromEvent(a, 'input'))           //--&gt; get input from a
+  .to(map(() =&gt; parseInt(a.value)))   //--&gt; map it to a number
+  .to(e.in(0));                       //--&gt; feed it to e
+
+wrap(fromEvent(b, 'input'))           //--&gt; get input from b
+  .to(map(() =&gt; parseInt(b.value)))   //--&gt; map it to a number
+  .to(e.in(1));                       //--&gt; feed it to e
+
+wrap(fromEvent(btn, 'click'))         //--&gt; wait for the click before
+  .to(e.control);                     //... running the function
+
+e.result
+ .subscribe(v =&gt; p.innerHTML = v);    //--&gt; display the thing</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex3" target="_blank">TRY IT!</a>
+</div>
+
+Note that the <span code>expr()</span> waits for its control signal for every execution.
+
+<br><br>
+
+<h2 id="error-handling">Error handling</h2>
+
+Similar to <a href="/docs/map"><span code>map()</span></a>, synchronous errors happening during
+execution of the function are handled automatically. For async errors, the returned function
+is similarly provided with an error callback as its second argument. You should catch possible errors
+and pass them to this callback:
+
+<pre>
+  <code class="javascript">import { expr } from '@connectv/core';
+
+//--&gt; sync error handling in expr:
+
+let e = expr(() =&gt; {
+  throw new Error('because why not');
+});
+
+e.result.subscribe(
+  () =&gt; console.log('not here ...'),        //--&gt; normal callback
+  () =&gt; console.log('E HAD ERROR!')         //--&gt; error callback
+);
+
+//--&gt; async error handling in expr:
+
+let brokenPromise = () =&gt; new Promise(() =&gt; { throw new Error('well ...')});
+
+let f = expr(() =&gt; (done, error) =&gt; {
+  setImmediate(() =&gt;
+    brokenPromise().catch(error));         //--&gt; passing the caught error on ...
+});
+
+f.result.subscribe(
+  () =&gt; console.log('not here too ...'),   //--&gt; normal callback
+  () =&gt; console.log('F HAD ERROR!')        //--&gt; error callback
+)</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex4" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/expr.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/expr.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
