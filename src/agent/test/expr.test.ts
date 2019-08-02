@@ -37,13 +37,13 @@ describe('Expr', () => {
     new Expr(() => true).result.subscribe(() => done());
   });
 
-  it('should pass the proper error callback to the function.', done => {
-    new Expr((error: ErrorCallback) => error('hellow')).
+  it('should handle erros occuring in function execution.', done => {
+    new Expr(() => { throw new Error(); }).
       result.subscribe(() => {}, () => done());
   });
 
   it('should also pass the context to the function.', done => {
-    let e = new Expr(['i'], (_, __, ctx: ContextType) => {
+    let e = new Expr(['i'], (_, ctx: ContextType) => {
       ctx.name.should.equal('the dude');
       done();
     });
@@ -104,19 +104,8 @@ describe('expr()', () => {
     b.send(3);
   });
 
-  it('should pass the error function in `rest` param if automatically creating a signature.', done => {
-    let e = expr((a: any, ...[error]:[ErrorCallback]) => {
-      a.should.equal(42);
-      error('well ...');
-    });
-
-    let a = new Source(); a.to(e.in(0));
-    e.result.subscribe(() => {}, () => done());
-    a.send(42);
-  });
-
   it('should also pass the context in `rest` param if automatically creating a signature.', done => {
-    let e = expr((_:any, ...[__, ctx]: [any, ContextType]) => {
+    let e = expr((_:any, ...[ctx]: [any, ContextType]) => {
       ctx.name.should.equal('the dude');
       done();
     });
