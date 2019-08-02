@@ -171,6 +171,28 @@ f.result.subscribe(
   <a class="button" href="https://stackblitz.com/edit/connective-expr-ex4" target="_blank">TRY IT!</a>
 </div>
 
+<h2 id="signature">Signature</h2>
+
+An <span code>expr()</span> will have one input pin for each input of your function, named numerically:
+
+<pre>
+  <code class="javascript">let e = expr((a, b, c) => {
+  // ...
+});
+
+e.in(0); //--> this pin's data goes to param a
+e.in(1); //--> this pin's data goes to param b
+e.in(2); //--> this pin's data goes to param c</code>
+</pre>
+
+Each <span code>expr()</span> also has a <span code>"result"</span> output, which will relay the return value
+of the function:
+
+<pre>
+  <code class="javascript">e.out('result') //--&gt; this will get you the return value
+e.result        //--&gt; this is a shortcut for the same thing</code>
+</pre>
+
 <h2 id="further-reading">Further reading</h2>
 
 <ul>
