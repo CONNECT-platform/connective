@@ -103,29 +103,59 @@ window.addEventListener('load', function() {
   //
   // dark mode
   //
-  var dmtoggle = document.getElementById('dmtoggle');
-  var body = document.body;
+  (function() {
+    var dmtoggle = document.getElementById('dmtoggle');
+    var body = document.body;
 
-  var darkMode = function() { body.classList.add('dark-mode'); localStorage.setItem('dark-mode', 'true'); }
-  var lightMode = function() { body.classList.remove('dark-mode'); localStorage.setItem('dark-mode', 'false'); }
+    var darkMode = function() { body.classList.add('dark-mode');  }
+    var lightMode = function() { body.classList.remove('dark-mode'); }
 
-  dmtoggle.addEventListener('click', function() {
-    if (body.classList.contains('dark-mode')) lightMode();
-    else darkMode();
-  });
+    var systemPref = undefined;
 
-  if (localStorage.getItem('dark-mode') === 'true') darkMode();
-  if (localStorage.getItem('dark-mode') === 'false') lightMode();
+    var localPrefDark = function() {
+      if (systemPref == 'dark') localStorage.setItem('pref-scheme', 'system');
+      else localStorage.setItem('pref-scheme', 'dark');
+      setByLocalOrSystem();
+    }
 
-  if (window.matchMedia) {
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) darkMode();
-    window.matchMedia('(prefers-color-scheme: dark)').addListener(function(q) { if (q.matches) darkMode(); });
+    var localPrefLight = function() {
+      if (systemPref == 'light') localStorage.setItem('pref-scheme', 'system');
+      else localStorage.setItem('pref-scheme', 'light');
+      setByLocalOrSystem();
+    }
 
-    if (window.matchMedia('(prefers-color-scheme: light)').matches) lightMode();
-    window.matchMedia('(prefers-color-scheme: light)').addListener(function(q) { if (q.matches) lightMode(); });
-  }
+    var systemPrefDark = function() { systemPref = 'dark'; setByLocalOrSystem(); }
+    var systemPrefLight = function() {  systemPref = 'light'; setByLocalOrSystem(); }
 
-  setTimeout(function() { body.classList.add('dark-mode-animate')}, 100);
+    var setByLocalOrSystem = function() {
+      let localPref = localStorage.getItem('pref-scheme');
+      if (localPref && localPref !== 'system') {
+        if (localPref == 'dark') darkMode();
+        if (localPref == 'light') lightMode();
+      }
+      else if (systemPref) {
+        if (systemPref == 'dark') darkMode();
+        if (systemPref == 'light') lightMode();
+      }
+    }
+
+    dmtoggle.addEventListener('click', function() {
+      if (body.classList.contains('dark-mode')) localPrefLight();
+      else localPrefDark();
+    });
+
+    if (window.matchMedia) {
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) systemPrefDark();
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function(q) { if (q.matches) systemPrefDark(); });
+
+      if (window.matchMedia('(prefers-color-scheme: light)').matches) systemPrefLight();
+      window.matchMedia('(prefers-color-scheme: light)').addListener(function(q) { if (q.matches) systemPrefLight(); });
+    }
+
+    setByLocalOrSystem();
+
+    setTimeout(function() { body.classList.add('dark-mode-animate')}, 100);
+  })();
 
   //
   // nav toggle

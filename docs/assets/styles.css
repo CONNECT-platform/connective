@@ -766,6 +766,10 @@ code .line:before {
   transition: border-color .15s;
 }
 
+body.dark-mode code .line:before {
+  border-color: #212121;
+}
+
 code .line:hover {
   background: #424242;
 }
@@ -774,7 +778,8 @@ body.dark-mode code .line:hover {
   background: #212121;
 }
 
-code .line:hover:before {
+code .line:hover:before,
+body.dark-mode code .line:hover:before {
   border-color: #4A90E2;
 }
 
