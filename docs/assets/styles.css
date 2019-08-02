@@ -195,6 +195,12 @@ h1[id]::before, h2[id]::before, h3[id]::before {
   transition: opacity .15s, transform .15s;
 }
 
+body.dark-mode h1[id]::before,
+body.dark-mode h2[id]::before,
+body.dark-mode h3[id]::before {
+  background-image: url('./link-dark.svg');
+}
+
 h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
   opacity: .5;
   transform: translateX(0px);
