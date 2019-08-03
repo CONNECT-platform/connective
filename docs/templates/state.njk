@@ -1,0 +1,144 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">State</h1>
+
+<span code>state()</span> allows you to store and work with stateful values in your reactive flows:
+
+<pre>
+  <code class="javascript">import { wrap, map, state, pipe } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+let s = state();
+
+wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
+  .to(map(() =&gt; a.value))        //--&gt; map it to the input value
+  .to(pipe(debounceTime(1000)))  //--&gt; wait for the typing to finish
+  .to(s.input);                  //--&gt; set the state
+
+//
+// this will emit only when the state changes
+// so you cannot have something like
+//
+// &gt; state change: hellow
+// &gt; state change: hellow
+//
+s.output.subscribe(v =&gt; p.innerHTML += '&gt; state change: ' + v + '&lt;br&gt;');</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-st-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="late-sub">Late subscription</h2>
+
+<span code>state()</span> emits its value to late subscribers as well:
+
+<pre>
+  <code class="javascript">import { wrap, map, state, pipe } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let btn = document.getElementById('btn');
+let p = document.getElementById('p');
+let p2 = document.getElementById('p2');
+
+let s = state();
+
+wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
+  .to(map(() =&gt; a.value))        //--&gt; map it to the input value
+  .to(pipe(debounceTime(1000)))  //--&gt; wait for the typing to finish
+  .to(s.input);                  //--&gt; set the state
+
+s.output.subscribe(v =&gt; p.innerHTML = 'state: ' + v);
+
+wrap(fromEvent(btn, 'click'))
+  .subscribe(() =&gt; {
+    //
+    // so this guy subscribes on the state well after
+    // the latest value was emitted to it, but still
+    // receives the latest value:
+    //
+    s.output.subscribe(v =&gt; p2.innerHTML = 'received: ' + v).unsubscribe();
+  });</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-st-ex2" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="change-detection">Change detection</h2>
+
+<span code>state()</span> only changes its value and emits when it receives a value that is
+<i>deeply</i> different:
+
+<pre>
+  <code class="javascript">import { source, state } from '@connectv/core';
+
+let a = source();
+let s = state();
+
+a.to(s.input);
+s.output.subscribe(console.log);
+
+a.send([1, 2, 3]);
+a.send([1, 2, 3]);    //--&gt; this one does not get logged
+a.send([1, 2, 3, 4]);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-st-ex3" target="_blank">TRY IT!</a>
+</div>
+
+You can change this behavior by providing a custom equality function:
+
+<pre>
+  <code class="javascript">import { source, state } from '@connectv/core';
+
+let a = source();
+let s = state((x, y) =&gt; x == y);  //--&gt; provide custom equality check
+
+a.to(s.input);
+s.output.subscribe(console.log);
+
+a.send([1, 2, 3]);
+a.send([1, 2, 3]);                //--&gt; this is logged too
+a.send([1, 2, 3, 4]);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-st-ex4" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="signature">Signature</h2>
+
+Each <span code>state()</span> has an input pin named <span code>"value"</span> and an output pin
+named <span code>"value"</span>, which are also accessible via shortcut properties <span code>.input</span>
+and <span code>.output</span> respectively:
+
+<pre><code class="javascript">let s = state();
+
+s.in("value") == s.input;
+s.out("value") == s.output;</code></pre>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/state.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/state.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
