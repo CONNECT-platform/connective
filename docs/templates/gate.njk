@@ -1,0 +1,124 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Gate</h1>
+
+<span code>gate()</span> chooses which values to pass and which to drop based on signals
+it receives on its <span code>.control</span>:
+
+<pre>
+  <code class="javascript">import { wrap, pipe, gate, map, pin } from '@connectv/core';
+import { fromEvent} from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let btn = document.getElementById('btn');
+let p1 = document.getElementById('p1');
+let p2 = document.getElementById('p2');
+
+let g = gate();
+let p = pin();
+
+wrap(fromEvent(a, 'input'))                          //--&gt; when input comes in
+  .to(map(() =&gt; a.value))                            //--&gt; map it to input's value
+  .to(pipe(debounceTime(1000)))                      //--&gt; wait for typing to finish
+  .to(g.input, p);                                   //--&gt; pass it to the gate and some pin
+
+wrap(fromEvent(btn, 'click')).to(g.control);         //--&gt; open gate when button is clicked
+
+p.subscribe(v =&gt; p1.innerHTML += v + '&lt;br&gt;');        //--&gt; display what the pin receives
+g.output.subscribe(v =&gt; p2.innerHTML += v + '&lt;br&gt;'); //--&gt; display what the gate lets through</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-gate-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<span code>gate()</span> will either pass on each received value or drop it based on the boolean value
+it receives on <span code>.control</span>:
+
+<pre>
+  <code class="javascript">import { wrap, pipe, gate, map } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+let validator = map(v =&gt; v.startsWith('q'));
+let g = gate();
+
+wrap(fromEvent(a, 'input'))
+  .to(map(() =&gt; a.value))
+  .to(pipe(debounceTime(1000)))
+  .to(g.input, validator);       //--&gt; each value goes to the gate and the validator
+
+validator.to(g.control);         //--&gt; if the validator sends `true`, the gate will
+                                 //... let the value pass. otherwise, it will
+                                 //... drop the value.
+
+g.output.subscribe(v =&gt; p.innerHTML += v + '&lt;br&gt;');</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-gate-ex2" target="_blank">TRY IT!</a>
+</div>
+
+When multiple sources are connected to a <span code>gate</span>'s control, it will only pass values for which
+all sources emit <span code>true</span>, and drop the rest:
+
+<pre>
+  <code class="javascript">import { wrap, pipe, gate, map } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+let validator1 = map(v =&gt; v.startsWith('q'));
+let validator2 = map(v =&gt; v.length &gt; 5);
+let g = gate();
+
+wrap(fromEvent(a, 'input'))
+  .to(map(() =&gt; a.value))
+  .to(pipe(debounceTime(1000)))
+  .to(g.input, validator1, validator2);
+
+validator1.to(g.control);               //--&gt; only values will be passed
+validator2.to(g.control);               //... that both validators send `true` for,
+                                        //... the rest will be dropped.
+
+g.output.subscribe(v =&gt; p.innerHTML += v + '&lt;br&gt;');</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-gate-ex3" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="signature">Signature</h2>
+
+Each <span code>gate()</span> has one <span code>"value"</span> input, and one <span code>"value"</span> output,
+which are also accessible via <span code>.input</span> and <span code>.output</span> shortcut properties respectively.
+
+<pre><code class="javascript">let g = gate();
+
+g.in("value") == g.input;
+g.out("value") == g.output;</code></pre>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/gate.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/gate.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
