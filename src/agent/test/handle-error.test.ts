@@ -10,7 +10,7 @@ import filter from '../../pin/filter';
 import handleError, { HandleError } from '../handle-error';
 
 
-describe('HandleError', () => {
+describe.only('HandleError', () => {
   it('should pass proper data normally.', () => {
     let a = source();
     let h = handleError();
@@ -109,6 +109,27 @@ describe('HandleError', () => {
     });
 
     a.emit(emission(undefined, { x : 42 }));
+  });
+
+  it('should share its incoming values.', () => {
+    let a = source();
+    let h = handleError();
+    let e = 0;
+
+    a.to(map((x: any) => {
+      if (x == 2) throw new Error();
+      else return x;
+    }))
+    .to(h.input);
+
+    h.output.subscribe();
+    h.error.subscribe(() => e++);
+
+    a.send(1);
+    a.send(2);
+    a.send(3);
+
+    e.should.equal(1);
   });
 });
 

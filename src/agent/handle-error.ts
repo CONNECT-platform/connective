@@ -1,4 +1,4 @@
-import { retry, tap } from 'rxjs/operators';
+import { retry, tap, share } from 'rxjs/operators';
 
 import emission from '../shared/emission';
 import { isEmissionError } from '../shared/errors/emission-error';
@@ -31,7 +31,8 @@ export class HandleError extends Agent {
         else
           this._err.send(error);
       }),
-      retry()
+      retry(),
+      share(),
     ));
   }
 
