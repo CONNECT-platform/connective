@@ -208,11 +208,33 @@ h1[id]:hover::before, h2[id]:hover::before, h3[id]:hover::before {
 
 /*********** 404 ***********/
 
-.not-found img {
+.not-found .image-group {
   width: 100%;
   margin: 0 auto;
   display: block;
+  position: relative;
 }
+
+.not-found .image-group img {
+  width: 100%;
+}
+
+body.dark-mode-animate .not-found .image-group img {
+  transition: opacity .3s;
+}
+
+.not-found .image-group img.dark {
+  position: absolute;
+  top: 0; left: 0;
+  opacity: 0;
+}
+
+body.dark-mode .image-group img.dark { opacity: 1; }
+body.dark-mode .image-group img.light { opacity: 0; }
+
+.not-found span.dark { display: none; }
+body.dark-mode .not-found span.dark { display: inline; }
+body.dark-mode .not-found span.light { display: none; }
 
 /*********** toc ***********/
 
