@@ -1,0 +1,102 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">HandleError</h1>
+
+By default, if an error is thrown somewhere in a reactive flow, the whole flow or parts of it will shut-down afterwards.
+<span code>handleError()</span> allows you to catch errors and handle them gracefully:
+
+<pre>
+  <code class="javascript">import { source, map, handleError } from '@connectv/core';
+
+let a = source();
+
+//
+//--&gt;this flow does not have error handling, so it will die
+//--&gt; out after an error occurs..
+//
+a.to(map(x =&gt; {
+  if (x == 2) throw new Error();
+  else return x;
+})).subscribe(v =&gt; console.log('A:: ' + v));
+
+//
+//--&gt; this flow has error handling, so it will continue after
+//--&gt; an error occurs.
+//
+let h = handleError();
+a.to(map(x =&gt; {
+  if (x == 2) throw new Error();
+  else return x;
+})).to(h.input);
+h.output.subscribe(v =&gt; console.log('B:: ' + v));
+
+a.send(1);  //--&gt; logged by both
+a.send(2);  //--&gt; ignored by both
+a.send(3);  //--&gt; logged by 'B:: ' only, since 'A:: ' flow is dead.</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-he-ex1" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="catch">Catching errors</h2>
+
+You can access thrown errors using <span code>.error</span> (or <span code>.out("error")</span>):
+
+<pre>
+  <code class="javascript">import { source, map, group, handleError } from '@connectv/core';
+
+let a = source();
+let h = handleError();
+a.to(map(x =&gt; {
+  if (x == 2) throw new Error();
+  else return x;
+})).to(h.input);
+
+group(
+  h.output,                                         //--&gt; the usual output
+  h.error                                           //--&gt; the error output,
+    .to(map(e =&gt; `error for  ${e.emission.value}`)) //... lets make it presentable
+).subscribe(console.log);
+
+a.send(1);
+a.send(2);
+a.send(3);</code>
+</pre>
+<div class="buttons">
+  <a class="button" href="https://stackblitz.com/edit/connective-he-ex2" target="_blank">TRY IT!</a>
+</div>
+
+<h2 id="signature">Signature</h2>
+
+Each <span code>handleError()</span> has an <span code>"input"</span> input (short-hand property: <span code>.input</span>),
+on which it receives incoming emissions. When no error has occured, it will simply relay the emission on its
+<span code>"output"</span> output (short-hand property: <span code>.output</span>). In case of error, the error object
+will be emitted via its <span code>"error"</span> output (short-hand property: <span code>.error</span>):
+
+<pre><code class="javascript">let h = handleError();
+
+h.in("input") == h.input    //--&gt; receives emissions on this
+h.out("output") == h.output //--&gt; emits them on this where there is no error
+h.out("error") == h.error   //--&gt; emits errors on this pin.</code></pre>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/handle-error.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/handle-error.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
