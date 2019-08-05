@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>copy</title>
+    <desc>Created with Sketch.</desc>
+    <g id="copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" stroke-opacity="0.01" stroke="#979797" stroke-width="0.1" fill-rule="nonzero" x="0.05" y="0.05" width="23.9" height="23.9"></rect>
+        <path d="M4,19.8292943 C2.83480763,19.4174579 2,18.3062188 2,17 L2,3 C2,1.34314575 3.34314575,-1.47199765e-15 5,-1.77635684e-15 L15,-1.77635684e-15 C16.3062188,-2.01630535e-15 17.4174579,0.834807627 17.8292943,2 L5,2 C4.44771525,2 4,2.44771525 4,3 L4,19.8292943 Z M9,6 C8.44771525,6 8,6.44771525 8,7 L8,21 C8,21.5522847 8.44771525,22 9,22 L19,22 C19.5522847,22 20,21.5522847 20,21 L20,7 C20,6.44771525 19.5522847,6 19,6 L9,6 Z M9,4 L19,4 C20.6568542,4 22,5.34314575 22,7 L22,21 C22,22.6568542 20.6568542,24 19,24 L9,24 C7.34314575,24 6,22.6568542 6,21 L6,7 C6,5.34314575 7.34314575,4 9,4 Z" id="Shape" fill="#4A90E2" fill-rule="nonzero"></path>
+    </g>
+</svg>

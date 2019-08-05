@@ -13,7 +13,7 @@
 
 You can use <span code>pack()</span> to collect values from multiple sources:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pack-ex1">
   <code class="javascript">import { wrap, pack, group, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -29,15 +29,12 @@ group(
 .to(map(v =&gt; v.join(' ')))                             //--&gt; pack returns an array, lets join it
 .subscribe(v =&gt; p.innerHTML = v);                      //--&gt; say hi</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pack-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="initial">First emission</h2>
 
 <span code>pack()</span> waits for all connected sources to emit at least once before its first emission:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pack-ex2">
   <code class="javascript">import { wrap, pack, filter, map, group } from '@connectv/core';
 import { fromEvent, interval } from 'rxjs';
 
@@ -55,9 +52,6 @@ group(
 .to(map(v =&gt; v[0]))                  //--&gt; map to the interval's value
 .subscribe(v =&gt; p.innerHTML = v);    //--&gt; display the beautiful</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pack-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 

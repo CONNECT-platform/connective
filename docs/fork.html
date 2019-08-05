@@ -48,7 +48,7 @@ record on the login user, e.g. to see if they exist or their password matches, a
 a token for them that they could use, i.e. a <b>JWT</b> token. For generating the token, you do not need
 the data from database, so you can do these two actions in parallel, leading to a flow like this:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-fj-ex1">
   <code class="javascript">import { source, map, control } from '@connectv/core';
 
 
@@ -68,9 +68,6 @@ loginReq
 loginReq.send('john');                                //--&gt; first john sends a login request
 loginReq.send('jack');                                //--&gt; then jack does</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fj-ex1" target="_blank">TRY IT!</a>
-</div>
 
 If you run this code, you'll see that the output will look like this:
 
@@ -93,7 +90,7 @@ What happens is:
 <span code>fork()</span> allows you to <i>stamp</i> incoming emissions, so you can pair them later based on this stamp
 using <span code>join()</span>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-fj-ex2">
   <code class="javascript">import { source, map, fork, join } from '@connectv/core';
 
 
@@ -117,9 +114,6 @@ j.output.subscribe(console.log);
 loginReq.send('john');                                //--&gt; first john sends a login request
 loginReq.send('jack');                                //--&gt; then jack does</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fj-ex2" target="_blank">TRY IT!</a>
-</div>
 
 Now the result becomes:
 

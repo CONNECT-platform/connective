@@ -7,7 +7,7 @@
 
 You can use <span code>source()</span> to manually send events/data to your reactive flows:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-src-ex1">
   <code class="javascript">import { source, map, group } from '@connectv/core';
 
 let a = source();
@@ -21,9 +21,6 @@ b.send('B');
 setInterval(() =&gt; a.send('A'), 1000);
 document.addEventListener('click', () =&gt; b.send('B'));</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-src-ex1" target="_blank">TRY IT!</a>
-</div>
 
 A source is a <a href="/docs/pin">Pin</a> and have all of its properties, though connecting to a source
 can lead to unpredictable behavior.
@@ -34,7 +31,7 @@ Like other pin types, <span code>source()</span> has a <span code>.clear()</span
 call when you are done with your source. This will clean up the flow and send the <i>complete</i> signal down
 the line for <a href="/docs/pin#error-and-complete">any such callback</a> to handle:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex7">
   <code class="javascript">import { source, pin } from '@connectv/core';
 
 let a = source();
@@ -50,9 +47,6 @@ a.send(12);
 a.send('YOLO!');
 a.clear();</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex7" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 

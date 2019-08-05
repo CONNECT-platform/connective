@@ -45,7 +45,7 @@
 <span code>value()</span> is like <span code><a href="/docs/control">control()</span></a>,
 except it will emit the given value:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-val-ex1">
   <code class="javascript">import { wrap, value } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -53,13 +53,10 @@ let btn = document.getElementById('btn');
 
 wrap(fromEvent(btn, 'click')).to(value('HELLOW!')).subscribe(console.log);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-val-ex1" target="_blank">TRY IT!</a>
-</div>
 
 A <span code>value()</span> can also be the source of a flow:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-val-ex2">
   <code class="javascript">import { value, spread, pipe } from '@connectv/core';
 import { timer } from 'rxjs';
 import { delayWhen } from 'rxjs/operators';
@@ -73,9 +70,6 @@ value([1, 2, 3, 4, 5])                 //--&gt; start with this array
 )
 .subscribe(console.log);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-val-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="further-reading">Further reading</h2>
 

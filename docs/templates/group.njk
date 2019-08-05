@@ -21,7 +21,7 @@ be a group of pins containing all pins you passed to the method.
 When you use <span code>.to()</span> or <span code>.from()</span> methods on a group, all the pins in the group
 will be connected to (or receive a connection from) the given pin:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-grp-ex1">
   <code class="javascript">import { source, group, map } from '@connectv/core';
 
 let a = source();
@@ -30,14 +30,11 @@ a.to(g).subscribe(console.log); //--&gt; a goes to both `map()`s in g
 
 a.send('A');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-grp-ex1" target="_blank">TRY IT!</a>
-</div>
 
 When you call <span code>.to()</span> on a group passing another group to it (or multiple pins), all pins in the
 first group will be connected to the all pins in the second group:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-grp-ex2">
   <code class="javascript">import { source, group, map, pin } from '@connectv/core';
 
 let a = source();
@@ -48,15 +45,12 @@ a.to(g1).to(g2).to(pin()).subscribe(console.log);
 
 a.send(1);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-grp-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="subscribe">Subscribing</h2>
 
 You can use the <span code>.subscribe()</span> method on a group to subscribe to all of its pins:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-grp-ex3">
   <code class="javascript">import { source, group } from '@connectv/core';
 
 let a = source();
@@ -67,9 +61,6 @@ group(a, b).subscribe(console.log);
 a.send('hellow');
 b.send('world');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-grp-ex3" target="_blank">TRY IT!</a>
-</div>
 
 Similarly, you can call <span code>.bind()</span> method on a group. Note that this will only affect pins that
 have a <span code>.bind()</span> method (other pins in the group will remain unaffected).

@@ -54,7 +54,7 @@ It enables declarative creation of large and complex data/event flows and encour
 <br><br>
 
 A <i>Hellow World!</i> example:
-<pre>
+<pre try="https://stackblitz.com/edit/connective-hellow-world">
 <code class="javascript">import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -72,12 +72,9 @@ wrap(fromEvent(a, 'input'))           // --&gt; wrap the `Observable` in a `Pin`
 .to(map(name =&gt; 'hellow ' + name))    // --&gt; add 'hellow' to the name
 .subscribe(msg =&gt; p.innerHTML = msg); // --&gt; write it to the &lt;p&gt; element</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-hellow-world" target="_blank">TRY IT!</a>
-</div>
 
 A more elaborate example:
-<pre>
+<pre try="https://stackblitz.com/edit/connective-sample-fib">
 <code class="javascript">import { wrap, pipe, map, filter, sink } from '@connectv/core';
 import { fromEvent, timer } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
@@ -106,9 +103,6 @@ wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` i
 .to(sink(v =&gt; p.innerHTML = v))              // --&gt; set the text of &lt;p&gt; to the fib number
 .subscribe();                                // --&gt; bind the whole thing.</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-sample-fib" target="_blank">TRY IT!</a>
-</div>
 
 
 <br>
@@ -148,7 +142,7 @@ would also help, though it is not mandatory. For basic usage and/or for getting 
 leading to some sinks for those data/events which would consume them, possibly going through and being transformed by
 some other nodes along the way:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-1">
 <code class="javascript">import { source, sink, pin } from '@connectv/core';
 
 let a = source();
@@ -162,11 +156,8 @@ c.bind();
 a.send('hellow!');
 a.send('world!');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-1" target="_blank">TRY IT!</a>
-</div>
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-2">
 <code class="javascript">import { source, sink, pin } from '@connectv/core';
 
 let a = source();
@@ -180,9 +171,6 @@ c.bind();
 a.send('hellow!');
 a.send('world!');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-2" target="_blank">TRY IT!</a>
-</div>
 
 Every node of such a flow is represented by a
 <a href="/docs/pin">Pin</a>
@@ -200,7 +188,7 @@ You can connect pins to each other using their
 You can pass multiple parameters to <span code>.to()</span> and <span code>.from()</span>, causing the <i>Pin</i>
 to be connected to multiple pins:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-3">
 <code class="javascript">import { source, sink } from '@connectv/core';
 
 let a = source();
@@ -213,11 +201,8 @@ b.bind(); c.bind();
 a.send('hellow!');
 a.send('world!');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-3" target="_blank">TRY IT!</a>
-</div>
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-4">
 <code class="javascript">import { source, sink } from '@connectv/core';
 
 let a = source();
@@ -229,9 +214,6 @@ c.from(a, b); c.bind(); // --&gt; c's stuff come from both a and b
 a.send('hellow!');
 b.send('world!');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-4" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : SUBSCRIBE ---------->
 
@@ -240,7 +222,7 @@ b.send('world!');</code>
 You can directly subscribe on any <i>Pin</i> using its <a href="/docs/pin#subscribe"><span code>.subscribe()</span></a> method, so you don't need to use <span code>sink()</span> all the time.
 You can also use <a href="/docs/group"><span code>group()</span></a> to work with a multitude of <i>Pins</i> at once:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-5">
 <code class="javascript">import { source, pin, group } from '@connectv/core';
 
 let a = source();
@@ -251,9 +233,6 @@ group(a, b).to(pin()).subscribe(v =&gt; console.log(v));
 a.send('hellow!');
 b.send('world!');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-5" target="_blank">TRY IT!</a>
-</div>
 
 Note that:
 <ul>
@@ -264,7 +243,7 @@ becomes <i>locked</i>. You cannot connect any new pin to a locked pin.</li>
   <li>you can check if a pin is locked via its <span code>.locked</span> property.</li>
 </ul>
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-6">
 <code class="javascript">import { pin } from '@connectv/core';
 
 let a = pin();
@@ -278,9 +257,6 @@ b.subscribe();
 console.log('A:: ' + a.locked + ' B:: ' + b.locked);
 // &gt; 'A:: true B:: true'</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-6" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : OTHER SOURCES ---------->
 
@@ -288,7 +264,7 @@ console.log('A:: ' + a.locked + ' B:: ' + b.locked);
 
 You can also create sources from plain values or from <i>Observables</i>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-7">
 <code class="javascript">import { wrap, value, pin, group } from '@connectv/core';
 import { interval } from 'rxjs';
 
@@ -297,9 +273,6 @@ let b = wrap(interval(1000));   // --&gt; b emits a number every 1000ms
 
 group(a, b).to(pin()).subscribe(v =&gt; console.log(v));</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-7" target="_blank">TRY IT!</a>
-</div>
 
 Note that you cannot connect any pin to <a href="/docs/wrap"><span code>wrap()</span></a>.
 <br><br>
@@ -310,16 +283,13 @@ Note that you cannot connect any pin to <a href="/docs/wrap"><span code>wrap()</
 
 You can use <a href="/docs/spread"><span code>spread()</span></a> to turn incoming values into multiple emissions:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-8">
 <code class="javascript">import { spread, value } from '@connectv/core';
 
 value([1, 2, 3, 4, 5, 6])
 .to(spread())
 .subscribe(v =&gt; console.log(v));</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-8" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : FILTER & MAP ---------->
 
@@ -328,7 +298,7 @@ value([1, 2, 3, 4, 5, 6])
 You can change incoming values using <a href="/docs/map"><span code>map()</span></a>, and let them through or block them using
 <a href="/docs/filter"><span code>filter()</span></a>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-9">
 <code class="javascript">import { spread, value, filter, map } from '@connectv/core';
 
 value([1, 2, 3, 4, 5, 6])
@@ -337,9 +307,6 @@ value([1, 2, 3, 4, 5, 6])
 .to(map(v =&gt; v * 10))        // --&gt; multiply each value by 10
 .subscribe(v =&gt; console.log(v));</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-9" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : CONTROL ---------->
 
@@ -347,7 +314,7 @@ value([1, 2, 3, 4, 5, 6])
 
 You can break your flow into multiple branches and join them back using <a href="/docs/control"><span code>control()</span></a>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-10">
 <code class="javascript">import { spread, value, map, control } from '@connectv/core';
 
 value([1, 2, 3, 4, 5, 6])
@@ -359,9 +326,6 @@ map(v =&gt; v * 100),
 .to(control()) // --&gt; will wait for all incoming emissions and join them pair-wise
 .subscribe(v =&gt; console.log(v));</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-10" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : LOOP ---------->
 
@@ -369,7 +333,7 @@ map(v =&gt; v * 100),
 
 You can even create loops in your flow:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-11">
 <code class="javascript">import { source, map, filter } from '@connectv/core';
 
 let a = source();
@@ -382,9 +346,6 @@ a.to(m)
 
 a.send(0);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-11" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : PIPE ---------->
 
@@ -393,7 +354,7 @@ a.send(0);</code>
 In the example above, the order is not necessarily preserved. You can for example enforce the order by using
 <b>RxJS</b>'s <span code>delay()</span> operator:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-12">
 <code class="javascript">import { source, map, filter, pipe } from '@connectv/core';
 import { delay } from 'rxjs';
 
@@ -408,9 +369,6 @@ a.to(m)
 
 a.send(0);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-12" target="_blank">TRY IT!</a>
-</div>
 
 <a href="/docs/pipe"><span code>pipe()</span></a> allows you to use any <b>RxJS</b> pipeable operator.
 Note that values are not passed directly to pipeable operators, they are wrapped in
@@ -428,7 +386,7 @@ You can re-use parts of your reactive flows using the
 <a href="/docs/composition">Composition</a>
 class:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-13">
 <code class="javascript">import { Composition, source, filter } from '@connectv/core';
 
 class EvenOdd extends Composition {
@@ -471,9 +429,6 @@ a.send(2);
 a.send(3);
 a.send(4);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-13" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : AGENT ---------->
 <h3 id="agent">Agent</h3>
@@ -497,7 +452,7 @@ denote the possible names of the incoming and outgoing pins of the Agent.
 <a href="/docs/expr"><span code>expr()</span></a> allows you to convert any function into an agent:
 
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-14">
 <code class="javascript">import { source, expr } from '@connectv/core';
 
 let a = source();
@@ -511,9 +466,6 @@ e.result.subscribe(v =&gt; console.log(v));  // --&gt; this is a short-hand for 
 a.send(2); b.send(3);
 a.send(42); b.send(30);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-14" target="_blank">TRY IT!</a>
-</div>
 
 Notice how the expr is called for every new value provided by the sources after the two initial values.
 
@@ -525,7 +477,7 @@ A <a href="/docs/node">Node</a>
 is basically a more complex version of an Expr, allowing you to emit to any outputs denoted in the signature
 (instead of just <span code>"result"</span> pin). You can create nodes easily using <span code>node()</span> function:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-15">
 <code class="javascript">import { source, node } from '@connectv/core';
 
 let N = node({ inputs: ['a'], outputs: ['even', 'odd']}, // --&gt; set the signature
@@ -546,16 +498,13 @@ a.send(3);
 a.send(4);
 a.send(5);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-15" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : GATE ---------->
 <h3 id="gate">Gate</h3>
 
 You can control when some emission passes through via another emission using <a href="/docs/gate"><span code>gate()</span></a>
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-16">
 <code class="javascript">import { source, gate, map, spread, pipe, group, control } from '@connectv/core';
 import { delay } from 'rxjs/operators';
 
@@ -574,9 +523,6 @@ g.output.subscribe(v =&gt; console.log(v));
 
 a.send("Hellow darkness my old friend I've come to talk with you again");</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-16" target="_blank">TRY IT!</a>
-</div>
 
 In this example, <span code>g.control</span> is a <a href="/docs/control">control pin</a> that will cause the
 gate to let emissions through when it receives a value itself. This pin is not mentioned in the gate's
@@ -593,7 +539,7 @@ introduces a composition that represents the state of a <i>html input</i>, which
 <span code>state()</span>,
 and then uses that composition to bind two inputs together:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-17">
 <code class="javascript">import { wrap, map, state, sink, Composition } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -642,9 +588,6 @@ b.out('value').to(a.in('value'));
 a.bind(); // --&gt; .bind() on composition will call .bind() on all child nodes having that method
 b.bind();</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-17" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : SEQUENCE ---------->
 <h3 id="sequence">Sequence</h3>
@@ -652,7 +595,7 @@ b.bind();</code>
 The <a href="/docs/sequence"><span code>sequence()</span></a> agent allows you to distinguish specific sequences of events
 coming from various sources:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-18">
 <code class="javascript">import { wrap, map, sequence, group } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -668,9 +611,6 @@ click.output.to(map(() =&gt; 'CLICK!!')),
 drag.output.to(map(() =&gt; 'DRAG!!'))
 ).subscribe(v => console.log(v));</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-18" target="_blank">TRY IT!</a>
-</div>
 
 <!---------- QUICK-DIVE : MEMORY ---------->
 

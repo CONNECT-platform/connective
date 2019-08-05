@@ -45,7 +45,7 @@
 <span code>wrap()</span> allows you to turn any <b>RxJS</b> observable into a pin and use it
 in your reactive flows:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-wrap-ex1">
   <code class="javascript">import { wrap, map, group } from '@connectv/core';
 import { interval, fromEvent } from 'rxjs';
 
@@ -56,9 +56,6 @@ group(
 .to(map(v => 'GOT:: ' + v))
 .subscribe(console.log);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-wrap-ex1" target="_blank">TRY IT!</a>
-</div>
 
 Wrap is a (special kind of) <a href="/docs/pin">Pin</a> and so inherits a lot of its properties and behaviors,
 though connecting another pin to it is prohibited.

@@ -45,7 +45,7 @@
 <span code>gate()</span> chooses which values to pass and which to drop based on signals
 it receives on its <span code>.control</span>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-gate-ex1">
   <code class="javascript">import { wrap, pipe, gate, map, pin } from '@connectv/core';
 import { fromEvent} from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -68,14 +68,11 @@ wrap(fromEvent(btn, 'click')).to(g.control);         //--&gt; open gate when but
 p.subscribe(v =&gt; p1.innerHTML += v + '&lt;br&gt;');        //--&gt; display what the pin receives
 g.output.subscribe(v =&gt; p2.innerHTML += v + '&lt;br&gt;'); //--&gt; display what the gate lets through</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-gate-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <span code>gate()</span> will either pass on each received value or drop it based on the boolean value
 it receives on <span code>.control</span>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-gate-ex2">
   <code class="javascript">import { wrap, pipe, gate, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -97,14 +94,11 @@ validator.to(g.control);         //--&gt; if the validator sends `true`, the gat
 
 g.output.subscribe(v =&gt; p.innerHTML += v + '&lt;br&gt;');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-gate-ex2" target="_blank">TRY IT!</a>
-</div>
 
 When multiple sources are connected to a <span code>gate</span>'s control, it will only pass values for which
 all sources emit <span code>true</span>, and drop the rest:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-gate-ex3">
   <code class="javascript">import { wrap, pipe, gate, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -127,9 +121,6 @@ validator2.to(g.control);               //... that both validators send `true` f
 
 g.output.subscribe(v =&gt; p.innerHTML += v + '&lt;br&gt;');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-gate-ex3" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="signature">Signature</h2>
 

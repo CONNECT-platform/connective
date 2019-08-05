@@ -44,7 +44,7 @@
 
 A <span code>sink()</span> acts as a consumer of incoming events/data:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-sink-ex1">
   <code class="javascript">import { source, map, filter, sink } from '@connectv/core';
 
 let a = source();
@@ -57,9 +57,6 @@ b.bind();
 a.send(2);
 a.send(3);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-sink-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <span code>sink()</span> has a <span code>.bind()</span> method which will lock the sink and cause it to receive
 events/data from the rest of the flow. <span code>.bind()</span> will lock the portion of the flow that the sink is reliant
@@ -70,7 +67,7 @@ on, much like <span code>.subscribe()</span> method.
 You can also place a sink in the middle of your reactive flow to do something according to incoming data/events without
 transforming them:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-sink-ex1">
   <code class="javascript">import { wrap, group, map, filter, sink } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -83,9 +80,6 @@ wrap(fromEvent(a, 'input'))
 .to(filter(x =&gt; x % 2 == 1))        //--&gt; filter for odd ones
 .subscribe(v =&gt; p.innerHTML = v);   //--&gt; put them on the page</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-sink-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="further-reading">Further reading</h2>
 

@@ -44,7 +44,7 @@
 
 <span code>spread()</span> will spread an incoming array into multiple emissions:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-sprd-ex1">
   <code class="javascript">import { wrap, control, group, spread, gate, pipe, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
@@ -68,13 +68,10 @@ group(control(), g.output)           //--&gt; the control() is not connected
 
 g.output.subscribe(v =&gt; p.innerHTML = v);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-sprd-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <span code>spread()</span> will just relay incoming values that are not arrays:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-sprd-ex2">
   <code class="javascript">import { source, spread } from '@connectv/core';
 
 let a = source();
@@ -85,9 +82,6 @@ a.send(4);         //--> just relay 4
 a.send([5, 6]);    //--> spread again
 a.send(7);         //--> relay again</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-sprd-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="further-reading">Further reading</h2>
 

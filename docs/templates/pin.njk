@@ -114,7 +114,7 @@ Pins are always in one of two states: <i>bound</i> or <i>unbound</i>.
 
 You can bind a pin using its <span code>.subscribe()</span> method:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex1">
   <code class="javascript">import { source, pin } from '@connectv/core';
 
 let a = source();
@@ -126,13 +126,10 @@ b.subscribe(console.log);
 a.send('Hellow!');
 a.send('World!');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex1" target="_blank">TRY IT!</a>
-</div>
 
 or the <span code>.bind()</span> method on a <a href="/docs/sink"><span code>sink()</span></a>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex2">
   <code class="javascript">import { source, sink } from '@connectv/core';
 
 let a = source();
@@ -144,13 +141,10 @@ b.bind();
 a.send('Hellow!');
 a.send('World!');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex2" target="_blank">TRY IT!</a>
-</div>
 
 Note that before a pin is bound, it will not receive incoming events/data:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex3">
   <code class="javascript">import { source, sink } from '@connectv/core';
 
 let a = source();
@@ -162,9 +156,6 @@ a.send('Hellow!'); //--&gt; falling on deaf ears ...
 b.bind();
 a.send('World!');  //--&gt; now this one gets heard.</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex3" target="_blank">TRY IT!</a>
-</div>
 
 You can check if a pin is bound or not using its <span code>.locked</span> property:
 
@@ -187,7 +178,7 @@ else {
 You do not need to manually bind all the pins in your flow. When one pin is bound, all the pins in the flow that the bound pin
 relies on are going to be bound as well:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex4">
   <code class="javascript">import { pin } from '@connectv/core';
 
 let a = pin();
@@ -200,9 +191,6 @@ b.subscribe();         //--&gt; so we will lock b
 console.log(a.locked); //--&gt; a is locked as well
 console.log(c.locked); //--&gt; but c is not.</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex4" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 
@@ -213,7 +201,7 @@ The <span code>.subscribe()</span> method on pins returns an instance of <b>RxJS
 object. This object in turn has an <span code>.unsubscribe()</span> method, which you can use
 to clean-up the subscriptions you make to your flows:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex5">
   <code class="javascript">import { source, pin } from '@connectv/core';
 
 let a = source();
@@ -233,9 +221,6 @@ a.send('world');    //--&gt; picked up by c only
 sc.unsubscribe();   //--&gt; c is out of the game ...
 a.send('well ...'); //--&gt; falling on deaf ears</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex5" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 
@@ -247,7 +232,7 @@ the <a href="https://rxjs-dev.firebaseapp.com/api/index/class/Observable#subscri
 </a> on <b>RxJS</b>'s Observables. This means you can supply it with <i>error</i> and/or <i>complete</i>
 callbacks as well:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex6">
   <code class="javascript">import { source, map, pin } from '@connectv/core';
 
 let a = source();
@@ -265,11 +250,8 @@ a.to(map(() =&gt; { throw new Error(); }))       //--&gt; someone in the flow is
 
 a.send();</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex6" target="_blank">TRY IT!</a>
-</div>
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex7">
   <code class="javascript">import { source, pin } from '@connectv/core';
 
 let a = source();
@@ -285,9 +267,6 @@ a.send(12);
 a.send('YOLO!');
 a.clear();</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex7" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 
@@ -297,7 +276,7 @@ It is a good idea to clear up any pin using its <span code>.clear()</span> metho
 This method will disconnect the pin from rest of the flow and also unsubscribe subscriptions made via
 the <span code>.subscribe()</span> method.
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-ex8">
   <code class="javascript">import { source, pin } from '@connectv/core';
 
 let a = source();
@@ -314,9 +293,6 @@ a.send('world!');                     //--&gt; does not go through
 b.subscribe(v =&gt; console.log(v));
 a.send('yo mate!');                   //--&gt; still not going through</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-ex8" target="_blank">TRY IT!</a>
-</div>
 
 There is no guarantee that a pin will be usable after being cleared, so call it when you are absolutely
 done with it. Most of the time you should not need to call this method directly, as other mechanisms in <b>CONNECTIVE</b>
@@ -335,7 +311,7 @@ go un-tracked. If you make such subscriptions, be sure to track them and clean t
 Mostly you would use some other pin type in your reactive flows. However, you could use
 the basic relay function of <span code>pin()</span> to <i>OR</i> multiple control signals:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pin-example">
 <code class="javascript">import { source, pin, gate, group } from '@connectv/core';
 
 let a = source();
@@ -355,9 +331,6 @@ g2.output.subscribe(v =&gt; console.log('G2:: ' + v));
 c.send(1); a.send(true); b.send(true);
 c.send(2); a.send(true);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pin-example" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 

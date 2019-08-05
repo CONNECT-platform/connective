@@ -50,7 +50,7 @@
 
 The function can be a simple synchronous function, in which case it should take only one argument:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-map-ex1">
   <code class="javascript">import { source, spread, map } from '@connectv/core';
 
 let a = source();
@@ -62,13 +62,10 @@ a.to(spread())             //--&gt; spread incoming array as multiple emissions
 a.send([1, 2, 3, 4]);
 a.send([10, 20, 30, 40]);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-map-ex1" target="_blank">TRY IT!</a>
-</div>
 
 Or it can be an asynchronous function, in which case it should take a callback as second argument:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-map-ex2">
   <code class="javascript">import { source, spread, map } from '@connectv/core';
 
 let a = source();
@@ -81,9 +78,6 @@ a.to(spread())
 
 a.send([4, 2, 1, 3, 8, 5, 7]);              //--&gt; notice how the order is not preserved</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-map-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 
@@ -91,7 +85,7 @@ a.send([4, 2, 1, 3, 8, 5, 7]);              //--&gt; notice how the order is not
 
 In a sync map function, you can simply throw the errors that occur:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-map-ex3">
   <code class="javascript">import { source, map } from '@connectv/core';
 
 let a = source();
@@ -110,14 +104,11 @@ a.to(map(x =&gt; {
 a.send(5);
 a.send(2);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-map-ex3" target="_blank">TRY IT!</a>
-</div>
 
 Async map functions are provided with an error callback as their third argument, to which they should pass
 errors that occur:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-map-ex4">
   <code class="javascript">import { source, map } from '@connectv/core';
 
 let a = source();
@@ -138,9 +129,6 @@ a.to(map((x, done, error) =&gt; {
 
 a.send();</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-map-ex4" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 

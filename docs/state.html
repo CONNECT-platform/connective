@@ -44,7 +44,7 @@
 
 <span code>state()</span> allows you to store and work with stateful values in your reactive flows:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-st-ex1">
   <code class="javascript">import { wrap, map, state, pipe } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -68,15 +68,12 @@ wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
 //
 s.output.subscribe(v =&gt; p.innerHTML += '&gt; state change: ' + v + '&lt;br&gt;');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-st-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="late-sub">Late subscription</h2>
 
 <span code>state()</span> emits its value to late subscribers as well:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-st-ex2">
   <code class="javascript">import { wrap, map, state, pipe } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -105,16 +102,13 @@ wrap(fromEvent(btn, 'click'))
     s.output.subscribe(v =&gt; p2.innerHTML = 'received: ' + v).unsubscribe();
   });</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-st-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="change-detection">Change detection</h2>
 
 <span code>state()</span> only changes its value and emits when it receives a value that is
 <i>deeply</i> different:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-st-ex3">
   <code class="javascript">import { source, state } from '@connectv/core';
 
 let a = source();
@@ -127,13 +121,10 @@ a.send([1, 2, 3]);
 a.send([1, 2, 3]);    //--&gt; this one does not get logged
 a.send([1, 2, 3, 4]);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-st-ex3" target="_blank">TRY IT!</a>
-</div>
 
 You can change this behavior by providing a custom equality function:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-st-ex4">
   <code class="javascript">import { source, state } from '@connectv/core';
 
 let a = source();
@@ -146,9 +137,6 @@ a.send([1, 2, 3]);
 a.send([1, 2, 3]);                //--&gt; this is logged too
 a.send([1, 2, 3, 4]);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-st-ex4" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="signature">Signature</h2>
 

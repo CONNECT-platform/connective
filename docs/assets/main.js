@@ -61,6 +61,39 @@ window.addEventListener('load', function() {
   });
 
   //
+  // also add copy buttons to all triable codes:
+  //
+  document.querySelectorAll('pre[try]').forEach(function(node) {
+    var holder = document.createElement('div');
+    holder.setAttribute('class', 'buttons');
+
+    var copyBtn = document.createElement('button');
+    copyBtn.innerHTML = '<img src="/docs/assets/copy.svg"/><img src="/docs/assets/copy-blue.svg"/>';
+    copyBtn.setAttribute('class', 'copy-btn');
+    holder.appendChild(copyBtn);
+
+    var tryBtn = document.createElement('a');
+    tryBtn.setAttribute('class', 'button');
+    tryBtn.setAttribute('href', node.getAttribute('try'));
+    tryBtn.setAttribute('target', '_blank');
+    tryBtn.innerHTML = 'TRY IT!'
+    holder.appendChild(tryBtn);
+
+    node.parentNode.insertBefore(holder, node.nextSibling);
+  });
+
+  new ClipboardJS('pre[try] + .buttons .copy-btn', {
+    text: function(trigger) {
+      showOverlay(copyConfirm, 2000);
+      let code = '';
+      let lines = trigger.parentElement.previousElementSibling.childNodes[1].childNodes;
+      for (var i = 0; i < lines.length; i++)
+        code += lines[i].textContent + '\n';
+      return code;
+    }
+  });
+
+  //
   // make the links of titles copiable
   //
   new ClipboardJS('h1[id], h2[id], h3[id]', {

@@ -14,7 +14,7 @@ Filter blocks some emissions while letting some others true utilizng the provide
 Similar to <a href="/docs/map"><span code>map()</span></a>, this function can be a simple sync function, in which case
 it needs to take one argument:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-fil-ex1">
   <code class="javascript">import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -25,13 +25,10 @@ wrap(fromEvent(a, 'input'))       //--&gt; get input events on the input
  .to(filter(x =&gt; x.length &gt; 3))   //--&gt; only allow long enough text
  .subscribe(console.log);         //--&gt; log it</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex1" target="_blank">TRY IT!</a>
-</div>
 
 Or it can be an asynchronous one, in which case it needs to take a callback as its second argument:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-fil-ex2">
   <code class="javascript">import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -45,9 +42,6 @@ wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
  }))
  .subscribe(console.log);               //--&gt; log it</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 
@@ -57,7 +51,7 @@ wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
 <a href="/docs/map#error-handling"><span code>map()</span></a>
 does, i.e. in sync filter functions you can just throw the errors:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-fil-ex3">
   <code class="javascript">import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -76,14 +70,11 @@ wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
      console.log(err.original.message)  //--&gt; ERROR!
  );</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex3" target="_blank">TRY IT!</a>
-</div>
 
 and in async filter functions, you have to catch the error and pass it to the <i>error callback</i>, which
 will be the third argument passed to the filter function:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-fil-ex4">
   <code class="javascript">import { wrap, map, filter } from '@connectv/core';
 import { fromEvent, throwError } from 'rxjs';
 
@@ -106,9 +97,6 @@ wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
      console.log(err.original.message)  //--&gt; ERROR!
  );</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-fil-ex4" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 

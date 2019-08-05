@@ -48,7 +48,7 @@
 </a>
 in your reactive flows:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pipe-ex1">
   <code class="javascript">import { wrap, pipe, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
@@ -61,16 +61,13 @@ wrap(fromEvent(a, 'input'))
 .to(pipe(throttleTime(1000)))       //--&gt; throttle a bit
 .subscribe(v =&gt; p.innerHTML = v);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pipe-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="emission">Emissions</h2>
 
 The operators are not passed raw emitted data/events, but rather <a href="/docs/emission">Emission</a>
 objects that contain them:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pipe-ex2">
   <code class="javascript">import { value, spread, pipe } from '@connectv/core';
 import { tap } from 'rxjs/operators';
 
@@ -83,14 +80,11 @@ value([1, 2, 3, 4])
 .to(pipe(tap(console.log)))   //--&gt; `Emission` objects are logged
 .subscribe();</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pipe-ex2" target="_blank">TRY IT!</a>
-</div>
 
 In a lot of cases you don't need to work with incoming emissions directly. In cases that you do, you can
 access the actual value of the emission using its <span code>.value</span> property:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-pipe-ex3">
   <code class="javascript">import { value, spread, pipe } from '@connectv/core';
 import { timer } from 'rxjs';
 import { delayWhen } from 'rxjs/operators';
@@ -101,9 +95,6 @@ value([1, 2, 3, 4])
                                                       //... so that the array is reversed
 .subscribe(console.log);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-pipe-ex3" target="_blank">TRY IT!</a>
-</div>
 
 The operators should also return observables that will emit emissions (<span code>Observable&lt;Emission&gt;</span>).
 You can use <a href="/docs/emission#fork">.fork()</a> method on an incoming emission to create a new one with a new value,

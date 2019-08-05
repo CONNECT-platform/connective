@@ -44,7 +44,7 @@
 
 <span code>expr()</span> allows you turn a function into an <a href="/docs/agent">agent</a>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-expr-ex1">
   <code class="javascript">import { wrap, map, expr } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -65,15 +65,12 @@ wrap(fromEvent(b, 'input'))           //--&gt; get input from b
 e.result
  .subscribe(v => p.innerHTML = v);    //--&gt; display the thing</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="async">Async functions</h2>
 
 You can run async operations in an <span code>expr()</span> by returning a function as return value:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-expr-ex2">
   <code class="javascript">import { source, expr } from '@connectv/core';
 
 let a = source();
@@ -91,15 +88,12 @@ a.send('hellow'); b.send(100); //&gt; `(after 100ms): hellow`
 a.send('world');               //&gt; `(after 100ms): world`
 b.send(1000);                  //&gt; `(after 1000ms): world`</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="control">Control</h2>
 
 You can control when the function is executed using its <span code>.control</span> property:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-expr-ex3">
   <code class="javascript">import { wrap, map, expr } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -124,9 +118,6 @@ wrap(fromEvent(btn, 'click'))         //--&gt; wait for the click before
 e.result
  .subscribe(v =&gt; p.innerHTML = v);    //--&gt; display the thing</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex3" target="_blank">TRY IT!</a>
-</div>
 
 Note that the <span code>expr()</span> waits for its control signal for every execution.
 
@@ -139,7 +130,7 @@ execution of the function are handled automatically. For async errors, the retur
 is similarly provided with an error callback as its second argument. You should catch possible errors
 and pass them to this callback:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-expr-ex4">
   <code class="javascript">import { expr } from '@connectv/core';
 
 //--&gt; sync error handling in expr:
@@ -167,9 +158,6 @@ f.result.subscribe(
   () =&gt; console.log('F HAD ERROR!')        //--&gt; error callback
 )</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-expr-ex4" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="signature">Signature</h2>
 

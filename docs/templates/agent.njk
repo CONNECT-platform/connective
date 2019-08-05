@@ -15,7 +15,7 @@ Agents are to be used to modularize your reactive flows. For example, any repeat
 by definition outlined above, an agent, and so you could replace it with an agent instead of repeating yourself constantly, the
 same way that you would encapsulate repeated logic in a function and/or a class:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-agent-ex1?file=multi.ts">
   <code class="javascript">import { Agent, sink, map, block } from '@connectv/core';
 
 export class Multi extends Agent {
@@ -43,9 +43,6 @@ export class Multi extends Agent {
   }
 }</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-agent-ex1?file=multi.ts" target="_blank">TRY IT!</a>
-</div>
 
 Our custom agent here has two inputs: <span code>'n'</span> and <span code>'k'</span>, and one output, <span code>'o'</span>.
 It will multiply anything that comes through <span code>'n'</span> by <span code>this.k</span> (default 1) and send it
@@ -55,7 +52,7 @@ to <span code>'o'</span>, and values sent to <span code>'k'</span> will update <
 
 Now that we have our custom agent defined, we can use it in our other reactive flows like this:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-agent-ex1?file=index.ts">
   <code class="javascript">import { wrap, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { Multi } from './multi';
@@ -69,9 +66,6 @@ wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value)).to(m.in('n'));
 wrap(fromEvent(k, 'input')).to(map(() =&gt; k.value)).to(m.in('k'));
 m.out('o').subscribe(v =&gt; p.innerHTML = v);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-agent-ex1?file=index.ts" target="_blank">TRY IT!</a>
-</div>
 
 <b>NOTICE</b>: This is just an example of how you could define custom agents and it is <b>NOT</b> the recommended method.
 The recommended way of creating your custom agents is using the <a href="/docs/composition"><span code>Composition</span></a>

@@ -7,7 +7,7 @@
 
 A <span code>Composition</span> is the main class for writing your own custom <a href="/docs/agent">agents</a>:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-comp-ex1?file=click-count.ts">
   <code class="javascript">import { Composition, value, map, pipe, filter,
         state, State, expr, Expr } from '@connectv/core';
 import { debounceTime, delay } from 'rxjs/operators';
@@ -65,13 +65,10 @@ export class ClickCounter extends Composition {
   }
 }</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-comp-ex1?file=click-count.ts" target="_blank">TRY IT!</a>
-</div>
 
 Which you can subsequently re-use in other flows:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-comp-ex1?file=index.ts">
   <code class="javascript">import { wrap } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -86,9 +83,6 @@ counter.out('count').subscribe(v =&gt; { if (v) p.innerHTML = v });
 counter.out('multi').subscribe(() =&gt; p.innerHTML = 'MULTI CLICK!');
 counter.out('single').subscribe(() =&gt; p.innerHTML = 'single click');</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-comp-ex1?file=index.ts" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="build">Build</h2>
 
@@ -182,7 +176,7 @@ To overcome this, you should override <span code>.init()</span> method, which is
 and by default calls <span code>.build()</span> and <span code>.wire()</span>, and call <span code>.build()</span> and
 <span code>.wire()</span> yourself in your composition's constructor:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-comp-ex1?file=click-count.ts">
   <code class="javascript">import { Composition, value, map, pipe, filter,
         state, State, expr, Expr } from '@connectv/core';
 import { debounceTime, delay } from 'rxjs/operators';
@@ -233,9 +227,6 @@ export class ClickCounter extends Composition {
   }
 }</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-comp-ex1?file=click-count.ts" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="why">Why composition</h2>
 

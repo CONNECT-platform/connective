@@ -8,7 +8,7 @@
 By default, if an error is thrown somewhere in a reactive flow, the whole flow or parts of it will shut-down afterwards.
 <span code>handleError()</span> allows you to catch errors and handle them gracefully:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-he-ex1">
   <code class="javascript">import { source, map, handleError } from '@connectv/core';
 
 let a = source();
@@ -37,15 +37,12 @@ a.send(1);  //--&gt; logged by both
 a.send(2);  //--&gt; ignored by both
 a.send(3);  //--&gt; logged by 'B:: ' only, since 'A:: ' flow is dead.</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-he-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="catch">Catching errors</h2>
 
 You can access thrown errors using <span code>.error</span> (or <span code>.out("error")</span>):
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-he-ex2">
   <code class="javascript">import { source, map, group, handleError } from '@connectv/core';
 
 let a = source();
@@ -65,9 +62,6 @@ a.send(1);
 a.send(2);
 a.send(3);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-he-ex2" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="signature">Signature</h2>
 

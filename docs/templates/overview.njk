@@ -26,7 +26,7 @@ The events/data can also go through some sinks, which will do something accordin
 For example a sink might show some text on the DOM in response to a button-click, another one might save
 a record in some database, etc.
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-overview-ex1">
   <code class="javascript">import { source, map, sink } from '@connectv/core';
 
 let a = source();                    //--&gt; creates a source
@@ -38,16 +38,13 @@ c.bind();                            //--&gt; lets bind the sink
 
 a.send('world');                     //--&gt; send 'world' to our flow</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-overview-ex1" target="_blank">TRY IT!</a>
-</div>
 
 The sources of a reactive flow might send events/data at any given time. For example, the user might change the value
 of an input or click on a button at any given time, multiple times even, or a http request might come to your code
 at any moment. However, the actual code of the flow does not care when the source emits something (or most of time even
 how many times):
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-overview-ex2">
   <code class="javascript">import { source, map, sink } from '@connectv/core';
 
 let a = source();                         //--&gt; creates a source
@@ -59,14 +56,11 @@ c.bind();                                 //--&gt; lets bind the sink
 
 setInterval(() => a.send('world'), 1000); //--&gt; send 'world' to our flow every second.</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-overview-ex2" target="_blank">TRY IT!</a>
-</div>
 
 Each node in a reactive flow might also do its thing either in sync or asynchronously, without the rest of the flow
 being affected:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-overview-ex3">
   <code class="javascript">import { source, map, sink } from '@connectv/core';
 
 let a = source();                             //--&gt; creates a source
@@ -80,9 +74,6 @@ c.bind();                                     //--&gt; lets bind the sink
 
 setInterval(() => a.send('world'), 1000);     //--&gt; send 'world' to our flow every second.</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-overview-ex3" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 
@@ -175,7 +166,7 @@ The main way to define your own custom agent is the <a href="/docs/composition">
 <i>Composition</i> as it directly represents a part of a reactive flow (while other agents might not even utilize reactive
 flows in their description):
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-cheat-13">
 <code class="javascript">import { Composition, source, filter } from '@connectv/core';
 
 class EvenOdd extends Composition {
@@ -218,9 +209,6 @@ a.send(2);
 a.send(3);
 a.send(4);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-cheat-13" target="_blank">TRY IT!</a>
-</div>
 
 Besides full-fledged compositions, you can also utilize <a href="/docs/expr"><span code>expr()</span></a>
 to turn simpler functions into agents or <a href="/docs/node"><span code>node()</span></a> to turn much

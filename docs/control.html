@@ -50,7 +50,7 @@
 
 The main usage of <span code>control()</span> is as an <i>AND</i> gate between multiple sources:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-ctrl-ex1">
   <code class="javascript">import { wrap, control, group } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -65,16 +65,13 @@ group(
 .to(control())
 .subscribe(() =&gt; console.log('BOTH CLICKED!'));</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex1" target="_blank">TRY IT!</a>
-</div>
 
 <h2 id="queueing">Queueing</h2>
 
 If one source emits multiple times, <span code>control()</span> will queue incoming emissions and pair them
 with emissions of other sources:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-ctrl-ex2">
   <code class="javascript">import { source, control, group } from '@connectv/core';
 
 
@@ -92,9 +89,6 @@ b.send('b1'); //--&gt; paired with 'a1'
 b.send('b2'); //--&gt; paired with 'a2'
 b.send('b3'); //--&gt; paired with 'a3'</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex2" target="_blank">TRY IT!</a>
-</div>
 
 As you can see, <span code>control()</span> will emit an array of all paired values.
 
@@ -115,7 +109,7 @@ In a <a href="/docs/gate"><span code>gate()</span></a> agent, the <span code>.co
 is used to allow something through or
 drop it:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-ctrl-ex3">
   <code class="javascript">import { wrap, map, group, gate } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -135,9 +129,6 @@ validator.to(submitGate.control);         //--&gt; the validator controls the ga
 
 submitGate.output.subscribe(console.log); //--&gt; gate submits (to console ;))</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex3" target="_blank">TRY IT!</a>
-</div>
 
 <h3 id="node">Node</h3>
 
@@ -145,7 +136,7 @@ In a <a href="/docs/node"><span code>node()</span></a> agent, such as
 <span code><a href="/docs/expr">expr()</a></span>,
 <span code>.control</span> property controls when the node is going to run:
 
-<pre>
+<pre try="https://stackblitz.com/edit/connective-ctrl-ex4">
   <code class="javascript">import { wrap, map, expr } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -161,9 +152,6 @@ wrap(fromEvent(btn, 'click')).to(e.control);  //--&gt; so only add when the butt
 
 e.result.subscribe(console.log);</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-ctrl-ex4" target="_blank">TRY IT!</a>
-</div>
 
 <br><br>
 

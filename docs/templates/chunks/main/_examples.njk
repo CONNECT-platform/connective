@@ -1,5 +1,5 @@
 A <i>Hellow World!</i> example:
-<pre>
+<pre try="https://stackblitz.com/edit/connective-hellow-world">
 <code class="javascript">import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
@@ -17,12 +17,9 @@ wrap(fromEvent(a, 'input'))           // --&gt; wrap the `Observable` in a `Pin`
 .to(map(name =&gt; 'hellow ' + name))    // --&gt; add 'hellow' to the name
 .subscribe(msg =&gt; p.innerHTML = msg); // --&gt; write it to the &lt;p&gt; element</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-hellow-world" target="_blank">TRY IT!</a>
-</div>
 
 A more elaborate example:
-<pre>
+<pre try="https://stackblitz.com/edit/connective-sample-fib">
 <code class="javascript">import { wrap, pipe, map, filter, sink } from '@connectv/core';
 import { fromEvent, timer } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
@@ -51,6 +48,3 @@ wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` i
 .to(sink(v =&gt; p.innerHTML = v))              // --&gt; set the text of &lt;p&gt; to the fib number
 .subscribe();                                // --&gt; bind the whole thing.</code>
 </pre>
-<div class="buttons">
-  <a class="button" href="https://stackblitz.com/edit/connective-sample-fib" target="_blank">TRY IT!</a>
-</div>
