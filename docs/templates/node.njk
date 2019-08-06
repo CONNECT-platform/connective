@@ -1,0 +1,166 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Node</h1>
+
+<span code>node()</span> allows you to create custom agents by wrapping traditional functions:
+
+<pre try="https://stackblitz.com/edit/connective-node-ex1?file=password-validator.ts">
+  <code class="javascript">import { node } from '@connectv/core';
+
+const minLength = 6;
+const symbols = ['$', '#', '@', '!', '%', '^', '*'];
+
+export const passwordValidator = node({ //--&gt; this is the node's signature
+  inputs: ['pass', 'confirm'],          //--&gt; taking in password and its confirmation as inputs
+  outputs: [                            //--&gt; possible outputs ...
+    'valid',                            //... password is valid
+    'not match',                        //... passwords do not match
+    'too short',                        //... password is too short
+    'no symbol'                         //... password does not have a symbol character
+  ]
+}, (inputs, output) =&gt; {                //--&gt; `inputs` is an object with all of the inputs,
+                                        //... `output` is a callback to to output the result
+  if (inputs.pass != inputs.confirm) output('not match');
+  if (inputs.pass.length < minLength) output('too short', minLength);
+  if (!inputs.pass.match(new RegExp(symbols.map(s =&gt; `\\${s}`).join('|'))))
+    output('no symbol', symbols);
+  output('valid');
+});</code>
+</pre>
+
+<span code>node()</span> takes two arguments, first is the <a href="/docs/agent#signature">signature</a> of your
+custom agent, and second the function outlining its functionality. This function is is provided with an object of all
+inputs, and a callback that will send given data to given output pin.
+
+<br><br>
+
+<span code>node()</span> returns a factory function for your custom agent, so you can re-use your custom agent like this:
+
+<pre try="https://stackblitz.com/edit/connective-node-ex1?file=index.ts">
+  <code class="javascript">import { wrap, map } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+import { passwordValidator } from './password-validator';
+
+let pass = document.getElementById('pass') as HTMLInputElement;
+let confirm = document.getElementById('confirm') as HTMLInputElement;
+let hint = document.getElementById('hint');
+
+let validator = passwordValidator();
+
+wrap(fromEvent(pass, 'input')).to(map(() =&gt; pass.value)).to(validator.in('pass'));
+wrap(fromEvent(confirm, 'input')).to(map(() =&gt; confirm.value)).to(validator.in('confirm'));
+
+validator.out('valid').subscribe(() =&gt; hint.textContent = 'valid password');
+validator.out('not match').subscribe(() =&gt; hint.textContent = 'passowrds do not match');
+validator.out('too short').subscribe(l =&gt; hint.textContent = `must be at least ${l} characters`);
+validator.out('no symbol').subscribe(symbols =&gt; hint.textContent = `must include one of ${symbols}`);</code>
+</pre>
+
+Note that:
+
+<ul>
+  <li>A <span code>node()</span> waits for all of the inputs before execution, and is executed everytime a new value arrives
+    for any of the inputs,</li>
+  <li>A <span code>node()</span> can emit through only <b>ONE</b> of its outputs per execution, so only the first time you
+    call the <span code>output()</span> callback matters per execution.</li>
+</ul>
+
+<br><br>
+
+<h2 id="control">Control</h2>
+
+Each <span code>node()</span> comes with a <a href="/docs/control"><span code>.control</span></a> property which allows you
+to hold on its execution:
+
+<pre try="https://stackblitz.com/edit/connective-node-ex2?file=index.ts">
+  <code class="javascript">import { wrap, map, pipe, sink, group } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+import { passwordValidator } from './password-validator';
+
+let pass = document.getElementById('pass') as HTMLInputElement;
+let confirm = document.getElementById('confirm') as HTMLInputElement;
+let hint = document.getElementById('hint');
+
+let validator = passwordValidator();
+let $pass = wrap(fromEvent(pass, 'input')).to(map(() =&gt; pass.value));
+let $confirm = wrap(fromEvent(confirm, 'input')).to(map(() =&gt; confirm.value));
+
+$pass.to(validator.in('pass'));
+$confirm.to(validator.in('confirm'));
+
+//
+// so lets be a bit less annoying on feedback:
+//
+group($pass, $confirm)                   //--&gt; when the user types
+  .to(sink(() =&gt; hint.textContent = '')) //--&gt; clear the hint
+  .to(pipe(debounceTime(1000)))          //--&gt; wait a bit
+  .to(validator.control);                //--&gt; THEN validate
+
+validator.out('valid').subscribe(() =&gt; hint.textContent = 'valid password');
+validator.out('not match').subscribe(() =&gt; hint.textContent = 'passowrds do not match');
+validator.out('too short').subscribe(l =&gt; hint.textContent = `must be at least ${l} characters`);
+validator.out('no symbol').subscribe(symbols =&gt; hint.textContent = `must include one of ${symbols}`);</code>
+</pre>
+
+<h2 id="optional">Optional parameters</h2>
+
+By default, a <span code>node()</span> waits on values from inputs that <i>are connected</i>, i.e. if you
+do not connect anything from the outside to an input pin of a <span code>node()</span>, it will be treated
+as an optional parameter and it will not appear in <span code>inputs</span> object.
+
+<br><br>
+
+If your <span code>node()</span> needs some specific inputs for execution, you can mark them in the
+<span code>required</span> field of the signature object:
+
+<pre>
+  <code class="javascript">node({
+  inputs: ['a', 'b', 'c'],  //--&gt; three inputs
+  required: ['a', 'b'],     //--&gt; a and b are required, which leaves c as an optional input
+  outputs: [ /* ... */ ]
+}, (inputs, output) =&gt; {
+  //...
+})</code>
+</pre>
+
+<br><br>
+
+<h2 id="error-handling">Error handling</h2>
+
+A third argument is always provided to your node's function, which can be used for error handling:
+
+<pre><code class="javascript">node({
+  //...
+}, (inputs, output, error) =&gt; {
+  //...
+  if (errorCase)
+    error('some error');
+  //....
+})</code></pre>
+
+You <b>MUST</b> capture all errors and pass them to this callback for them to be handled properly.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/node.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/node.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
