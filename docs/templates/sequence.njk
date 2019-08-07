@@ -1,0 +1,114 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Sequence</h1>
+
+<span code>sequence()</span> allows you to detect a specific sequence of emissions from multiple sources:
+
+<pre try="https://stackblitz.com/edit/connective-seq-ex1">
+  <code class="javascript">import { wrap, sequence } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let p = document.getElementById('p');
+
+// 'drag' is a sequence of
+// - 1 mouse down
+// - one or more mouse moves ('+')
+// - 1 mouse up
+let drag = sequence(1, '+', 1);
+
+// 'click' is a sequence of
+// - 1 mouse down
+// - 0 mouse moves
+// - 1 mouse up
+let click = sequence(1, 0, 1);
+
+// now lets connect the 'mousedown', 'mousemove' and 'mouseup' events
+// to drag and click ...
+wrap(fromEvent(document, 'mousedown')).to(drag.in(0), click.in(0));
+wrap(fromEvent(document, 'mousemove')).to(drag.in(1), click.in(1));
+wrap(fromEvent(document, 'mouseup')).to(drag.in(2), click.in(2));
+
+drag.output.subscribe(() =&gt; p.textContent = 'DRAG');
+click.output.subscribe(() =&gt; p.textContent = 'CLICK');</code>
+</pre>
+
+You can pass any number of arguments to <span code>sequence()</span>. Each argument corresponds to an incoming
+event, and has an input pin (named numerically). Each argument must be one of the following:
+
+<ul>
+  <li>a number, indicating how many times that specific event source shall emit in the sequence</li>
+  <li><span code>'*'</span>, which means any number of emissions is accepted (including 0)</li>
+  <li><span code>'+'</span>, which means the sequence expects at least one emission at this position</li>
+</ul>
+
+The <span code>sequence()</span> will then match sequences of incoming emissions to the described sequence, and
+emit the matching sequences. So in the example above:
+
+<pre><code class="javascript">let drag = sequence(1, '+', 1);</code></pre>
+
+<span code>drag</span> will emit only when it receives exactly one emission on its first input <span code>drag.in(0)</span>,
+then at least one emission on its second input <span code>drag.in(1)</span>, and then exactly one emission
+on its third input <span code>drag.in(2)</span>.
+
+<br><br>
+
+Here is another example to play around with:
+
+<pre try="https://stackblitz.com/edit/connective-seq-ex2">
+  <code class="javascript">import { wrap, sequence, pipe, sink } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { delay } from 'rxjs/operators';
+
+let A = document.getElementById('A');
+let B = document.getElementById('B');
+let C = document.getElementById('C');
+let D = document.getElementById('D');
+let p = document.getElementById('p');
+
+// so the desired sequence of actions is:
+// - 1 or more clicks on A
+// - no clicks on B
+// - any number of clicks on C (maybe 0 even)
+// - 2 clicks on D
+let seq = sequence('+', 0, '*', 2);
+wrap(fromEvent(A, 'click')).to(seq.in(0));
+wrap(fromEvent(B, 'click')).to(seq.in(1));
+wrap(fromEvent(C, 'click')).to(seq.in(2));
+wrap(fromEvent(D, 'click')).to(seq.in(3));
+
+seq.output.to(sink(() =&gt; p.textContent = 'SEQUENCE!'))
+  .to(pipe(delay(2000)))
+  .subscribe(() =&gt; p.textContent = '');</code>
+</pre>
+
+<h2 id="signature">Signature</h2>
+
+Each <span code>sequence()</span> has the same number of inputs as arguments provided to it (i.e. the length of the described
+sequence). These inputs are named numerically, i.e. <span code>seq.in(0), seq.in(1), ...</span>.
+
+<br><br>
+
+The output of the sequence is accessible either via <span code>seq.out("out")</span>, or the shortcut property
+<span code>.output</span>.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/sequence.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/sequence.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
