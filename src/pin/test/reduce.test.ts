@@ -32,6 +32,20 @@ describe('reduce()', () => {
     res.should.eql([1, 2, 6]);
   });
 
+  it('should properly work with 0 as starting value', () => {
+    let res: number = 0;
+
+    let a = source();
+    a.to(reduce((x: number, y: number) => x + y)).subscribe(v => res = v);
+    a.send(0);
+    a.send(0)
+    a.send(0);
+    a.send(32);
+    a.send(0);
+
+    res.should.equal(32);
+  });
+
   it('should work properly with async reduce functions as well.', () => {
     let res = <number[]>[];
 

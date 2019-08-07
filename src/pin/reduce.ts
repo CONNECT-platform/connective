@@ -28,7 +28,7 @@ export class Reduce extends Pipe {
       ([map((emission: Emission) => {
         if (!this._acc) {
           this._acc = this._init(emission, start);
-          if (start == _Unset) return this._acc;
+          if (start === _Unset) return this._acc;
         }
 
         this._acc = Emission.from([this._acc, emission],
@@ -41,7 +41,7 @@ export class Reduce extends Pipe {
             if (!this._acc) {
               this._acc = this._init(emission, start);
 
-              if (start == _Unset) {
+              if (start === _Unset) {
                 subscriber.next(this._acc);
                 subscriber.complete();
                 return;

@@ -6,15 +6,17 @@ export class MergedEmissionContextVal {
 }
 
 
+const _Unset = {};
+
 export class Emission {
   constructor(
     readonly value: any = undefined,
     readonly context: ContextType = {},
   ) {}
 
-  public static from(emissions: Emission[], value?: any): Emission {
+  public static from(emissions: Emission[], value: any = _Unset): Emission {
     return new Emission(
-      value || emissions.map(emission => emission.value),
+      (value === _Unset)?(emissions.map(emission => emission.value)):(value),
       emissions.reduce((ctx, emission) => {
         Object.entries(emission.context).forEach(([key, value]) => {
           if (key in ctx) {

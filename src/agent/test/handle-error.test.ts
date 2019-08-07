@@ -10,7 +10,7 @@ import filter from '../../pin/filter';
 import handleError, { HandleError } from '../handle-error';
 
 
-describe.only('HandleError', () => {
+describe('HandleError', () => {
   it('should pass proper data normally.', () => {
     let a = source();
     let h = handleError();
