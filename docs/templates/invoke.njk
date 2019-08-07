@@ -116,8 +116,6 @@ s.out('not-found').subscribe(() =&gt; p.textContent = 'NOT FOUND');
 s.out('stars').subscribe(v =&gt; p.textContent = v);</code>
 </pre>
 
-<br><br>
-
 <h2 id="behavior">Behavior</h2>
 
 <span code>invoke()</span> behaves just like a <a href="/docs/node"><span code>node()</span></a>:
@@ -129,7 +127,7 @@ s.out('stars').subscribe(v =&gt; p.textContent = v);</code>
   <li>Only the first emission per execution matters, the rest will be ignored.</li>
 </ul>
 
-<br><br>
+<br>
 
 <h2 id="signature">Signature</h2>
 
@@ -151,7 +149,7 @@ This also means that your agent's construction process also <b>MUST</b> be pure.
 an agent whose construction is not pure, or your factory function cannot be pure, provide the signature
 explicitly.
 
-<br><br><br>
+<br><br>
 
 <h2 id="further-reading">Further reading</h2>
 
