@@ -1,0 +1,345 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CONNECTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="subject" content='Reactive Programming At Scale'/>
+    <meta name="robots" content='index,follow'/>
+    <meta name="description" content='A thin library enabling large-scale, efficient reactive programming in Javascript/Typescript.'/>
+    <meta name="keywords" content="reactive, rxjs, programming, asynchronous, async, agent, actor, library, asynchronous programming, javascript, typescript, rx"/>
+    <meta name="theme-color" content="#212121">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" href="/docs/assets/favicon.ico"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
+
+    <link href="/docs/assets/styles.css" rel="stylesheet">
+    <script src="/docs/assets/main.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      
+      <a class="github-button" href="https://github.com/connect-platform/connective" data-icon="octicon-star" data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star</a>
+      
+    </div>
+    <div class="container">
+
+      
+<br><br>
+
+<h1 id="">Invoke</h1>
+
+Use <span code>invoke()</span> when you need a fresh instance of a sub-flow to properly handle each incoming
+set of inputs.
+<br><br>
+For example, imagine the following composition:
+
+<pre try="https://stackblitz.com/edit/connective-invk-ex1?file=stargazers.ts">
+  <code class="javascript">import { Composition, map, pipe, spread, reduce, handleError, HandleError } from '@connectv/core';
+import { ajax } from 'rxjs/ajax';
+import { debounceTime } from 'rxjs/operators';
+
+//--&gt; this composition will calculate all of stargazers
+//--&gt; all the public repos of a user have on github.
+export class Stargazers extends Composition {
+  private handle: HandleError;
+
+  constructor(){
+    super({
+      inputs: ['username'],
+      outputs: ['stars', 'not-found']
+    });
+  }
+
+  build() {
+    this.handle = this.add(handleError()) as HandleError;
+  }
+
+  wire() {
+    this.in('username')
+    .to(map((username, done, error) =&gt; {
+      ajax.getJSON(
+        `https://api.github.com/users/${username}/repos` //--&gt; GitHub API!
+      ).subscribe(done, error);                          //--&gt; pass on the callbacks
+    }))
+    .to(this.handle.input);                              //--&gt; let errors be handled
+
+    this.handle.error.to(this.out('not-found'));         //--&gt; in case of error, assume NotFound
+
+    this.handle.output                                   //--&gt; in case of proper result ...
+    .to(spread())                                        //... spread to individual repos
+    .to(map(repo =&gt; repo.stargazers_count))              //... get the stargazers of the repo
+    .to(reduce((total, stars) =&gt; total + stars))         //... aggregate everything
+    .to(pipe(debounceTime(1)))                           //... wait till aggregation is done
+    .to(this.out('stars'));                              //... tell the whole world about it
+  }
+}</code>
+</pre>
+
+Using this composition usually looks like this:
+
+<pre try="https://stackblitz.com/edit/connective-invk-ex1?file=index.ts">
+  <code class="javascript">import { wrap, map, pipe, filter } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+import { Stargazers } from './stargazers';
+
+let i = document.getElementById('i') as HTMLInputElement;
+let p = document.getElementById('p');
+
+//
+// PROBLEM:: we need a fresh instance of Stargazers so that we don't
+// get the aggregate of all users we tried ...
+//
+let s = new Stargazers();
+
+wrap(fromEvent(i, 'input'))
+  .to(map(() =&gt; i.value))
+  .to(filter(v =&gt; v))
+  .to(pipe(debounceTime(1000)))
+  .to(s.in('username'));
+
+s.out('not-found').subscribe(() =&gt; p.textContent = 'NOT FOUND');
+s.out('stars').subscribe(v =&gt; p.textContent = v);</code>
+</pre>
+
+Now if you enter multiple usernames, you will see that the output you are getting is the aggregate of the total number of stars
+for <i>ALL</i> of the entered users.
+This is because we have one instance of <span code>Stargazers</span> in our flow, so it will aggregate
+the stars of all incoming users.
+
+<br><br>
+
+To fix this, you can use <span code>invoke()</span> to create a new instance of <span code>Stargazers</span> per username,
+hence only getting the aggregate number of stars for that user:
+
+<pre try="https://stackblitz.com/edit/connective-invk-ex2?file=index.ts">
+  <code class="javascript">import { wrap, map, pipe, filter, invoke } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+import { Stargazers } from './stargazers';
+
+let i = document.getElementById('i') as HTMLInputElement;
+let p = document.getElementById('p');
+
+//
+// PROBLEM FIXED: invoke() will create a new instance of
+// Stargazers() for each username.
+//
+let s = invoke(() =&gt; new Stargazers());
+
+wrap(fromEvent(i, 'input'))
+  .to(map(() =&gt; i.value))
+  .to(filter(v =&gt; v))
+  .to(pipe(debounceTime(1000)))
+  .to(s.in('username'));
+
+s.out('not-found').subscribe(() =&gt; p.textContent = 'NOT FOUND');
+s.out('stars').subscribe(v =&gt; p.textContent = v);</code>
+</pre>
+
+<br><br>
+
+<h2 id="behavior">Behavior</h2>
+
+<span code>invoke()</span> behaves just like a <a href="/docs/node"><span code>node()</span></a>:
+<ul>
+  <li>It will <a href="/docs/node#optional">wait for all of its connected inputs</a>
+    before invoking the provided factory function and executing,</i>
+  <li>It has a <a href="/docs/node#control"><span code>.control</span></a> pin that allows you
+    to control its execution,</li>
+  <li>Only the first emission per execution matters, the rest will be ignored.</li>
+</ul>
+
+<br><br>
+
+<h2 id="signature">Signature</h2>
+
+<span code>invoke()</span> will have the same signature as the agent that the factory function returns.
+You can override this by providing a signature as the second argument.
+
+<br><br>
+
+<h3 id="construction-purity">Construction purity</h3>
+
+<span code>invoke()</span> will call your factory function at least once before any execution, to collect
+the signature. This means that your factory function <b>MUST</b> be pure, i.e. resulting in the same thing
+every time it is executed, and not changing the state of the overall program. If not, this might lead to
+unpredictable flow behavior.
+
+<br><br>
+
+This also means that your agent's construction process also <b>MUST</b> be pure. If, for any reason, you have
+an agent whose construction is not pure, or your factory function cannot be pure, provide the signature
+explicitly.
+
+<br><br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/invoke.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/invoke.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+
+      <br><br>
+
+      
+      <div id="prevnext">
+  <div id="prev">Prev</div>
+  <hr>
+  <div id="next">Next</div>
+</div>
+
+      
+
+      
+      <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
+      
+    </div>
+
+    <div id="toc">
+    </div>
+
+    <div id="nav">
+  <div class="contents">
+    <a href="/">Home</a>
+    <hr>
+    <a href="/docs/overview">Overview</a>
+
+    <br><br>
+
+    <h3>Pins</h3>
+    <a href="/docs/pin">pin</a>
+    <hr>
+    <a href="/docs/source">source</a>
+    <hr>
+    <a href="/docs/wrap">wrap</a>
+    <hr>
+    <a href="/docs/map">map</a>
+    <hr>
+    <a href="/docs/filter">filter</a>
+    <hr>
+    <a href="/docs/control">control</a>
+    <hr>
+    <a href="/docs/value">value</a>
+    <hr>
+    <a href="/docs/pack">pack</a>
+    <hr>
+    <a href="/docs/spread">spread</a>
+    <hr>
+    <a href="/docs/group">group</a>
+    <hr>
+    <a href="/docs/sink">sink</a>
+    <hr>
+    <a href="/docs/pipe">pipe</a>
+    <hr>
+    <a href="/docs/fork">fork</a>
+    <hr>
+    <a href="/docs/reduce">reduce</a>
+
+    <br><br>
+
+    <h3>Agents</h3>
+    <a href="/docs/agent">Agent</a>
+    <hr>
+    <a href="/docs/expr">expr</a>
+    <hr>
+    <a href="/docs/state">state</a>
+    <hr>
+    <a href="/docs/gate">gate</a>
+    <hr>
+    <a href="/docs/handle-error">handleError</a>
+    <hr>
+    <a href="/docs/composition">Composition</a>
+    <hr>
+    <a href="/docs/node">node</a>
+    <hr>
+    <a href="/docs/invoke">invoke</a>
+    <hr>
+    <a href="/docs/sequence">sequence</a>
+    <hr>
+    <a href="/docs/switch">switch</a>
+    <hr>
+    <a href="/docs/proxy">proxy</a>
+    <hr>
+    <a href="/docs/join">join</a>
+
+    <br><br>
+
+    <h3>Advanced</h3>
+    <a href="/docs/memory">Memory management</a>
+    <hr>
+    <a href="/docs/emission">Emission and context</a>
+    <hr>
+    <a href="/docs/interfaces">Interfaces</a>
+    <hr>
+    <a href="/docs/under-the-hoold">Under the hood</a>
+
+  </div>
+  <div class="search">
+    <input id="navsearch" type="text" placeholder="Search..."/>
+    <p><b>NOTE:</b> GitHub limits the rate for searching to 10 queries per minute.</p>
+    <div id="navsearchicon" class="icon">
+      <img class="handle" src="/docs/assets/search-handle.svg"/>
+      <img class="ring" src="/docs/assets/search-ring.svg"/>
+    </div>
+  </div>
+</div>
+
+
+    <div class="footer">
+  <a href="/docs/overview">Docs</a>
+  <hr>
+  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+
+  <div id="dmtoggle">
+    <div class="arc"></div>
+    <div class="darc"></div>
+    <div class="ray one"></div>
+    <div class="ray two"></div>
+    <div class="ray three"></div>
+    <div class="ray four"></div>
+    <div class="ray five"></div>
+    <div class="ray six"></div>
+    <div class="ray seven"></div>
+    <div class="ray eight"></div>
+  </div>
+
+  <a id="navtoggle" class="nav no-underline">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </a>
+</div>
+
+
+    <div id="copy-confirm" class="overlay">
+      Copied to Clipboard!
+    </div>
+  </body>
+</html>
