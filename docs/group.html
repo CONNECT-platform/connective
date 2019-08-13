@@ -59,10 +59,10 @@ When you use <span code>.to()</span> or <span code>.from()</span> methods on a g
 will be connected to (or receive a connection from) the given pin:
 
 <pre try="https://stackblitz.com/edit/connective-grp-ex1">
-  <code class="javascript">import { source, group, map } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, group, map } from '@connectv/core';
 
 let a = source();
-let g = group(map(x =&gt; 'x' + x), map(x =&gt; 'y' + x));
+/*!*/let g = group(map(x =&gt; 'x' + x), map(x =&gt; 'y' + x));
 a.to(g).subscribe(console.log); //--&gt; a goes to both `map()`s in g
 
 a.send('A');</code>
@@ -72,13 +72,13 @@ When you call <span code>.to()</span> on a group passing another group to it (or
 first group will be connected to the all pins in the second group:
 
 <pre try="https://stackblitz.com/edit/connective-grp-ex2">
-  <code class="javascript">import { source, group, map, pin } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, group, map, pin } from '@connectv/core';
 
 let a = source();
-let g1 = group(map(x => 'x' + x), map(x => 'y' + x));
-let g2 = group(map(x => 'a' + x), map(x => 'b' + x));
-
-a.to(g1).to(g2).to(pin()).subscribe(console.log);
+/*!*/let g1 = group(map(x => 'x' + x), map(x => 'y' + x));
+/*!*/let g2 = group(map(x => 'a' + x), map(x => 'b' + x));
+/*!*/
+/*!*/a.to(g1).to(g2).to(pin()).subscribe(console.log);
 
 a.send(1);</code>
 </pre>
@@ -88,12 +88,12 @@ a.send(1);</code>
 You can use the <span code>.subscribe()</span> method on a group to subscribe to all of its pins:
 
 <pre try="https://stackblitz.com/edit/connective-grp-ex3">
-  <code class="javascript">import { source, group } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, group } from '@connectv/core';
 
 let a = source();
 let b = source();
 
-group(a, b).subscribe(console.log);
+/*!*/group(a, b).subscribe(console.log);
 
 a.send('hellow');
 b.send('world');</code>

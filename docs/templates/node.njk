@@ -8,27 +8,27 @@
 <span code>node()</span> allows you to create custom agents by wrapping traditional functions:
 
 <pre try="https://stackblitz.com/edit/connective-node-ex1?file=password-validator.ts">
-  <code class="javascript">import { node } from '@connectv/core';
+  <code class="javascript">/*!*/import { node } from '@connectv/core';
 
 const minLength = 6;
 const symbols = ['$', '#', '@', '!', '%', '^', '*'];
 
-export const passwordValidator = node({ //--&gt; this is the node's signature
-  inputs: ['pass', 'confirm'],          //--&gt; taking in password and its confirmation as inputs
-  outputs: [                            //--&gt; possible outputs ...
-    'valid',                            //... password is valid
-    'not match',                        //... passwords do not match
-    'too short',                        //... password is too short
-    'no symbol'                         //... password does not have a symbol character
-  ]
-}, (inputs, output) =&gt; {                //--&gt; `inputs` is an object with all of the inputs,
-                                        //... `output` is a callback to to output the result
-  if (inputs.pass != inputs.confirm) output('not match');
-  if (inputs.pass.length < minLength) output('too short', minLength);
-  if (!inputs.pass.match(new RegExp(symbols.map(s =&gt; `\\${s}`).join('|'))))
-    output('no symbol', symbols);
-  output('valid');
-});</code>
+/*!*/export const passwordValidator = node({ //--&gt; this is the node's signature
+/*!*/  inputs: ['pass', 'confirm'],          //--&gt; taking in password and its confirmation as inputs
+/*!*/  outputs: [                            //--&gt; possible outputs ...
+/*!*/    'valid',                            //... password is valid
+/*!*/    'not match',                        //... passwords do not match
+/*!*/    'too short',                        //... password is too short
+/*!*/    'no symbol'                         //... password does not have a symbol character
+/*!*/  ]
+/*!*/}, (inputs, output) =&gt; {                //--&gt; `inputs` is an object with all of the inputs,
+/*!*/                                        //... `output` is a callback to to output the result
+/*!*/  if (inputs.pass != inputs.confirm) output('not match');
+/*!*/  if (inputs.pass.length < minLength) output('too short', minLength);
+/*!*/  if (!inputs.pass.match(new RegExp(symbols.map(s =&gt; `\\${s}`).join('|'))))
+/*!*/    output('no symbol', symbols);
+/*!*/  output('valid');
+/*!*/});</code>
 </pre>
 
 <span code>node()</span> takes two arguments, first is the <a href="/docs/agent#signature">signature</a> of your
@@ -43,21 +43,21 @@ inputs, and a callback that will send given data to given output pin.
   <code class="javascript">import { wrap, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-import { passwordValidator } from './password-validator';
+/*!*/import { passwordValidator } from './password-validator';
 
 let pass = document.getElementById('pass') as HTMLInputElement;
 let confirm = document.getElementById('confirm') as HTMLInputElement;
 let hint = document.getElementById('hint');
 
-let validator = passwordValidator();
+/*!*/let validator = passwordValidator();
 
-wrap(fromEvent(pass, 'input')).to(map(() =&gt; pass.value)).to(validator.in('pass'));
-wrap(fromEvent(confirm, 'input')).to(map(() =&gt; confirm.value)).to(validator.in('confirm'));
+/*!*/wrap(fromEvent(pass, 'input')).to(map(() =&gt; pass.value)).to(validator.in('pass'));
+/*!*/wrap(fromEvent(confirm, 'input')).to(map(() =&gt; confirm.value)).to(validator.in('confirm'));
 
-validator.out('valid').subscribe(() =&gt; hint.textContent = 'valid password');
-validator.out('not match').subscribe(() =&gt; hint.textContent = 'passowrds do not match');
-validator.out('too short').subscribe(l =&gt; hint.textContent = `must be at least ${l} characters`);
-validator.out('no symbol').subscribe(symbols =&gt; hint.textContent = `must include one of ${symbols}`);</code>
+/*!*/validator.out('valid').subscribe(() =&gt; hint.textContent = 'valid password');
+/*!*/validator.out('not match').subscribe(() =&gt; hint.textContent = 'passowrds do not match');
+/*!*/validator.out('too short').subscribe(l =&gt; hint.textContent = `must be at least ${l} characters`);
+/*!*/validator.out('no symbol').subscribe(symbols =&gt; hint.textContent = `must include one of ${symbols}`);</code>
 </pre>
 
 Note that:
@@ -97,10 +97,10 @@ $confirm.to(validator.in('confirm'));
 //
 // so lets be a bit less annoying on feedback:
 //
-group($pass, $confirm)                   //--&gt; when the user types
-  .to(sink(() =&gt; hint.textContent = '')) //--&gt; clear the hint
-  .to(pipe(debounceTime(1000)))          //--&gt; wait a bit
-  .to(validator.control);                //--&gt; THEN validate
+/*!*/group($pass, $confirm)                   //--&gt; when the user types
+/*!*/  .to(sink(() =&gt; hint.textContent = '')) //--&gt; clear the hint
+/*!*/  .to(pipe(debounceTime(1000)))          //--&gt; wait a bit
+/*!*/  .to(validator.control);                //--&gt; THEN validate
 
 validator.out('valid').subscribe(() =&gt; hint.textContent = 'valid password');
 validator.out('not match').subscribe(() =&gt; hint.textContent = 'passowrds do not match');

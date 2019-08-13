@@ -18,9 +18,9 @@ the data from database, so you can do these two actions in parallel, leading to 
 let loginReq = source();                              //--&gt; emulates incoming requests
 let generateToken = map(user =&gt; `token for ${user}`); //--&gt; generate a token for each user
 let authenticate = map((user, done) =&gt; {              //--&gt; check if user is authenticated
-  if (user == 'john')                                 //--&gt; if the user is john ...
-    setTimeout(() =&gt; done(`auth for ${user}`), 100);  //... it will take a bit to process it ...
-  else done(`auth for ${user}`);                      //... but not for others
+/*!*/  if (user == 'john')                                 //--&gt; if the user is john ...
+/*!*/    setTimeout(() =&gt; done(`auth for ${user}`), 100);  //... it will take a bit to process it ...
+/*!*/  else done(`auth for ${user}`);                      //... but not for others
 });
 
 loginReq
@@ -54,7 +54,7 @@ What happens is:
 using <span code>join()</span>:
 
 <pre try="https://stackblitz.com/edit/connective-fj-ex2">
-  <code class="javascript">import { source, map, fork, join } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, map, fork, join } from '@connectv/core';
 
 
 let loginReq = source();                              //--&gt; emulates incoming requests
@@ -66,13 +66,13 @@ let authenticate = map((user, done) =&gt; {              //--&gt; check if user 
 });
 
 loginReq
-.to(fork())                                           //--&gt; stamp the request
+/*!*/.to(fork())                                           //--&gt; stamp the request
 .to(generateToken, authenticate);                     //--&gt; so check auth and generate token in parallel
 
-let j = join('token', 'auth');                        //--&gt; join() is an agent
-generateToken.to(j.in('token'));                      //--&gt; generateToken goes to 'token' field
-authenticate.to(j.in('auth'));                        //--&gt; authenticate goes to 'auth' field
-j.output.subscribe(console.log);
+/*!*/let j = join('token', 'auth');                        //--&gt; join() is an agent
+/*!*/generateToken.to(j.in('token'));                      //--&gt; generateToken goes to 'token' field
+/*!*/authenticate.to(j.in('auth'));                        //--&gt; authenticate goes to 'auth' field
+/*!*/j.output.subscribe(console.log);
 
 loginReq.send('john');                                //--&gt; first john sends a login request
 loginReq.send('jack');                                //--&gt; then jack does</code>

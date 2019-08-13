@@ -45,40 +45,40 @@
 A <span code>Composition</span> is the main class for writing your own custom <a href="/docs/agent">agents</a>:
 
 <pre try="https://stackblitz.com/edit/connective-comp-ex1?file=click-count.ts">
-  <code class="javascript">import { Composition, value, map, pipe, filter,
+  <code class="javascript">/*!*/import { Composition, value, map, pipe, filter,
         state, State, expr, Expr } from '@connectv/core';
 import { debounceTime, delay } from 'rxjs/operators';
 
 //
 //--&gt; this composition counts subsequent clicks
 //
-export class ClickCounter extends Composition {
+/*!*/export class ClickCounter extends Composition {
   count: State;   //--&gt; this state holds the count
   incr: Expr;     //--&gt; this expr increases the count
   multi: Expr;    //--&gt; this expr determines whether it was a single or multi click
 
   constructor() {
-    super({
-      inputs: [
-        'click',  //--&gt; receives click events on this input
-        'reset'   //--&gt; receives 'reset' commands on this input
-      ],
-      outputs: [
-        'count',  //--&gt; this emits the number of subsequent clicks
-        'single', //--&gt; this emits when it was a single click
-        'multi'   //--&gt; this emits when it was a multi click
-      ]
-    });
+/*!*/    super({
+/*!*/      inputs: [
+/*!*/        'click',  //--&gt; receives click events on this input
+/*!*/        'reset'   //--&gt; receives 'reset' commands on this input
+/*!*/      ],
+/*!*/      outputs: [
+/*!*/        'count',  //--&gt; this emits the number of subsequent clicks
+/*!*/        'single', //--&gt; this emits when it was a single click
+/*!*/        'multi'   //--&gt; this emits when it was a multi click
+/*!*/      ]
+/*!*/    });
   }
 
-  build() {
+/*!*/  build() {
     this.add('initial', value(0));                   //--&gt; our initial value for the counter is 0
     this.count = this.add(state()) as State;         //--&gt; initialize the state and add it to comp's children
     this.incr = this.add(expr(c =&gt; c + 1)) as Expr;  //--&gt; same with increment expr
     this.multi = this.add(expr(c =&gt; c &gt; 1)) as Expr; //--&gt; same with multi-click-check expr
   }
 
-  wire() {
+/*!*/  wire() {
     this.pin('initial').to(this.count.input);        //--&gt; connect the initial value to the counter
 
     this.count.output.to(                            //--&gt; the counter's value goes to...
@@ -109,16 +109,16 @@ Which you can subsequently re-use in other flows:
   <code class="javascript">import { wrap } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-import { ClickCounter } from './click-counter';
+/*!*/import { ClickCounter } from './click-counter';
 
 let p = document.getElementById('p');
 
-let counter = new ClickCounter();
+/*!*/let counter = new ClickCounter();
 
-wrap(fromEvent(document, 'click')).to(counter.in('click'));
-counter.out('count').subscribe(v =&gt; { if (v) p.innerHTML = v });
-counter.out('multi').subscribe(() =&gt; p.innerHTML = 'MULTI CLICK!');
-counter.out('single').subscribe(() =&gt; p.innerHTML = 'single click');</code>
+/*!*/wrap(fromEvent(document, 'click')).to(counter.in('click'));
+/*!*/counter.out('count').subscribe(v =&gt; { if (v) p.innerHTML = v });
+/*!*/counter.out('multi').subscribe(() =&gt; p.innerHTML = 'MULTI CLICK!');
+/*!*/counter.out('single').subscribe(() =&gt; p.innerHTML = 'single click');</code>
 </pre>
 
 <h2 id="build">Build</h2>
@@ -233,13 +233,13 @@ export class ClickCounter extends Composition {
 
     // .build() and .wire() should be called by child class
     // so when they are called, this.debounce is initialized
-    this.build();
-    this.wire();
+/*!*/    this.build();
+/*!*/    this.wire();
   }
 
   // override init() so that parent class does not call
   // .build() and .wire()
-  init(){}
+/*!*/  init(){}
 
   build() {
     this.add('initial', value(0));

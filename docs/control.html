@@ -51,7 +51,7 @@
 The main usage of <span code>control()</span> is as an <i>AND</i> gate between multiple sources:
 
 <pre try="https://stackblitz.com/edit/connective-ctrl-ex1">
-  <code class="javascript">import { wrap, control, group } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, control, group } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 
@@ -62,7 +62,7 @@ group(
   wrap(fromEvent(b1, 'click')),
   wrap(fromEvent(b2, 'click'))
 )
-.to(control())
+/*!*/.to(control())
 .subscribe(() =&gt; console.log('BOTH CLICKED!'));</code>
 </pre>
 
@@ -72,22 +72,22 @@ If one source emits multiple times, <span code>control()</span> will queue incom
 with emissions of other sources:
 
 <pre try="https://stackblitz.com/edit/connective-ctrl-ex2">
-  <code class="javascript">import { source, control, group } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, control, group } from '@connectv/core';
 
 
 let a = source();
 let b = source();
 
 group(a, b)
-.to(control())
+/*!*/.to(control())
 .subscribe(console.log);
 
-a.send('a1'); //--&gt; queued
-a.send('a2'); //--&gt; queued
-a.send('a3'); //--&gt; queued
-b.send('b1'); //--&gt; paired with 'a1'
-b.send('b2'); //--&gt; paired with 'a2'
-b.send('b3'); //--&gt; paired with 'a3'</code>
+/*!*/a.send('a1'); //--&gt; queued
+/*!*/a.send('a2'); //--&gt; queued
+/*!*/a.send('a3'); //--&gt; queued
+/*!*/b.send('b1'); //--&gt; paired with 'a1'
+/*!*/b.send('b2'); //--&gt; paired with 'a2'
+/*!*/b.send('b3'); //--&gt; paired with 'a3'</code>
 </pre>
 
 As you can see, <span code>control()</span> will emit an array of all paired values.
@@ -114,18 +114,18 @@ drop it:
 import { fromEvent } from 'rxjs';
 
 let i = document.getElementById('i') as HTMLInputElement;
-let submitGate = gate();
+/*!*/let submitGate = gate();
 
 //
 //--&gt; so this validator checks if the length of input is proper
 //
-let validator = map(v =&gt; v.length &gt; 5 && v.length &lt; 10);
+/*!*/let validator = map(v =&gt; v.length &gt; 5 && v.length &lt; 10);
 
 wrap(fromEvent(i, 'input'))
 .to(map(() =&gt; i.value))
 .to(submitGate.input, validator);         //--&gt; the value goes both to the gate and validator
 
-validator.to(submitGate.control);         //--&gt; the validator controls the gate
+/*!*/validator.to(submitGate.control);         //--&gt; the validator controls the gate
 
 submitGate.output.subscribe(console.log); //--&gt; gate submits (to console ;))</code>
 </pre>
@@ -144,11 +144,11 @@ let a = document.getElementById('a') as HTMLInputElement;
 let b = document.getElementById('b') as HTMLInputElement;
 let btn = document.getElementById('btn');
 
-let e = expr((a, b) =&gt; a + b);
+/*!*/let e = expr((a, b) =&gt; a + b);
 
 wrap(fromEvent(a, 'input')).to(map(() =&gt; parseInt(a.value))).to(e.in(0));
 wrap(fromEvent(b, 'input')).to(map(() =&gt; parseInt(b.value))).to(e.in(1));
-wrap(fromEvent(btn, 'click')).to(e.control);  //--&gt; so only add when the button is pressed
+/*!*/wrap(fromEvent(btn, 'click')).to(e.control);  //--&gt; so only add when the button is pressed
 
 e.result.subscribe(console.log);</code>
 </pre>

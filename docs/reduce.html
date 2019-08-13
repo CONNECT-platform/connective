@@ -45,11 +45,11 @@
 <span code>reduce()</span> will aggregate incoming values using given aggregate function:
 
 <pre try="https://stackblitz.com/edit/connective-rdc-ex1">
-  <code class="javascript">import { value, spread, reduce } from '@connectv/core';
+  <code class="javascript">/*!*/import { value, spread, reduce } from '@connectv/core';
 
 value([1, 2, 3, 4])
 .to(spread())
-.to(reduce((total, each) =&gt; total + each))
+/*!*/.to(reduce((total, each) =&gt; total + each))
 .subscribe(console.log);</code>
 </pre>
 
@@ -59,11 +59,11 @@ When no initial value is passed to <span code>reduce()</span> (like the example 
 as the initial value. You can provide an initial value like this:
 
 <pre try="https://stackblitz.com/edit/connective-rdc-ex1">
-  <code class="javascript">import { value, spread, reduce } from '@connectv/core';
+  <code class="javascript">/*!*/import { value, spread, reduce } from '@connectv/core';
 
 value([1, 2, 3, 4])
 .to(spread())
-.to(reduce((total, each) =&gt; total * each, -1)) //--&gt; so all values will be negative
+/*!*/.to(reduce((total, each) =&gt; total * each, -1)) //--&gt; so all values will be negative
 .subscribe(console.log);</code>
 </pre>
 

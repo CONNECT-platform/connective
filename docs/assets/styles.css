@@ -830,8 +830,8 @@ body.dark-mode code .line:before {
 }
 
 code .line.highlight {
-  background: #3B3B3B;
-  color: #e0e0e0;
+  background: #505050;
+  color: #ffffff;
 }
 
 code .line:hover {
@@ -839,7 +839,7 @@ code .line:hover {
 }
 
 body.dark-mode code .line.highlight {
-  background: #1A1A1A;
+  background: #282828;
 }
 
 body.dark-mode code .line:hover {

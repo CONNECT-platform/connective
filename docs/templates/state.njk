@@ -8,19 +8,19 @@
 <span code>state()</span> allows you to store and work with stateful values in your reactive flows:
 
 <pre try="https://stackblitz.com/edit/connective-st-ex1">
-  <code class="javascript">import { wrap, map, state, pipe } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, map, state, pipe } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 let a = document.getElementById('a') as HTMLInputElement;
 let p = document.getElementById('p');
 
-let s = state();
+/*!*/let s = state();
 
 wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
   .to(map(() =&gt; a.value))        //--&gt; map it to the input value
   .to(pipe(debounceTime(1000)))  //--&gt; wait for the typing to finish
-  .to(s.input);                  //--&gt; set the state
+/*!*/  .to(s.input);                  //--&gt; set the state
 
 //
 // this will emit only when the state changes
@@ -29,7 +29,7 @@ wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
 // &gt; state change: hellow
 // &gt; state change: hellow
 //
-s.output.subscribe(v =&gt; p.innerHTML += '&gt; state change: ' + v + '&lt;br&gt;');</code>
+/*!*/s.output.subscribe(v =&gt; p.innerHTML += '&gt; state change: ' + v + '&lt;br&gt;');</code>
 </pre>
 
 <h2 id="late-sub">Late subscription</h2>
@@ -46,7 +46,7 @@ let btn = document.getElementById('btn');
 let p = document.getElementById('p');
 let p2 = document.getElementById('p2');
 
-let s = state();
+/*!*/let s = state();
 
 wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
   .to(map(() =&gt; a.value))        //--&gt; map it to the input value
@@ -55,15 +55,15 @@ wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
 
 s.output.subscribe(v =&gt; p.innerHTML = 'state: ' + v);
 
-wrap(fromEvent(btn, 'click'))
-  .subscribe(() =&gt; {
-    //
-    // so this guy subscribes on the state well after
-    // the latest value was emitted to it, but still
-    // receives the latest value:
-    //
-    s.output.subscribe(v =&gt; p2.innerHTML = 'received: ' + v).unsubscribe();
-  });</code>
+/*!*/wrap(fromEvent(btn, 'click'))
+/*!*/  .subscribe(() =&gt; {
+/*!*/    //
+/*!*/    // so this guy subscribes on the state well after
+/*!*/    // the latest value was emitted to it, but still
+/*!*/    // receives the latest value:
+/*!*/    //
+/*!*/    s.output.subscribe(v =&gt; p2.innerHTML = 'received: ' + v).unsubscribe();
+/*!*/  });</code>
 </pre>
 
 <h2 id="change-detection">Change detection</h2>
@@ -75,14 +75,14 @@ wrap(fromEvent(btn, 'click'))
   <code class="javascript">import { source, state } from '@connectv/core';
 
 let a = source();
-let s = state();
+/*!*/let s = state();
 
 a.to(s.input);
 s.output.subscribe(console.log);
 
-a.send([1, 2, 3]);
-a.send([1, 2, 3]);    //--&gt; this one does not get logged
-a.send([1, 2, 3, 4]);</code>
+/*!*/a.send([1, 2, 3]);
+/*!*/a.send([1, 2, 3]);    //--&gt; this one does not get logged
+/*!*/a.send([1, 2, 3, 4]);</code>
 </pre>
 
 You can change this behavior by providing a custom equality function:
@@ -91,14 +91,14 @@ You can change this behavior by providing a custom equality function:
   <code class="javascript">import { source, state } from '@connectv/core';
 
 let a = source();
-let s = state((x, y) =&gt; x == y);  //--&gt; provide custom equality check
+/*!*/let s = state((x, y) =&gt; x == y);  //--&gt; provide custom equality check
 
 a.to(s.input);
 s.output.subscribe(console.log);
 
-a.send([1, 2, 3]);
-a.send([1, 2, 3]);                //--&gt; this is logged too
-a.send([1, 2, 3, 4]);</code>
+/*!*/a.send([1, 2, 3]);
+/*!*/a.send([1, 2, 3]);                //--&gt; this is logged too
+/*!*/a.send([1, 2, 3, 4]);</code>
 </pre>
 
 <h2 id="signature">Signature</h2>

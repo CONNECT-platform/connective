@@ -51,7 +51,7 @@
 You can use <span code>pack()</span> to collect values from multiple sources:
 
 <pre try="https://stackblitz.com/edit/connective-pack-ex1">
-  <code class="javascript">import { wrap, pack, group, map } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, pack, group, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let s = document.getElementById('s') as HTMLInputElement;
@@ -62,7 +62,7 @@ group(
   wrap(fromEvent(s, 'input')).to(map(() =&gt; s.value)),  //--&gt; pick a salute
   wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value))   //--&gt; pick a name
 )
-.to(pack())
+/*!*/.to(pack())
 .to(map(v =&gt; v.join(' ')))                             //--&gt; pack returns an array, lets join it
 .subscribe(v =&gt; p.innerHTML = v);                      //--&gt; say hi</code>
 </pre>
@@ -72,7 +72,7 @@ group(
 <span code>pack()</span> waits for all connected sources to emit at least once before its first emission:
 
 <pre try="https://stackblitz.com/edit/connective-pack-ex2">
-  <code class="javascript">import { wrap, pack, filter, map, group } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, pack, filter, map, group } from '@connectv/core';
 import { fromEvent, interval } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
@@ -84,7 +84,7 @@ group(
   wrap(fromEvent(a, 'input')).to(map(() =&gt; a.checked)),
   wrap(fromEvent(b, 'input')).to(map(() =&gt; b.checked))
 )
-.to(pack())
+/*!*/.to(pack())
 .to(filter(v =&gt; v[1] && v[2]))       //--&gt; only let values through if both checkboxes are checked
 .to(map(v =&gt; v[0]))                  //--&gt; map to the interval's value
 .subscribe(v =&gt; p.innerHTML = v);    //--&gt; display the beautiful</code>

@@ -8,7 +8,7 @@
 <span code>spread()</span> will spread an incoming array into multiple emissions:
 
 <pre try="https://stackblitz.com/edit/connective-sprd-ex1">
-  <code class="javascript">import { wrap, control, group, spread, gate, pipe, map, filter } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, control, group, spread, gate, pipe, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
 
@@ -20,7 +20,7 @@ let g = gate();
 wrap(fromEvent(i, 'input'))
 .to(pipe(debounceTime(1000)))        //--&gt; wait for typing to finish
 .to(map(() =&gt; i.value.split(',')))   //--&gt; split the string
-.to(spread())                        //--&gt; spread the comma separated list
+/*!*/.to(spread())                        //--&gt; spread the comma separated list
 .to(map(x =&gt; x.trim()))              //--&gt; trim each word
 .to(filter(x =&gt; x.length > 3))       //--&gt; ignore super short ones
 .to(g.input);
@@ -35,10 +35,10 @@ g.output.subscribe(v =&gt; p.innerHTML = v);</code>
 <span code>spread()</span> will just relay incoming values that are not arrays:
 
 <pre try="https://stackblitz.com/edit/connective-sprd-ex2">
-  <code class="javascript">import { source, spread } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, spread } from '@connectv/core';
 
 let a = source();
-a.to(spread()).subscribe(console.log);
+/*!*/a.to(spread()).subscribe(console.log);
 
 a.send([1, 2, 3]); //--> spread the values
 a.send(4);         //--> just relay 4

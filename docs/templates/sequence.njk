@@ -8,7 +8,7 @@
 <span code>sequence()</span> allows you to detect a specific sequence of emissions from multiple sources:
 
 <pre try="https://stackblitz.com/edit/connective-seq-ex1">
-  <code class="javascript">import { wrap, sequence } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, sequence } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let p = document.getElementById('p');
@@ -17,22 +17,22 @@ let p = document.getElementById('p');
 // - 1 mouse down
 // - one or more mouse moves ('+')
 // - 1 mouse up
-let drag = sequence(1, '+', 1);
+/*!*/let drag = sequence(1, '+', 1);
 
 // 'click' is a sequence of
 // - 1 mouse down
 // - 0 mouse moves
 // - 1 mouse up
-let click = sequence(1, 0, 1);
+/*!*/let click = sequence(1, 0, 1);
 
 // now lets connect the 'mousedown', 'mousemove' and 'mouseup' events
 // to drag and click ...
-wrap(fromEvent(document, 'mousedown')).to(drag.in(0), click.in(0));
-wrap(fromEvent(document, 'mousemove')).to(drag.in(1), click.in(1));
-wrap(fromEvent(document, 'mouseup')).to(drag.in(2), click.in(2));
+/*!*/wrap(fromEvent(document, 'mousedown')).to(drag.in(0), click.in(0));
+/*!*/wrap(fromEvent(document, 'mousemove')).to(drag.in(1), click.in(1));
+/*!*/wrap(fromEvent(document, 'mouseup')).to(drag.in(2), click.in(2));
 
-drag.output.subscribe(() =&gt; p.textContent = 'DRAG');
-click.output.subscribe(() =&gt; p.textContent = 'CLICK');</code>
+/*!*/drag.output.subscribe(() =&gt; p.textContent = 'DRAG');
+/*!*/click.output.subscribe(() =&gt; p.textContent = 'CLICK');</code>
 </pre>
 
 You can pass any number of arguments to <span code>sequence()</span>. Each argument corresponds to an incoming
@@ -58,7 +58,7 @@ on its third input <span code>drag.in(2)</span>.
 Here is another example to play around with:
 
 <pre try="https://stackblitz.com/edit/connective-seq-ex2">
-  <code class="javascript">import { wrap, sequence, pipe, sink } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, sequence, pipe, sink } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
@@ -73,7 +73,7 @@ let p = document.getElementById('p');
 // - no clicks on B
 // - any number of clicks on C (maybe 0 even)
 // - 2 clicks on D
-let seq = sequence('+', 0, '*', 2);
+/*!*/let seq = sequence('+', 0, '*', 2);
 wrap(fromEvent(A, 'click')).to(seq.in(0));
 wrap(fromEvent(B, 'click')).to(seq.in(1));
 wrap(fromEvent(C, 'click')).to(seq.in(2));

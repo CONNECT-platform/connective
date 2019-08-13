@@ -16,22 +16,22 @@ by definition outlined above, an agent, and so you could replace it with an agen
 same way that you would encapsulate repeated logic in a function and/or a class:
 
 <pre try="https://stackblitz.com/edit/connective-agent-ex1?file=multi.ts">
-  <code class="javascript">import { Agent, sink, map, block } from '@connectv/core';
+  <code class="javascript">/*!*/import { Agent, sink, map, block } from '@connectv/core';
 
-export class Multi extends Agent {
+/*!*/export class Multi extends Agent {
   private k = 1;
 
   constructor() {
-    super({
-      inputs: ['n', 'k'], //--&gt; we have two inputs: 'n', and 'k'
-      outputs: ['o']      //--&gt; and one output: 'o'
-    });
+/*!*/    super({
+/*!*/      inputs: ['n', 'k'], //--&gt; we have two inputs: 'n', and 'k'
+/*!*/      outputs: ['o']      //--&gt; and one output: 'o'
+/*!*/    });
 
     //
     //--&gt; get every value from input 'n', multiply it by 'k',
     //--&gt; and pass it to the output.
     //
-    this.in('n').to(map(n =&gt; n * this.k)).to(this.out('o'));
+/*!*/    this.in('n').to(map(n =&gt; n * this.k)).to(this.out('o'));
 
     //
     //--&gt; `block()` is used here to make the output dependent on
@@ -39,7 +39,7 @@ export class Multi extends Agent {
     //--&gt; to the output. basically this just ensures that when the output
     //--&gt; is bound, so is the input 'k'.
     //
-    this.in('k').to(sink(k =&gt; this.k = k)).to(block()).to(this.out('o'));
+/*!*/    this.in('k').to(sink(k =&gt; this.k = k)).to(block()).to(this.out('o'));
   }
 }</code>
 </pre>
@@ -55,16 +55,16 @@ Now that we have our custom agent defined, we can use it in our other reactive f
 <pre try="https://stackblitz.com/edit/connective-agent-ex1?file=index.ts">
   <code class="javascript">import { wrap, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
-import { Multi } from './multi';
+/*!*/import { Multi } from './multi';
 
 let n = document.getElementById('n') as HTMLInputElement;
 let k = document.getElementById('k') as HTMLInputElement;
 let p = document.getElementById('p');
-let m = new Multi();
+/*!*/let m = new Multi();
 
-wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value)).to(m.in('n'));
-wrap(fromEvent(k, 'input')).to(map(() =&gt; k.value)).to(m.in('k'));
-m.out('o').subscribe(v =&gt; p.innerHTML = v);</code>
+/*!*/wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value)).to(m.in('n'));
+/*!*/wrap(fromEvent(k, 'input')).to(map(() =&gt; k.value)).to(m.in('k'));
+/*!*/m.out('o').subscribe(v =&gt; p.innerHTML = v);</code>
 </pre>
 
 <b>NOTICE</b>: This is just an example of how you could define custom agents and it is <b>NOT</b> the recommended method.

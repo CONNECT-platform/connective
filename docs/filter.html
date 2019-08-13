@@ -52,31 +52,31 @@ Similar to <a href="/docs/map"><span code>map()</span></a>, this function can be
 it needs to take one argument:
 
 <pre try="https://stackblitz.com/edit/connective-fil-ex1">
-  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
 
 wrap(fromEvent(a, 'input'))       //--&gt; get input events on the input
  .to(map(() =&gt; a.value))          //--&gt; map it to input's value
- .to(filter(x =&gt; x.length &gt; 3))   //--&gt; only allow long enough text
+/*!*/ .to(filter(x =&gt; x.length &gt; 3))   //--&gt; only allow long enough text
  .subscribe(console.log);         //--&gt; log it</code>
 </pre>
 
 Or it can be an asynchronous one, in which case it needs to take a callback as its second argument:
 
 <pre try="https://stackblitz.com/edit/connective-fil-ex2">
-  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
 
 wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
  .to(map(() =&gt; a.value))                //--&gt; map it to input's value
- .to(filter((x, done) =&gt; {              //--&gt; only allow long enough text
-   setTimeout(() =&gt; done(x.length &gt; 3),
-    10000 - x.length * 200);            //--&gt; also wait a bit
- }))
+/*!*/ .to(filter((x, done) =&gt; {              //--&gt; only allow long enough text
+/*!*/   setTimeout(() =&gt; done(x.length &gt; 3),
+/*!*/    10000 - x.length * 200);            //--&gt; also wait a bit
+/*!*/ }))
  .subscribe(console.log);               //--&gt; log it</code>
 </pre>
 
@@ -97,14 +97,14 @@ let a = document.getElementById('a') as HTMLInputElement;
 wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
  .to(map(() =&gt; a.value))                //--&gt; map it to input's value
  .to(filter(x =&gt; {                      //--&gt; only allow long enough text
-   if (x == 'end')
-     throw new Error('END!');           //--&gt; throw error when 'end' is nigh
+/*!*/   if (x == 'end')
+/*!*/     throw new Error('END!');           //--&gt; throw error when 'end' is nigh
    return x.length &gt; 3;
  }))
  .subscribe(
    console.log,                         //--&gt; log values
-   (err) =&gt;
-     console.log(err.original.message)  //--&gt; ERROR!
+/*!*/   (err) =&gt;
+/*!*/     console.log(err.original.message)  //--&gt; ERROR!
  );</code>
 </pre>
 
@@ -117,21 +117,21 @@ import { fromEvent, throwError } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
 
-let $badObs = throwError('END IS NIGH!');
+/*!*/let $badObs = throwError('END IS NIGH!');
 
 
 wrap(fromEvent(a, 'input'))             //--&gt; get input events on the input
  .to(map(() =&gt; a.value))                //--&gt; map it to input's value
- .to(filter((x, done, err) =&gt; {         //--&gt; only allow long enough text
-   $badObs.subscribe(
-     () =&gt; done(x.length &gt; 3),
-     error =&gt; err(error),
-   )
- }))
+/*!*/ .to(filter((x, done, err) =&gt; {         //--&gt; only allow long enough text
+/*!*/   $badObs.subscribe(
+/*!*/     () =&gt; done(x.length &gt; 3),
+/*!*/     error =&gt; err(error),
+/*!*/   )
+/*!*/ }))
  .subscribe(
    console.log,                         //--&gt; log values
-   (err) =&gt;
-     console.log(err.original.message)  //--&gt; ERROR!
+/*!*/   (err) =&gt;
+/*!*/     console.log(err.original.message)  //--&gt; ERROR!
  );</code>
 </pre>
 

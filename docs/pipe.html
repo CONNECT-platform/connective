@@ -49,16 +49,16 @@
 in your reactive flows:
 
 <pre try="https://stackblitz.com/edit/connective-pipe-ex1">
-  <code class="javascript">import { wrap, pipe, map } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, pipe, map } from '@connectv/core';
 import { fromEvent } from 'rxjs';
-import { throttleTime } from 'rxjs/operators';
+/*!*/import { throttleTime } from 'rxjs/operators';
 
 let a = document.getElementById('a') as HTMLInputElement;
 let p = document.getElementById('p');
 
 wrap(fromEvent(a, 'input'))
 .to(map(() =&gt; a.value))             //--&gt; get the input value
-.to(pipe(throttleTime(1000)))       //--&gt; throttle a bit
+/*!*/.to(pipe(throttleTime(1000)))       //--&gt; throttle a bit
 .subscribe(v =&gt; p.innerHTML = v);</code>
 </pre>
 
@@ -68,8 +68,8 @@ The operators are not passed raw emitted data/events, but rather <a href="/docs/
 objects that contain them:
 
 <pre try="https://stackblitz.com/edit/connective-pipe-ex2">
-  <code class="javascript">import { value, spread, pipe } from '@connectv/core';
-import { tap } from 'rxjs/operators';
+  <code class="javascript">/*!*/import { value, spread, pipe } from '@connectv/core';
+/*!*/import { tap } from 'rxjs/operators';
 
 value([1, 2, 3, 4])
 .to(spread())
@@ -77,7 +77,7 @@ value([1, 2, 3, 4])
 
 value([1, 2, 3, 4])
 .to(spread())
-.to(pipe(tap(console.log)))   //--&gt; `Emission` objects are logged
+/*!*/.to(pipe(tap(console.log)))   //--&gt; `Emission` objects are logged
 .subscribe();</code>
 </pre>
 
@@ -87,12 +87,12 @@ access the actual value of the emission using its <span code>.value</span> prope
 <pre try="https://stackblitz.com/edit/connective-pipe-ex3">
   <code class="javascript">import { value, spread, pipe } from '@connectv/core';
 import { timer } from 'rxjs';
-import { delayWhen } from 'rxjs/operators';
+/*!*/import { delayWhen } from 'rxjs/operators';
 
 value([1, 2, 3, 4])
 .to(spread())
-.to(pipe(delayWhen(e =&gt; timer(1000 - e.value * 10)))) //--&gt; delay proportional to inverse of the value
-                                                      //... so that the array is reversed
+/*!*/.to(pipe(delayWhen(e =&gt; timer(1000 - e.value * 10)))) //--&gt; delay proportional to inverse of the value
+/*!*/                                                      //... so that the array is reversed
 .subscribe(console.log);</code>
 </pre>
 

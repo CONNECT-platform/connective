@@ -82,7 +82,7 @@ export class Stargazers extends Composition {
     this.handle.output                                   //--&gt; in case of proper result ...
     .to(spread())                                        //... spread to individual repos
     .to(map(repo =&gt; repo.stargazers_count))              //... get the stargazers of the repo
-    .to(reduce((total, stars) =&gt; total + stars))         //... aggregate everything
+/*!*/    .to(reduce((total, stars) =&gt; total + stars))         //... aggregate everything
     .to(pipe(debounceTime(1)))                           //... wait till aggregation is done
     .to(this.out('stars'));                              //... tell the whole world about it
   }
@@ -105,7 +105,7 @@ let p = document.getElementById('p');
 // PROBLEM:: we need a fresh instance of Stargazers so that we don't
 // get the aggregate of all users we tried ...
 //
-let s = new Stargazers();
+/*!*/let s = new Stargazers();
 
 wrap(fromEvent(i, 'input'))
   .to(map(() =&gt; i.value))
@@ -128,7 +128,7 @@ To fix this, you can use <span code>invoke()</span> to create a new instance of 
 hence only getting the aggregate number of stars for that user:
 
 <pre try="https://stackblitz.com/edit/connective-invk-ex2?file=index.ts">
-  <code class="javascript">import { wrap, map, pipe, filter, invoke } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, map, pipe, filter, invoke } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -141,7 +141,7 @@ let p = document.getElementById('p');
 // PROBLEM FIXED: invoke() will create a new instance of
 // Stargazers() for each username.
 //
-let s = invoke(() =&gt; new Stargazers());
+/*!*/let s = invoke(() =&gt; new Stargazers());
 
 wrap(fromEvent(i, 'input'))
   .to(map(() =&gt; i.value))

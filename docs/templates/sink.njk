@@ -8,15 +8,15 @@
 A <span code>sink()</span> acts as a consumer of incoming events/data:
 
 <pre try="https://stackblitz.com/edit/connective-sink-ex1">
-  <code class="javascript">import { source, map, filter, sink } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, map, filter, sink } from '@connectv/core';
 
 let a = source();
-let b = sink(x =&gt; console.log(x));
+/*!*/let b = sink(x =&gt; console.log(x));
 
 a.to(map(x =&gt; x * 2)).to(b);
 a.to(filter(x =&gt; x % 2 == 0)).to(map(x =&gt; x * 10)).to(b);
 
-b.bind();
+/*!*/b.bind();
 a.send(2);
 a.send(3);</code>
 </pre>
@@ -31,7 +31,7 @@ You can also place a sink in the middle of your reactive flow to do something ac
 transforming them:
 
 <pre try="https://stackblitz.com/edit/connective-sink-ex1">
-  <code class="javascript">import { wrap, group, map, filter, sink } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, group, map, filter, sink } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
@@ -39,7 +39,7 @@ let p = document.getElementById('p');
 
 wrap(fromEvent(a, 'input'))
 .to(map(() =&gt; a.value))             //--&gt; get the input value
-.to(sink(x =&gt; console.log(x)))      //--&gt; log it
+/*!*/.to(sink(x =&gt; console.log(x)))      //--&gt; log it
 .to(filter(x =&gt; x % 2 == 1))        //--&gt; filter for odd ones
 .subscribe(v =&gt; p.innerHTML = v);   //--&gt; put them on the page</code>
 </pre>

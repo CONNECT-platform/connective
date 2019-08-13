@@ -45,25 +45,25 @@
 <span code>expr()</span> allows you turn a function into an <a href="/docs/agent">agent</a>:
 
 <pre try="https://stackblitz.com/edit/connective-expr-ex1">
-  <code class="javascript">import { wrap, map, expr } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, map, expr } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
 let b = document.getElementById('b') as HTMLInputElement;
 let p = document.getElementById('p');
 
-let e = expr((a, b) =&gt; a + b);
+/*!*/let e = expr((a, b) =&gt; a + b);
 
 wrap(fromEvent(a, 'input'))           //--&gt; get input from a
   .to(map(() =&gt; parseInt(a.value)))   //--&gt; map it to a number
-  .to(e.in(0));                       //--&gt; feed it to e
+/*!*/  .to(e.in(0));                       //--&gt; feed it to e
 
 wrap(fromEvent(b, 'input'))           //--&gt; get input from b
   .to(map(() =&gt; parseInt(b.value)))   //--&gt; map it to a number
-  .to(e.in(1));                       //--&gt; feed it to e
+/*!*/  .to(e.in(1));                       //--&gt; feed it to e
 
-e.result
- .subscribe(v => p.innerHTML = v);    //--&gt; display the thing</code>
+/*!*/e.result
+/*!*/ .subscribe(v => p.innerHTML = v);    //--&gt; display the thing</code>
 </pre>
 
 <h2 id="async">Async functions</h2>
@@ -71,14 +71,14 @@ e.result
 You can run async operations in an <span code>expr()</span> by returning a function as return value:
 
 <pre try="https://stackblitz.com/edit/connective-expr-ex2">
-  <code class="javascript">import { source, expr } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, expr } from '@connectv/core';
 
 let a = source();
 let b = source();
-let e = expr((msg, delay) =&gt;
-  done =&gt; {
-    setTimeout(() =&gt; done(`(after ${delay}ms): ${msg}`), delay);
-  });
+/*!*/let e = expr((msg, delay) =&gt;
+/*!*/  done =&gt; {
+/*!*/    setTimeout(() =&gt; done(`(after ${delay}ms): ${msg}`), delay);
+/*!*/  });
 
 a.to(e.in(0));
 b.to(e.in(1));
@@ -102,7 +102,7 @@ let b = document.getElementById('b') as HTMLInputElement;
 let btn = document.getElementById('btn');
 let p = document.getElementById('p');
 
-let e = expr((a, b) =&gt; a + b);
+/*!*/let e = expr((a, b) =&gt; a + b);
 
 wrap(fromEvent(a, 'input'))           //--&gt; get input from a
   .to(map(() =&gt; parseInt(a.value)))   //--&gt; map it to a number
@@ -112,8 +112,8 @@ wrap(fromEvent(b, 'input'))           //--&gt; get input from b
   .to(map(() =&gt; parseInt(b.value)))   //--&gt; map it to a number
   .to(e.in(1));                       //--&gt; feed it to e
 
-wrap(fromEvent(btn, 'click'))         //--&gt; wait for the click before
-  .to(e.control);                     //... running the function
+/*!*/wrap(fromEvent(btn, 'click'))         //--&gt; wait for the click before
+/*!*/  .to(e.control);                     //... running the function
 
 e.result
  .subscribe(v =&gt; p.innerHTML = v);    //--&gt; display the thing</code>
@@ -136,26 +136,26 @@ and pass them to this callback:
 //--&gt; sync error handling in expr:
 
 let e = expr(() =&gt; {
-  throw new Error('because why not');
+/*!*/  throw new Error('because why not');
 });
 
 e.result.subscribe(
   () =&gt; console.log('not here ...'),        //--&gt; normal callback
-  () =&gt; console.log('E HAD ERROR!')         //--&gt; error callback
+/*!*/  () =&gt; console.log('E HAD ERROR!')         //--&gt; error callback
 );
 
 //--&gt; async error handling in expr:
 
-let brokenPromise = () =&gt; new Promise(() =&gt; { throw new Error('well ...')});
+/*!*/let brokenPromise = () =&gt; new Promise(() =&gt; { throw new Error('well ...')});
 
-let f = expr(() =&gt; (done, error) =&gt; {
+/*!*/let f = expr(() =&gt; (done, error) =&gt; {
   setImmediate(() =&gt;
-    brokenPromise().catch(error));         //--&gt; passing the caught error on ...
+/*!*/    brokenPromise().catch(error));         //--&gt; passing the caught error on ...
 });
 
 f.result.subscribe(
   () =&gt; console.log('not here too ...'),   //--&gt; normal callback
-  () =&gt; console.log('F HAD ERROR!')        //--&gt; error callback
+/*!*/  () =&gt; console.log('F HAD ERROR!')        //--&gt; error callback
 )</code>
 </pre>
 

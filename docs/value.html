@@ -46,22 +46,22 @@
 except it will emit the given value:
 
 <pre try="https://stackblitz.com/edit/connective-val-ex1">
-  <code class="javascript">import { wrap, value } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, value } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let btn = document.getElementById('btn');
 
-wrap(fromEvent(btn, 'click')).to(value('HELLOW!')).subscribe(console.log);</code>
+/*!*/wrap(fromEvent(btn, 'click')).to(value('HELLOW!')).subscribe(console.log);</code>
 </pre>
 
 A <span code>value()</span> can also be the source of a flow:
 
 <pre try="https://stackblitz.com/edit/connective-val-ex2">
-  <code class="javascript">import { value, spread, pipe } from '@connectv/core';
+  <code class="javascript">/*!*/import { value, spread, pipe } from '@connectv/core';
 import { timer } from 'rxjs';
 import { delayWhen } from 'rxjs/operators';
 
-value([1, 2, 3, 4, 5])                 //--&gt; start with this array
+/*!*/value([1, 2, 3, 4, 5])                 //--&gt; start with this array
 .to(spread())                          //--&gt; spread it
 .to(pipe(                              //--&gt; delay based on value
   delayWhen(                           //--&gt; note that in pipe(), you get

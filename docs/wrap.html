@@ -46,12 +46,12 @@
 in your reactive flows:
 
 <pre try="https://stackblitz.com/edit/connective-wrap-ex1">
-  <code class="javascript">import { wrap, map, group } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, map, group } from '@connectv/core';
 import { interval, fromEvent } from 'rxjs';
 
 group(
-  wrap(interval(1000)),
-  wrap(fromEvent(document, 'click'))
+/*!*/  wrap(interval(1000)),
+/*!*/  wrap(fromEvent(document, 'click'))
 )
 .to(map(v => 'GOT:: ' + v))
 .subscribe(console.log);</code>
