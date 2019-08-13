@@ -45,12 +45,24 @@ window.addEventListener('load', function() {
   // make each line copiable
   //
   document.querySelectorAll('pre:not([copy]) code').forEach(function(node) {
-    let lines = node.innerHTML.split('\n');
+    var lines = node.innerHTML.split('\n');
+    var marker = '<span class="hljs-comment">/*!*/</span>';
     node.innerHTML = '';
-    for (var i = 0; i < lines.length; i++)
-      if (lines[i].trim().length > 0)
-        node.innerHTML += '<div class="line">' + lines[i] + '</div>';
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      if (line.trim().length > 0) {
+        if (line.startsWith(marker)) {
+          var content = line.substr(marker.length);
+          if (content.trim().length == 0)
+            node.innerHTML += '<div class="line highlight"><br></div>';
+          else
+            node.innerHTML += '<div class="line highlight">' + line.substr(marker.length) + '</div>';
+        }
+        else
+          node.innerHTML += '<div class="line">' + line + '</div>';
+      }
       else node.innerHTML += '<br>';
+    }
   });
 
   new ClipboardJS('code .line', {
@@ -86,9 +98,11 @@ window.addEventListener('load', function() {
     text: function(trigger) {
       showOverlay(copyConfirm, 2000);
       let code = '';
-      let lines = trigger.parentElement.previousElementSibling.childNodes[1].childNodes;
+      let lines = trigger.parentElement.previousElementSibling.childNodes[0].childNodes;
+      console.log(trigger.parentElement.previousElementSibling.childNodes[0]);
       for (var i = 0; i < lines.length; i++)
         code += lines[i].textContent + '\n';
+
       return code;
     }
   });

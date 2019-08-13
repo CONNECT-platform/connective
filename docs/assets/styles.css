@@ -828,12 +828,29 @@ body.dark-mode code .line:before {
   border-color: #212121;
 }
 
+code .line.highlight {
+  background: #3B3B3B;
+  color: #e0e0e0;
+}
+
 code .line:hover {
   background: #424242;
 }
 
+body.dark-mode code .line.highlight {
+  background: #1A1A1A;
+}
+
 body.dark-mode code .line:hover {
   background: #212121;
+}
+
+code .line.highlight:before {
+  border-color: #616161;
+}
+
+body.dark-mode code .line.highlight:before {
+  border-color: #424242;
 }
 
 code .line:hover:before,
@@ -843,7 +860,7 @@ body.dark-mode code .line:hover:before {
 
 .hljs {
   background: #212121;
-  color: #e0e0e0;
+  color: #bdbdbd;
   padding: 16px;
   border-radius: 3px;
   font-size: 12px;

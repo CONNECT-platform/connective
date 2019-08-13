@@ -55,7 +55,7 @@ It enables declarative creation of large and complex data/event flows and encour
 
 A <i>Hellow World!</i> example:
 <pre try="https://stackblitz.com/edit/connective-hellow-world">
-<code class="javascript">import { wrap, map, filter } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
@@ -66,16 +66,16 @@ let p = document.getElementById('p');
 // For obvious reasons.
 //
 
-wrap(fromEvent(a, 'input'))           // --&gt; wrap the `Observable` in a `Pin`
-.to(map(() =&gt; a.value))               // --&gt; map the event to value of the input
-.to(filter(name =&gt; name != 'Donald')) // --&gt; filter 'Donald' out
-.to(map(name =&gt; 'hellow ' + name))    // --&gt; add 'hellow' to the name
-.subscribe(msg =&gt; p.innerHTML = msg); // --&gt; write it to the &lt;p&gt; element</code>
+/*!*/wrap(fromEvent(a, 'input'))           // --&gt; wrap the `Observable` in a `Pin`
+/*!*/.to(map(() =&gt; a.value))               // --&gt; map the event to value of the input
+/*!*/.to(filter(name =&gt; name != 'Donald')) // --&gt; filter 'Donald' out
+/*!*/.to(map(name =&gt; 'hellow ' + name))    // --&gt; add 'hellow' to the name
+/*!*/.subscribe(msg =&gt; p.innerHTML = msg); // --&gt; write it to the &lt;p&gt; element</code>
 </pre>
 
 A more elaborate example:
 <pre try="https://stackblitz.com/edit/connective-sample-fib">
-<code class="javascript">import { wrap, pipe, map, filter, sink } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, pipe, map, filter, sink } from '@connectv/core';
 import { fromEvent, timer } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
 
@@ -88,20 +88,20 @@ let p = document.getElementById('p');
 //
 
 // --&gt; calculate next iteration step on fibonacci sequence
-let m = map(([next, prev, l]) =&gt; [next + prev, next, l - 1]);
+/*!*/let m = map(([next, prev, l]) =&gt; [next + prev, next, l - 1]);
 
-wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` in a `Pin`
-.to(pipe(debounceTime(1000)))                // --&gt; wait for people to type in the number
-.to(map(() =&gt; parseInt((a as any).value)))   // --&gt; map the input event to value of the input
-.to(map(n =&gt; [1, 0, n]))                     // --&gt; map the number to start iteration
-.to(filter(([_, __, l]) =&gt; l &gt;= 0))          // --&gt; check if we should do any iteration
-.to(m)                                       // --&gt; calculate next step
-.to(pipe(delay(300)))                        // --&gt; take a breath
-.to(filter(([_, __, l]) =&gt; l &gt; 0))           // --&gt; check if we should continue
-.to(m)                                       // --&gt; back to the loop
-.to(map(([_, f, __]) =&gt; f))                  // --&gt; btw, lets take each number in the sequence
-.to(sink(v =&gt; p.innerHTML = v))              // --&gt; set the text of &lt;p&gt; to the fib number
-.subscribe();                                // --&gt; bind the whole thing.</code>
+/*!*/wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` in a `Pin`
+/*!*/.to(pipe(debounceTime(1000)))                // --&gt; wait for people to type in the number
+/*!*/.to(map(() =&gt; parseInt((a as any).value)))   // --&gt; map the input event to value of the input
+/*!*/.to(map(n =&gt; [1, 0, n]))                     // --&gt; map the number to start iteration
+/*!*/.to(filter(([_, __, l]) =&gt; l &gt;= 0))          // --&gt; check if we should do any iteration
+/*!*/.to(m)                                       // --&gt; calculate next step
+/*!*/.to(pipe(delay(300)))                        // --&gt; take a breath
+/*!*/.to(filter(([_, __, l]) =&gt; l &gt; 0))           // --&gt; check if we should continue
+/*!*/.to(m)                                       // --&gt; back to the loop
+/*!*/.to(map(([_, f, __]) =&gt; f))                  // --&gt; btw, lets take each number in the sequence
+/*!*/.to(sink(v =&gt; p.innerHTML = v))              // --&gt; set the text of &lt;p&gt; to the fib number
+/*!*/.subscribe();                                // --&gt; bind the whole thing.</code>
 </pre>
 
 
@@ -143,13 +143,13 @@ leading to some sinks for those data/events which would consume them, possibly g
 some other nodes along the way:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-1">
-<code class="javascript">import { source, sink, pin } from '@connectv/core';
+<code class="javascript">/*!*/import { source, sink, pin } from '@connectv/core';
 
 let a = source();
 let b = pin();
 let c = sink(value =&gt; console.log(value));
 
-a.to(b).to(c); // --&gt; data/events go from a to b then to c.
+/*!*/a.to(b).to(c); // --&gt; data/events go from a to b then to c.
 
 c.bind();
 
@@ -158,13 +158,13 @@ a.send('world!');</code>
 </pre>
 
 <pre try="https://stackblitz.com/edit/connective-cheat-2">
-<code class="javascript">import { source, sink, pin } from '@connectv/core';
+<code class="javascript">/*!*/import { source, sink, pin } from '@connectv/core';
 
 let a = source();
 let b = pin();
 let c = sink(v =&gt; console.log(v));
 
-c.from(b).from(a); // --&gt; data/events that c receives come from b which in turn come from a.
+/*!*/c.from(b).from(a); // --&gt; data/events that c receives come from b which in turn come from a.
 
 c.bind();
 
@@ -195,7 +195,7 @@ let a = source();
 let b = sink(value =&gt; console.log('B::' + value));
 let c = sink(value =&gt; console.log('C::' + value));
 
-a.to(b, c); // --&gt; stuff from a goes to both b and c
+/*!*/a.to(b, c); // --&gt; stuff from a goes to both b and c
 b.bind(); c.bind();
 
 a.send('hellow!');
@@ -209,7 +209,7 @@ let a = source();
 let b = source();
 let c = sink(value =&gt; console.log(value));
 
-c.from(a, b); c.bind(); // --&gt; c's stuff come from both a and b
+/*!*/c.from(a, b); c.bind(); // --&gt; c's stuff come from both a and b
 
 a.send('hellow!');
 b.send('world!');</code>
@@ -228,7 +228,7 @@ You can also use <a href="/docs/group"><span code>group()</span></a> to work wit
 let a = source();
 let b = source();
 
-group(a, b).to(pin()).subscribe(v =&gt; console.log(v));
+/*!*/group(a, b).to(pin()).subscribe(v =&gt; console.log(v));
 
 a.send('hellow!');
 b.send('world!');</code>
@@ -265,11 +265,11 @@ console.log('A:: ' + a.locked + ' B:: ' + b.locked);
 You can also create sources from plain values or from <i>Observables</i>:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-7">
-<code class="javascript">import { wrap, value, pin, group } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, value, pin, group } from '@connectv/core';
 import { interval } from 'rxjs';
 
-let a = value('hellow world!'); // --&gt; a emits 'hellow world!' once
-let b = wrap(interval(1000));   // --&gt; b emits a number every 1000ms
+/*!*/let a = value('hellow world!'); // --&gt; a emits 'hellow world!' once
+/*!*/let b = wrap(interval(1000));   // --&gt; b emits a number every 1000ms
 
 group(a, b).to(pin()).subscribe(v =&gt; console.log(v));</code>
 </pre>
@@ -284,10 +284,10 @@ Note that you cannot connect any pin to <a href="/docs/wrap"><span code>wrap()</
 You can use <a href="/docs/spread"><span code>spread()</span></a> to turn incoming values into multiple emissions:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-8">
-<code class="javascript">import { spread, value } from '@connectv/core';
+<code class="javascript">/*!*/import { spread, value } from '@connectv/core';
 
 value([1, 2, 3, 4, 5, 6])
-.to(spread())
+/*!*/.to(spread())
 .subscribe(v =&gt; console.log(v));</code>
 </pre>
 
@@ -299,12 +299,12 @@ You can change incoming values using <a href="/docs/map"><span code>map()</span>
 <a href="/docs/filter"><span code>filter()</span></a>:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-9">
-<code class="javascript">import { spread, value, filter, map } from '@connectv/core';
+<code class="javascript">/*!*/import { spread, value, filter, map } from '@connectv/core';
 
 value([1, 2, 3, 4, 5, 6])
 .to(spread())
-.to(filter(v =&gt; v % 2 == 0)) // --&gt; only allow even ones through
-.to(map(v =&gt; v * 10))        // --&gt; multiply each value by 10
+/*!*/.to(filter(v =&gt; v % 2 == 0)) // --&gt; only allow even ones through
+/*!*/.to(map(v =&gt; v * 10))        // --&gt; multiply each value by 10
 .subscribe(v =&gt; console.log(v));</code>
 </pre>
 
@@ -315,7 +315,7 @@ value([1, 2, 3, 4, 5, 6])
 You can break your flow into multiple branches and join them back using <a href="/docs/control"><span code>control()</span></a>:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-10">
-<code class="javascript">import { spread, value, map, control } from '@connectv/core';
+<code class="javascript">/*!*/import { spread, value, map, control } from '@connectv/core';
 
 value([1, 2, 3, 4, 5, 6])
 .to(spread())
@@ -323,7 +323,7 @@ value([1, 2, 3, 4, 5, 6])
 map(v =&gt; v * 10),
 map(v =&gt; v * 100),
 )
-.to(control()) // --&gt; will wait for all incoming emissions and join them pair-wise
+/*!*/.to(control()) // --&gt; will wait for all incoming emissions and join them pair-wise
 .subscribe(v =&gt; console.log(v));</code>
 </pre>
 
@@ -334,14 +334,14 @@ map(v =&gt; v * 100),
 You can even create loops in your flow:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-11">
-<code class="javascript">import { source, map, filter } from '@connectv/core';
+<code class="javascript">/*!*/import { source, map, filter } from '@connectv/core';
 
 let a = source();
-let m = map(x =&gt; x + 1); // --&gt; lets give this pin a name so we can loop back to it
+/*!*/let m = map(x =&gt; x + 1); // --&gt; lets give this pin a name so we can loop back to it
 
 a.to(m)
-.to(filter(x =&gt; x &lt; 10)) // --&gt; keep looping until we reach 10
-.to(m)                   // --&gt; looping back to m
+/*!*/.to(filter(x =&gt; x &lt; 10)) // --&gt; keep looping until we reach 10
+/*!*/.to(m)                   // --&gt; looping back to m
 .subscribe(v =&gt; console.log(v));
 
 a.send(0);</code>
@@ -355,7 +355,7 @@ In the example above, the order is not necessarily preserved. You can for exampl
 <b>RxJS</b>'s <span code>delay()</span> operator:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-12">
-<code class="javascript">import { source, map, filter, pipe } from '@connectv/core';
+<code class="javascript">/*!*/import { source, map, filter, pipe } from '@connectv/core';
 import { delay } from 'rxjs';
 
 let a = source();
@@ -363,7 +363,7 @@ let m = map(x =&gt; x + 1); // --&gt; lets give this pin a name so we can loop b
 
 a.to(m)
 .to(filter(x =&gt; x &lt; 10)) // --&gt; keep looping until we reach 10
-.to(pipe(delay(1)))      // --&gt; wait a bit
+/*!*/.to(pipe(delay(1)))      // --&gt; wait a bit
 .to(m)                   // --&gt; looping back to m
 .subscribe(v =&gt; console.log(v));
 
@@ -387,31 +387,31 @@ You can re-use parts of your reactive flows using the
 class:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-13">
-<code class="javascript">import { Composition, source, filter } from '@connectv/core';
+<code class="javascript">/*!*/import { Composition, source, filter } from '@connectv/core';
 
-class EvenOdd extends Composition {
+/*!*/class EvenOdd extends Composition {
   constructor() {
     super({
-      inputs: ['a'],            // --&gt; marks pins that go into the flow
-      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
+/*!*/      inputs: ['a'],            // --&gt; marks pins that go into the flow
+/*!*/      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
     });
   }
 
-  build() {
-    //
-    // build all the elements of the flow
-    //
-    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
-    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
-  }
-
-  wire() {
-    //
-    // wire the flow together
-    //
-    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
-    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
-  }
+/*!*/  build() {
+/*!*/    //
+/*!*/    // build all the elements of the flow
+/*!*/    //
+/*!*/    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
+/*!*/    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
+/*!*/  }
+/*!*/
+/*!*/  wire() {
+/*!*/    //
+/*!*/    // wire the flow together
+/*!*/    //
+/*!*/    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
+/*!*/    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
+/*!*/  }
 }
 
 //
@@ -421,9 +421,9 @@ class EvenOdd extends Composition {
 let a = source();
 let eo = new EvenOdd();
 
-a.to(eo.in('a'));
-eo.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
-eo.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
+/*!*/a.to(eo.in('a'));
+/*!*/eo.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
+/*!*/eo.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
 
 a.send(2);
 a.send(3);
@@ -453,15 +453,15 @@ denote the possible names of the incoming and outgoing pins of the Agent.
 
 
 <pre try="https://stackblitz.com/edit/connective-cheat-14">
-<code class="javascript">import { source, expr } from '@connectv/core';
+<code class="javascript">/*!*/import { source, expr } from '@connectv/core';
 
 let a = source();
 let b = source();
-let e = expr((a, b) =&gt; `${a} + ${b} = ${a + b}`);
-
-a.to(e.in(0));
-b.to(e.in(1));
-e.result.subscribe(v =&gt; console.log(v));  // --&gt; this is a short-hand for `e.out('result')`
+/*!*/let e = expr((a, b) =&gt; `${a} + ${b} = ${a + b}`);
+/*!*/
+/*!*/a.to(e.in(0));
+/*!*/b.to(e.in(1));
+/*!*/e.result.subscribe(v =&gt; console.log(v));  // --&gt; this is a short-hand for `e.out('result')`
 
 a.send(2); b.send(3);
 a.send(42); b.send(30);</code>
@@ -478,21 +478,21 @@ is basically a more complex version of an Expr, allowing you to emit to any outp
 (instead of just <span code>"result"</span> pin). You can create nodes easily using <span code>node()</span> function:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-15">
-<code class="javascript">import { source, node } from '@connectv/core';
+<code class="javascript">/*!*/import { source, node } from '@connectv/core';
 
-let N = node({ inputs: ['a'], outputs: ['even', 'odd']}, // --&gt; set the signature
-(input, output) =&gt; {
-if (input.a % 2 == 0) output('even', input.a);
-else output('odd', input.a);
-});
+/*!*/let N = node({ inputs: ['a'], outputs: ['even', 'odd']}, // --&gt; set the signature
+/*!*/  (input, output) =&gt; {
+/*!*/    if (input.a % 2 == 0) output('even', input.a);
+/*!*/    else output('odd', input.a);
+/*!*/  });
 
 
 let a = source();
-let n = N(); // --&gt; create a new instance of the agent we defined above
-
-a.to(n.in('a'));
-n.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
-n.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
+/*!*/let n = N(); // --&gt; create a new instance of the agent we defined above
+/*!*/
+/*!*/a.to(n.in('a'));
+/*!*/n.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
+/*!*/n.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
 
 a.send(3);
 a.send(4);
@@ -505,21 +505,21 @@ a.send(5);</code>
 You can control when some emission passes through via another emission using <a href="/docs/gate"><span code>gate()</span></a>
 
 <pre try="https://stackblitz.com/edit/connective-cheat-16">
-<code class="javascript">import { source, gate, map, spread, pipe, group, control } from '@connectv/core';
+<code class="javascript">/*!*/import { source, gate, map, spread, pipe, group, control } from '@connectv/core';
 import { delay } from 'rxjs/operators';
 
 let a = source();
-let g = gate();
+/*!*/let g = gate();
 
 a.to(map(v =&gt; v.split(' '))) // --&gt; get all the words
 .to(spread())                // --&gt; spread them
-.to(g.input);                // --&gt; this is shorthand for `g.in('value')`
+/*!*/.to(g.input);                // --&gt; this is shorthand for `g.in('value')`
 
-group(g.output, control())   // --&gt; the `control()` causes a signal to be sent before the first output of the gate
+/*!*/group(g.output, control())   // --&gt; the `control()` causes a signal to be sent before the first output of the gate
 .to(pipe(delay(1000)))       // --&gt; wait one second after each word comes out
-.to(g.control);              // --&gt; open the gate again (letting next word through)
+/*!*/.to(g.control);              // --&gt; open the gate again (letting next word through)
 
-g.output.subscribe(v =&gt; console.log(v));
+/*!*/g.output.subscribe(v =&gt; console.log(v));
 
 a.send("Hellow darkness my old friend I've come to talk with you again");</code>
 </pre>
@@ -540,7 +540,7 @@ introduces a composition that represents the state of a <i>html input</i>, which
 and then uses that composition to bind two inputs together:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-17">
-<code class="javascript">import { wrap, map, state, sink, Composition } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, map, state, sink, Composition } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 class InputState extends Composition {
@@ -561,18 +561,18 @@ class InputState extends Composition {
   init() {}       // --&gt; prevent parent class from calling build() and wire()
 
   build() {
-    this.add('model', state());
+/*!*/    this.add('model', state());
     this.add('sink', sink(val =&gt; this.el.value = val));
   }
 
   wire() {
-    this.in('value').to(this.agent('model').in('value'));
+/*!*/    this.in('value').to(this.agent('model').in('value'));
 
     wrap(fromEvent(this.el, 'input'))
     .to(map(() =&gt; this.el.value))
-    .to(this.agent('model').in('value'));
+/*!*/    .to(this.agent('model').in('value'));
 
-    this.agent('model').out('value')
+/*!*/    this.agent('model').out('value')
     .to(this.pin('sink'))
     .to(this.out('value'));
   }
@@ -582,8 +582,8 @@ class InputState extends Composition {
 let a = new InputState(document.getElementById('a') as HTMLInputElement);
 let b = new InputState(document.getElementById('b') as HTMLInputElement);
 
-a.out('value').to(b.in('value')); // --&gt; literal two-way binding
-b.out('value').to(a.in('value'));
+/*!*/a.out('value').to(b.in('value')); // --&gt; literal two-way binding
+/*!*/b.out('value').to(a.in('value'));
 
 a.bind(); // --&gt; .bind() on composition will call .bind() on all child nodes having that method
 b.bind();</code>
@@ -596,15 +596,15 @@ The <a href="/docs/sequence"><span code>sequence()</span></a> agent allows you t
 coming from various sources:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-18">
-<code class="javascript">import { wrap, map, sequence, group } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, map, sequence, group } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-let click = sequence(1, 0, 1);  // --&gt; a click is one mousedown, no mousemove, and one mouseup
-let drag = sequence(1, '+', 1); // --&gt; a drag is one mousedown, some mousemove, and one mouseup
-
-wrap(fromEvent(document, 'mousedown')).to(click.in(0), drag.in(0));
-wrap(fromEvent(document, 'mousemove')).to(click.in(1), drag.in(1));
-wrap(fromEvent(document, 'mouseup'))  .to(click.in(2), drag.in(2));
+/*!*/let click = sequence(1, 0, 1);  // --&gt; a click is one mousedown, no mousemove, and one mouseup
+/*!*/let drag = sequence(1, '+', 1); // --&gt; a drag is one mousedown, some mousemove, and one mouseup
+/*!*/
+/*!*/wrap(fromEvent(document, 'mousedown')).to(click.in(0), drag.in(0));
+/*!*/wrap(fromEvent(document, 'mousemove')).to(click.in(1), drag.in(1));
+/*!*/wrap(fromEvent(document, 'mouseup'))  .to(click.in(2), drag.in(2));
 
 group(
 click.output.to(map(() =&gt; 'CLICK!!')),

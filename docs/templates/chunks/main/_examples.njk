@@ -1,6 +1,6 @@
 A <i>Hellow World!</i> example:
 <pre try="https://stackblitz.com/edit/connective-hellow-world">
-<code class="javascript">import { wrap, map, filter } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let a = document.getElementById('a') as HTMLInputElement;
@@ -11,16 +11,16 @@ let p = document.getElementById('p');
 // For obvious reasons.
 //
 
-wrap(fromEvent(a, 'input'))           // --&gt; wrap the `Observable` in a `Pin`
-.to(map(() =&gt; a.value))               // --&gt; map the event to value of the input
-.to(filter(name =&gt; name != 'Donald')) // --&gt; filter 'Donald' out
-.to(map(name =&gt; 'hellow ' + name))    // --&gt; add 'hellow' to the name
-.subscribe(msg =&gt; p.innerHTML = msg); // --&gt; write it to the &lt;p&gt; element</code>
+/*!*/wrap(fromEvent(a, 'input'))           // --&gt; wrap the `Observable` in a `Pin`
+/*!*/.to(map(() =&gt; a.value))               // --&gt; map the event to value of the input
+/*!*/.to(filter(name =&gt; name != 'Donald')) // --&gt; filter 'Donald' out
+/*!*/.to(map(name =&gt; 'hellow ' + name))    // --&gt; add 'hellow' to the name
+/*!*/.subscribe(msg =&gt; p.innerHTML = msg); // --&gt; write it to the &lt;p&gt; element</code>
 </pre>
 
 A more elaborate example:
 <pre try="https://stackblitz.com/edit/connective-sample-fib">
-<code class="javascript">import { wrap, pipe, map, filter, sink } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, pipe, map, filter, sink } from '@connectv/core';
 import { fromEvent, timer } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
 
@@ -33,18 +33,18 @@ let p = document.getElementById('p');
 //
 
 // --&gt; calculate next iteration step on fibonacci sequence
-let m = map(([next, prev, l]) =&gt; [next + prev, next, l - 1]);
+/*!*/let m = map(([next, prev, l]) =&gt; [next + prev, next, l - 1]);
 
-wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` in a `Pin`
-.to(pipe(debounceTime(1000)))                // --&gt; wait for people to type in the number
-.to(map(() =&gt; parseInt((a as any).value)))   // --&gt; map the input event to value of the input
-.to(map(n =&gt; [1, 0, n]))                     // --&gt; map the number to start iteration
-.to(filter(([_, __, l]) =&gt; l &gt;= 0))          // --&gt; check if we should do any iteration
-.to(m)                                       // --&gt; calculate next step
-.to(pipe(delay(300)))                        // --&gt; take a breath
-.to(filter(([_, __, l]) =&gt; l &gt; 0))           // --&gt; check if we should continue
-.to(m)                                       // --&gt; back to the loop
-.to(map(([_, f, __]) =&gt; f))                  // --&gt; btw, lets take each number in the sequence
-.to(sink(v =&gt; p.innerHTML = v))              // --&gt; set the text of &lt;p&gt; to the fib number
-.subscribe();                                // --&gt; bind the whole thing.</code>
+/*!*/wrap(fromEvent(a, 'input'))                    // --&gt; wrap the `Observable` in a `Pin`
+/*!*/.to(pipe(debounceTime(1000)))                // --&gt; wait for people to type in the number
+/*!*/.to(map(() =&gt; parseInt((a as any).value)))   // --&gt; map the input event to value of the input
+/*!*/.to(map(n =&gt; [1, 0, n]))                     // --&gt; map the number to start iteration
+/*!*/.to(filter(([_, __, l]) =&gt; l &gt;= 0))          // --&gt; check if we should do any iteration
+/*!*/.to(m)                                       // --&gt; calculate next step
+/*!*/.to(pipe(delay(300)))                        // --&gt; take a breath
+/*!*/.to(filter(([_, __, l]) =&gt; l &gt; 0))           // --&gt; check if we should continue
+/*!*/.to(m)                                       // --&gt; back to the loop
+/*!*/.to(map(([_, f, __]) =&gt; f))                  // --&gt; btw, lets take each number in the sequence
+/*!*/.to(sink(v =&gt; p.innerHTML = v))              // --&gt; set the text of &lt;p&gt; to the fib number
+/*!*/.subscribe();                                // --&gt; bind the whole thing.</code>
 </pre>
