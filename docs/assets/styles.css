@@ -819,13 +819,13 @@ code .line:before {
   width: 2px;
   top: 0;
   bottom: 0;
-  border-left: 2px dotted #313131;
-  border-right: 2px dotted #313131;
+  border-left: 2px dotted #272727;
+  border-right: 2px dotted #272727;
   transition: border-color .15s;
 }
 
 body.dark-mode code .line:before {
-  border-color: #212121;
+  border-color: #181818;
 }
 
 code .line.highlight {
