@@ -54,7 +54,7 @@ let c = sink(x =&gt; console.log(x));        //--&gt; will log the incoming valu
 a.to(b).to(c);                            //--&gt; data from a will go to b then to c
 c.bind();                                 //--&gt; lets bind the sink
 
-setInterval(() => a.send('world'), 1000); //--&gt; send 'world' to our flow every second.</code>
+/*!*/setInterval(() => a.send('world'), 1000); //--&gt; send 'world' to our flow every second.</code>
 </pre>
 
 Each node in a reactive flow might also do its thing either in sync or asynchronously, without the rest of the flow
@@ -64,9 +64,9 @@ being affected:
   <code class="javascript">import { source, map, sink } from '@connectv/core';
 
 let a = source();                             //--&gt; creates a source
-let b = map((x, done) =&gt; {                    //--&gt; says hellow to incoming strings ...
-  setTimeout(() =&gt; done('hellow ' + x), 500); //--&gt; but after a brief wait
-});
+/*!*/let b = map((x, done) =&gt; {                    //--&gt; says hellow to incoming strings ...
+/*!*/  setTimeout(() =&gt; done('hellow ' + x), 500); //--&gt; but after a brief wait
+/*!*/});
 let c = sink(x =&gt; console.log(x));            //--&gt; will log the incoming values
 
 a.to(b).to(c);                                //--&gt; data from a will go to b then to c
@@ -167,31 +167,31 @@ The main way to define your own custom agent is the <a href="/docs/composition">
 flows in their description):
 
 <pre try="https://stackblitz.com/edit/connective-cheat-13">
-<code class="javascript">import { Composition, source, filter } from '@connectv/core';
+<code class="javascript">/*!*/import { Composition, source, filter } from '@connectv/core';
 
-class EvenOdd extends Composition {
+/*!*/class EvenOdd extends Composition {
   constructor() {
     super({
-      inputs: ['a'],            // --&gt; marks pins that go into the flow
-      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
+/*!*/      inputs: ['a'],            // --&gt; marks pins that go into the flow
+/*!*/      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
     });
   }
 
-  build() {
-    //
-    // build all the elements of the flow
-    //
-    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
-    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
-  }
+/*!*/  build() {
+/*!*/    //
+/*!*/    // build all the elements of the flow
+/*!*/    //
+/*!*/    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
+/*!*/    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
+/*!*/  }
 
-  wire() {
-    //
-    // wire the flow together
-    //
-    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
-    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
-  }
+/*!*/  wire() {
+/*!*/    //
+/*!*/    // wire the flow together
+/*!*/    //
+/*!*/    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
+/*!*/    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
+/*!*/  }
 }
 
 //

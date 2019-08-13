@@ -810,6 +810,7 @@ code .line {
   background: transparent;
   transition: background .15s;
   position: relative;
+  padding: 1px 0;
 }
 
 code .line:before {
