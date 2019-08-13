@@ -845,14 +845,6 @@ body.dark-mode code .line:hover {
   background: #212121;
 }
 
-code .line.highlight:before {
-  border-color: #616161;
-}
-
-body.dark-mode code .line.highlight:before {
-  border-color: #424242;
-}
-
 code .line:hover:before,
 body.dark-mode code .line:hover:before {
   border-color: #4A90E2;
