@@ -1,0 +1,134 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Fork / Join</h1>
+
+In some cases you want to do multiple things in parallel to an incoming event/data, and then gather
+back the results and do something with it. For example, in your login flow, you need to check the database
+record on the login user, e.g. to see if they exist or their password matches, and also you would need to generate
+a token for them that they could use, i.e. a <b>JWT</b> token. For generating the token, you do not need
+the data from database, so you can do these two actions in parallel, leading to a flow like this:
+
+<pre try="https://stackblitz.com/edit/connective-fj-ex1">
+  <code class="javascript">import { source, map, control } from '@connectv/core';
+
+
+let loginReq = source();                              //--&gt; emulates incoming requests
+let generateToken = map(user =&gt; `token for ${user}`); //--&gt; generate a token for each user
+let authenticate = map((user, done) =&gt; {              //--&gt; check if user is authenticated
+/*!*/  if (user == 'john')                                 //--&gt; if the user is john ...
+/*!*/    setTimeout(() =&gt; done(`auth for ${user}`), 100);  //... it will take a bit to process it ...
+/*!*/  else done(`auth for ${user}`);                      //... but not for others
+});
+
+loginReq
+.to(generateToken, authenticate)                      //--&gt; so check auth and generate token in parallel
+.to(control())                                        //--&gt; gather the results
+.subscribe(console.log);                              //--&gt; see what happened
+
+loginReq.send('john');                                //--&gt; first john sends a login request
+loginReq.send('jack');                                //--&gt; then jack does</code>
+</pre>
+
+If you run this code, you'll see that the output will look like this:
+
+<pre>
+  <code class="json">&gt; ["token for john", "auth for jack"]
+&gt; ["token for jack", "auth for john"]</code>
+</pre>
+
+What happens is:
+<ol>
+  <li><span code>generateToken</span> first emits <i>"token for john"</i> and then <i>"token for jack"</i></li>
+  <li><span code>authenticate</span> first emits <i>"token for jack"</i> and then <i>"token for john"</i>, as it
+    takes a bit longer for processing <i>"john"</i></li>
+  <li><span code>control()</span> just pairs the first emission of each pin and then the second emission of each pin,
+    which results in the wrong pairing.</li>
+</ol>
+
+<br><br>
+
+<span code>fork()</span> allows you to <i>stamp</i> incoming emissions, so you can pair them later based on this stamp
+using <span code>join()</span>:
+
+<pre try="https://stackblitz.com/edit/connective-fj-ex2">
+  <code class="javascript">/*!*/import { source, map, fork, join } from '@connectv/core';
+
+
+let loginReq = source();                              //--&gt; emulates incoming requests
+let generateToken = map(user =&gt; `token for ${user}`); //--&gt; generate a token for each user
+let authenticate = map((user, done) =&gt; {              //--&gt; check if user is authenticated
+  if (user == 'john')                                 //--&gt; if the user is john ...
+    setTimeout(() =&gt; done(`auth for ${user}`), 100);  //... it will take a bit to process it ...
+  else done(`auth for ${user}`);                      //... but not for others
+});
+
+loginReq
+/*!*/.to(fork())                                           //--&gt; stamp the request
+.to(generateToken, authenticate);                     //--&gt; so check auth and generate token in parallel
+
+/*!*/let j = join('token', 'auth');                        //--&gt; join() is an agent
+/*!*/generateToken.to(j.in('token'));                      //--&gt; generateToken goes to 'token' field
+/*!*/authenticate.to(j.in('auth'));                        //--&gt; authenticate goes to 'auth' field
+/*!*/j.output.subscribe(console.log);
+
+loginReq.send('john');                                //--&gt; first john sends a login request
+loginReq.send('jack');                                //--&gt; then jack does</code>
+</pre>
+
+Now the result becomes:
+
+<pre>
+  <code class="json">&gt; { token: "token for jack", auth: "auth for jack"}
+&gt; { token: "token for john", auth: "auth for john" }</code>
+</pre>
+
+Note that while <span code>fork()</span> is a <a href="/docs/pin">pin</a>, <span code>join()</span>
+is an <a href="/docs/agent">agent</a>. Unlike <a href="/docs/control"><span code>control()</span></a>
+or <a href="/docs/pack"><span code>pack()</span></a>, it will generate an object with given fields,
+and will have one input pin for each of those fields.
+
+<br><br>
+
+<h2 id="chain-fork">Chain forks</h2>
+
+The stamp that <span code>fork()</span> puts on emissions is actually a <i>stack</i>, so you can have multiple
+forks and joins simultaenously. Each <span code>fork()</span> will push a new stamp onto this stack, and
+each <span code>join()</span> will match emissions with equal values through-out the whole stack (not just the last stamp).
+When <span code>join()</span> emits, it will also pop the last stamp.
+
+<br><br>
+
+If you want to join emissions without poping the stamp, for example for joining later on to emissions of the same fork,
+then simply use <span code>peekJoin()</span> instead of <span code>join()</span>.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/test/fork.test.ts" target="_blank">
+      Specification for <span code>fork()</span> (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/join.test.ts" target="_blank">
+      Specification for <span code>join()</span> and <span code>peekJoin()</span> (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/fork.ts" target="_blank">
+      Source code for <span code>fork()</span>
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/join.ts" target="_blank">
+      Source code for <span code>join()</span> and <span code>peekJoin()</span>
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
