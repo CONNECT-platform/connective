@@ -857,6 +857,7 @@ body.dark-mode code .line:hover:before {
   padding: 16px;
   border-radius: 3px;
   font-size: 12px;
+  font-family: 'PT Mono', 'Courier New', Courier, monospace;
 }
 
 body.dark-mode .hljs {
