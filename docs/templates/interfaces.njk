@@ -1,0 +1,230 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Interfaces & Types</h1>
+
+<b>CONNECTIVE</b> comes with a host of interfaces and types to allow strong type annotation in Typescript codes
+which use it. The most common ones are listed here.
+
+<br><br>
+
+<h2 id="shared">Shared Types</h2>
+
+These types are re-used across <b>CONNECTIVE</b> and shared between <a href="/docs/pin">pins</a>
+and <a href="/docs/agent">agents</a>.
+
+<br><br>
+
+<h3 id="clearable">Clearable</h2>
+
+A <span code>Clearable</span> is an object that bears the <span code>.clear()</span> method, which can be
+called when the object is to be disposed. The core functionality of a <span code>Clearable</span> should be
+assumed unusable after invokation of the <span code>.clear()</span> method. All <a href="/docs/agent">agents</a>
+and <a href="/docs/pin">pins</a> are <span code>Clearable</span>.
+
+<pre><code class="javascript">import { Clearable, isClearable } from '@connectv/core';
+
+isClearable(obj); //--&gt; returns true if the object is `Clearable`, useful for type inference.</code></pre>
+
+<br><br>
+
+<h3 id="bindable">Bindable</h3>
+
+A <span code>Bindable</span> object can be bound via its <span code>.bind()</span> method.
+<a href="/docs/sink"><span code>sink()</span></a>s, <a href="/docs/state"><span code>state()</span></a>s
+and <a href="/docs/composition"><span code>Composition</span></a>s are examples of <span code>Bindable</span>.
+
+<pre><code class="javascript">import { Bindable, isBindable } from '@connectv/core';
+
+if (isBindable(obj))
+  obj.bind();        //--&gt; because of type inference, this will compile without errors.</code></pre>
+
+<br><br>
+
+<h3 id="error">Error callback</h3>
+
+<span code>ErrorCallback</span> denotes callbacks responsible for error handling in async functions:
+
+<pre><code class="javascript">/*!*/import { map, ResolveCallback, ErrorCallback } from '@connectv/core';
+
+...
+
+map((x: any, 
+  done: ResolveCallback, 
+/*!*/  err: ErrorCallback) =&gt; {
+  ...
+/*!*/  err('something went wrong ...');
+// or ...
+/*!*/  err(new Error('Bad Stuff'));
+});</code></pre>
+
+<br><br>
+
+<h3 id="resolve">Resolve callback</h3>
+
+<span code>ResolveCallback</span> denotes callbacks used to return async results:
+
+<pre><code class="javascript">/*!*/import { filter, ResolveCallback } from '@connectv/core';
+
+...
+
+filter((x: value, 
+/*!*/  done: ResolveCallback) =&gt; {
+  ...
+/*!*/  done(typeof x === 'something');
+});</code></pre>
+
+<br><br>
+
+<h3 id="notify">Notify callback</h3>
+
+<span code>NotifyCallback</span> denotes callbacks responding to a notification, for example when a 
+<a href="/docs/source"><span code>source()</span></a> has completed.
+
+<pre><code class="javascript">import { source, ResolveCallback, ErrorCallback, 
+/*!*/          NotifyCallback } from '@connectv/core';
+
+let a = source();
+a.to(...)
+.to(...)
+.to(...)
+.subscribe({
+  &lt;ResolveCallback&gt;(v => { ... }), //--&gt; the default callback,
+  &lt;ErrorCallback&gt;(err => { ... }), //--&gt; the error callback,
+/*!*/  &lt;NotifyCallback&gt;(() => { ... })  //--&gt; the complete callback
+});</code></pre>
+
+<br><br>
+
+<h2 id="pins">Pins</h2>
+
+These are types and interfaces related to <a href="/docs/pin">pins</a>:
+
+<br><br>
+
+<h3 id="pin-like">Pin-like</h3>
+
+The <span code>PinLike</span> interface denotes any object that can act like a Pin. It is the recommended
+type annotation for any function parameter, return type, and class property that is to denote a pin
+without requiring to be more strict.
+
+<pre><code class="javascript">/*!*/import { PinLike, isPinLike } from '@connectv/core';
+
+...
+
+/*!*/if (isPinLike(p))
+  p.to(...).subscribe(...);</code></pre>
+
+<br><br>
+
+<h2 id="agents">Agents</h2>
+
+These are types and interfaces related to <a href="/docs/agent">agents</a>:
+
+<br><br>
+
+<h3 id="agent-like">Agent-like</h3>
+
+The <span code>AgentLike</span> interface denotes any object that acts like an agent. It is the recommended
+type annotation for any function parameter, return type, and class property that is to denote an agent
+without requiring to be more strict.
+
+<pre><code class="javascript">/*!*/import { AgentLike, isAgentLike } from '@connectv/core';
+
+...
+
+/*!*/isAgentLike(obj);</code></pre>
+
+<br><br>
+
+<h3 id="node-like">Node-like</h3>
+
+<span code>NodeLike</span> denotes agents that behave like nodes. Though from a strict typing perspective this
+just means that they have a <span code>.control</span> property 
+(which is a <a href="/docs/control"><span code>control()</span></a>), it is highly recommended that any
+class implementing this interface also abides by the following rules:
+
+<ul>
+  <li>It should wait for all of its (connected) inputs (at least for the first time) before sending any output,</li>
+  <li>It should send one output in response to each set of inputs,</li>
+  <li>It should wait for its <span code>.control</span>, if connected, before sending each output.</li>
+</ul>
+
+<pre><code class="javascript">/*!*/import { NodeLike, isNodeLike } from '@connectv/core';
+
+...
+
+/*!*/isNodeLike(obj);</code></pre>
+
+<br><br>
+
+<h3 id="node-func-types">Node function parameters</h3>
+
+Functions that are used to build a <a href="/docs/node"><span code>node()</span></a> are provided
+with parameters with following types:
+
+<ul>
+<li><span code>NodeInputs</span>: is an object with key/values corresponding to inputs of the node,</li>
+<li><span code>NodeOutput</span>: is the callback the function invokes to send an output.</li>
+</ul>
+
+<pre><code class="javascript">/*!*/import { node, NodeInputs, NodeOutput } from '@connectv/core';
+
+node({
+  inputs: ['a', 'b'],
+  outputs: ['c']
+}, 
+/*!*/(inputs: NodeInputs, output: NodeOutput) =&gt; {
+/*!*/  output('c', inputs.a + inputs.b);
+});</code></pre>
+
+<br><br>
+
+<h3 id="signature">Signature</h3>
+
+A <span code>Signature</span> denotes the <a href="/docs/agent#signature">signature of an agent</a>.
+
+<pre><code class="javascript">/*!*/import { Signature, isSignature } from '@connectv/core';
+
+...
+
+/*!*/isSignature(obj);</code></pre>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+In addition to types and interfaces outlined here, <b>CONNECTIVE</b> offers a lot of other type aliases and classes
+designed to allow for strict typing. For example, each <a href="/docs/pin"><span code>pin()</span></a> is an instance
+of <span code>Pin</span>, each <a href="/docs/expr"><span code>expr()</span></a> is an instance of 
+<span code>Expr</span>, etc. 
+
+<br><br>
+
+Additionally, there are type aliases for the type of function you should provide
+to a <a href="/docs/filter"><span code>filter()</span></a> (which is a <span code>FilterFunc</span>), etc.
+You can find comprehensive lists of exported types, interfaces and classes in the following files:
+
+<br><br>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/shared/index.ts" target="_blank">
+      Shared exported stuff
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/index.ts" target="_blank">
+      Exported stuff relating to pins
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/index.ts" target="_blank">
+      Exported stuff relating to agents
+    </a>
+  </li>
+</ul>
+
+{% endblock %}

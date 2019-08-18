@@ -1,0 +1,404 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CONNECTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="subject" content='Reactive Programming At Scale'/>
+    <meta name="robots" content='index,follow'/>
+    <meta name="description" content='A thin library enabling large-scale, efficient reactive programming in Javascript/Typescript.'/>
+    <meta name="keywords" content="reactive, rxjs, programming, asynchronous, async, agent, actor, library, asynchronous programming, javascript, typescript, rx"/>
+    <meta name="theme-color" content="#212121">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" href="/docs/assets/favicon.ico"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
+
+    <link href="/docs/assets/styles.css" rel="stylesheet">
+    <script src="/docs/assets/main.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      
+      <a class="github-button" href="https://github.com/connect-platform/connective" data-icon="octicon-star" data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star</a>
+      
+    </div>
+    <div class="container">
+
+      
+<br><br>
+
+<h1 id="">Interfaces & Types</h1>
+
+<b>CONNECTIVE</b> comes with a host of interfaces and types to allow strong type annotation in Typescript codes
+which use it. The most common ones are listed here.
+
+<br><br>
+
+<h2 id="shared">Shared Types</h2>
+
+These types are re-used across <b>CONNECTIVE</b> and shared between <a href="/docs/pin">pins</a>
+and <a href="/docs/agent">agents</a>.
+
+<br><br>
+
+<h3 id="clearable">Clearable</h2>
+
+A <span code>Clearable</span> is an object that bears the <span code>.clear()</span> method, which can be
+called when the object is to be disposed. The core functionality of a <span code>Clearable</span> should be
+assumed unusable after invokation of the <span code>.clear()</span> method. All <a href="/docs/agent">agents</a>
+and <a href="/docs/pin">pins</a> are <span code>Clearable</span>.
+
+<pre><code class="javascript">import { Clearable, isClearable } from '@connectv/core';
+
+isClearable(obj); //--&gt; returns true if the object is `Clearable`, useful for type inference.</code></pre>
+
+<br><br>
+
+<h3 id="bindable">Bindable</h3>
+
+A <span code>Bindable</span> object can be bound via its <span code>.bind()</span> method.
+<a href="/docs/sink"><span code>sink()</span></a>s, <a href="/docs/state"><span code>state()</span></a>s
+and <a href="/docs/composition"><span code>Composition</span></a>s are examples of <span code>Bindable</span>.
+
+<pre><code class="javascript">import { Bindable, isBindable } from '@connectv/core';
+
+if (isBindable(obj))
+  obj.bind();        //--&gt; because of type inference, this will compile without errors.</code></pre>
+
+<br><br>
+
+<h3 id="error">Error callback</h3>
+
+<span code>ErrorCallback</span> denotes callbacks responsible for error handling in async functions:
+
+<pre><code class="javascript">/*!*/import { map, ResolveCallback, ErrorCallback } from '@connectv/core';
+
+...
+
+map((x: any, 
+  done: ResolveCallback, 
+/*!*/  err: ErrorCallback) =&gt; {
+  ...
+/*!*/  err('something went wrong ...');
+// or ...
+/*!*/  err(new Error('Bad Stuff'));
+});</code></pre>
+
+<br><br>
+
+<h3 id="resolve">Resolve callback</h3>
+
+<span code>ResolveCallback</span> denotes callbacks used to return async results:
+
+<pre><code class="javascript">/*!*/import { filter, ResolveCallback } from '@connectv/core';
+
+...
+
+filter((x: value, 
+/*!*/  done: ResolveCallback) =&gt; {
+  ...
+/*!*/  done(typeof x === 'something');
+});</code></pre>
+
+<br><br>
+
+<h3 id="notify">Notify callback</h3>
+
+<span code>NotifyCallback</span> denotes callbacks responding to a notification, for example when a 
+<a href="/docs/source"><span code>source()</span></a> has completed.
+
+<pre><code class="javascript">import { source, ResolveCallback, ErrorCallback, 
+/*!*/          NotifyCallback } from '@connectv/core';
+
+let a = source();
+a.to(...)
+.to(...)
+.to(...)
+.subscribe({
+  &lt;ResolveCallback&gt;(v => { ... }), //--&gt; the default callback,
+  &lt;ErrorCallback&gt;(err => { ... }), //--&gt; the error callback,
+/*!*/  &lt;NotifyCallback&gt;(() => { ... })  //--&gt; the complete callback
+});</code></pre>
+
+<br><br>
+
+<h2 id="pins">Pins</h2>
+
+These are types and interfaces related to <a href="/docs/pin">pins</a>:
+
+<br><br>
+
+<h3 id="pin-like">Pin-like</h3>
+
+The <span code>PinLike</span> interface denotes any object that can act like a Pin. It is the recommended
+type annotation for any function parameter, return type, and class property that is to denote a pin
+without requiring to be more strict.
+
+<pre><code class="javascript">/*!*/import { PinLike, isPinLike } from '@connectv/core';
+
+...
+
+/*!*/if (isPinLike(p))
+  p.to(...).subscribe(...);</code></pre>
+
+<br><br>
+
+<h2 id="agents">Agents</h2>
+
+These are types and interfaces related to <a href="/docs/agent">agents</a>:
+
+<br><br>
+
+<h3 id="agent-like">Agent-like</h3>
+
+The <span code>AgentLike</span> interface denotes any object that acts like an agent. It is the recommended
+type annotation for any function parameter, return type, and class property that is to denote an agent
+without requiring to be more strict.
+
+<pre><code class="javascript">/*!*/import { AgentLike, isAgentLike } from '@connectv/core';
+
+...
+
+/*!*/isAgentLike(obj);</code></pre>
+
+<br><br>
+
+<h3 id="node-like">Node-like</h3>
+
+<span code>NodeLike</span> denotes agents that behave like nodes. Though from a strict typing perspective this
+just means that they have a <span code>.control</span> property 
+(which is a <a href="/docs/control"><span code>control()</span></a>), it is highly recommended that any
+class implementing this interface also abides by the following rules:
+
+<ul>
+  <li>It should wait for all of its (connected) inputs (at least for the first time) before sending any output,</li>
+  <li>It should send one output in response to each set of inputs,</li>
+  <li>It should wait for its <span code>.control</span>, if connected, before sending each output.</li>
+</ul>
+
+<pre><code class="javascript">/*!*/import { NodeLike, isNodeLike } from '@connectv/core';
+
+...
+
+/*!*/isNodeLike(obj);</code></pre>
+
+<br><br>
+
+<h3 id="node-func-types">Node function parameters</h3>
+
+Functions that are used to build a <a href="/docs/node"><span code>node()</span></a> are provided
+with parameters with following types:
+
+<ul>
+<li><span code>NodeInputs</span>: is an object with key/values corresponding to inputs of the node,</li>
+<li><span code>NodeOutput</span>: is the callback the function invokes to send an output.</li>
+</ul>
+
+<pre><code class="javascript">/*!*/import { node, NodeInputs, NodeOutput } from '@connectv/core';
+
+node({
+  inputs: ['a', 'b'],
+  outputs: ['c']
+}, 
+/*!*/(inputs: NodeInputs, output: NodeOutput) =&gt; {
+/*!*/  output('c', inputs.a + inputs.b);
+});</code></pre>
+
+<br><br>
+
+<h3 id="signature">Signature</h3>
+
+A <span code>Signature</span> denotes the <a href="/docs/agent#signature">signature of an agent</a>.
+
+<pre><code class="javascript">/*!*/import { Signature, isSignature } from '@connectv/core';
+
+...
+
+/*!*/isSignature(obj);</code></pre>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+In addition to types and interfaces outlined here, <b>CONNECTIVE</b> offers a lot of other type aliases and classes
+designed to allow for strict typing. For example, each <a href="/docs/pin"><span code>pin()</span></a> is an instance
+of <span code>Pin</span>, each <a href="/docs/expr"><span code>expr()</span></a> is an instance of 
+<span code>Expr</span>, etc. 
+
+<br><br>
+
+Additionally, there are type aliases for the type of function you should provide
+to a <a href="/docs/filter"><span code>filter()</span></a> (which is a <span code>FilterFunc</span>), etc.
+You can find comprehensive lists of exported types, interfaces and classes in the following files:
+
+<br><br>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/shared/index.ts" target="_blank">
+      Shared exported stuff
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/pin/index.ts" target="_blank">
+      Exported stuff relating to pins
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/index.ts" target="_blank">
+      Exported stuff relating to agents
+    </a>
+  </li>
+</ul>
+
+
+      <br><br>
+
+      
+      <div id="prevnext">
+  <div id="prev">Prev</div>
+  <hr>
+  <div id="next">Next</div>
+</div>
+
+      
+
+      
+      <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
+      
+    </div>
+
+    <div id="toc">
+    </div>
+
+    <div id="nav">
+  <div class="contents">
+    <a href="/">Home</a>
+    <hr>
+    <a href="/docs/overview">Overview</a>
+
+    <br><br>
+
+    <h3>Pins</h3>
+    <a href="/docs/pin">pin</a>
+    <hr>
+    <a href="/docs/source">source</a>
+    <hr>
+    <a href="/docs/wrap">wrap</a>
+    <hr>
+    <a href="/docs/map">map</a>
+    <hr>
+    <a href="/docs/filter">filter</a>
+    <hr>
+    <a href="/docs/control">control</a>
+    <hr>
+    <a href="/docs/value">value</a>
+    <hr>
+    <a href="/docs/pack">pack</a>
+    <hr>
+    <a href="/docs/spread">spread</a>
+    <hr>
+    <a href="/docs/group">group</a>
+    <hr>
+    <a href="/docs/sink">sink</a>
+    <hr>
+    <a href="/docs/pipe">pipe</a>
+    <hr>
+    <a href="/docs/fork">fork</a>
+    <hr>
+    <a href="/docs/reduce">reduce</a>
+
+    <br><br>
+
+    <h3>Agents</h3>
+    <a href="/docs/agent">Agent</a>
+    <hr>
+    <a href="/docs/expr">expr</a>
+    <hr>
+    <a href="/docs/state">state</a>
+    <hr>
+    <a href="/docs/gate">gate</a>
+    <hr>
+    <a href="/docs/handle-error">handleError</a>
+    <hr>
+    <a href="/docs/composition">Composition</a>
+    <hr>
+    <a href="/docs/node">node</a>
+    <hr>
+    <a href="/docs/invoke">invoke</a>
+    <hr>
+    <a href="/docs/sequence">sequence</a>
+    <!--<hr>
+    <a href="/docs/switch">switch</a>-->
+    <hr>
+    <a href="/docs/proxy">proxy</a>
+    <hr>
+    <a href="/docs/join">join</a>
+
+    <br><br>
+
+    <h3>Advanced</h3>
+    <a href="/docs/memory">Memory management</a>
+    <hr>
+    <a href="/docs/emission">Emission and context</a>
+    <hr>
+    <a href="/docs/interfaces">Interfaces & Types</a>
+    <hr>
+    <a href="/docs/under-the-hoold">Under the hood</a>
+
+  </div>
+  <div class="search">
+    <input id="navsearch" type="text" placeholder="Search..."/>
+    <p><b>NOTE:</b> GitHub limits the rate for searching to 10 queries per minute.</p>
+    <div id="navsearchicon" class="icon">
+      <img class="handle" src="/docs/assets/search-handle.svg"/>
+      <img class="ring" src="/docs/assets/search-ring.svg"/>
+    </div>
+  </div>
+</div>
+
+
+    <div class="footer">
+  <a href="/docs/overview">Docs</a>
+  <hr>
+  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+
+  <div id="dmtoggle">
+    <div class="arc"></div>
+    <div class="darc"></div>
+    <div class="ray one"></div>
+    <div class="ray two"></div>
+    <div class="ray three"></div>
+    <div class="ray four"></div>
+    <div class="ray five"></div>
+    <div class="ray six"></div>
+    <div class="ray seven"></div>
+    <div class="ray eight"></div>
+  </div>
+
+  <a id="navtoggle" class="nav no-underline">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </a>
+</div>
+
+
+    <div id="copy-confirm" class="overlay">
+      Copied to Clipboard!
+    </div>
+  </body>
+</html>
