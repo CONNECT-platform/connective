@@ -1,0 +1,425 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CONNECTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="subject" content='Reactive Programming At Scale'/>
+    <meta name="robots" content='index,follow'/>
+    <meta name="description" content='A thin library enabling large-scale, efficient reactive programming in Javascript/Typescript.'/>
+    <meta name="keywords" content="reactive, rxjs, programming, asynchronous, async, agent, actor, library, asynchronous programming, javascript, typescript, rx"/>
+    <meta name="theme-color" content="#212121">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" href="/docs/assets/favicon.ico"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
+
+    <link href="/docs/assets/styles.css" rel="stylesheet">
+    <script src="/docs/assets/main.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      
+      <a class="github-button" href="https://github.com/connect-platform/connective" data-icon="octicon-star" data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star</a>
+      
+    </div>
+    <div class="container">
+
+      
+<br><br>
+
+<h1 id="">Emission and context</h1>
+
+Events and data <i>DO NOT</i> move around in their raw form within reactive flows created with <b>CONNECTIVE</b>.
+Instead, they are wrapped with <span code>Emission</span> objects. This allows for adding context to each emission,
+which for example is used by <a href="/docs/fork"><span code>fork()</span> and <span code>join()</span></a> to
+track each emission through-out the flow.
+
+<pre try="https://stackblitz.com/edit/connective-em-ex1">
+<code class="javascript">/*!*/import { source, map, emission, Emission } from '@connectv/core';
+
+let a = source();
+a.to(map(x =&gt; x * 2))
+/*!*/.observable.subscribe((e: Emission) =&gt; {      //--&gt; subscribe to `.observable`
+  console.log('RECEIVED EMISSION:: ');        //... to receive the emission
+/*!*/  console.log('- value : ' + e.value);        //... instead of just raw value
+/*!*/  console.log('- index: ' + e.context.index); //... which also has a context
+});
+
+/*!*/a.emit(emission(2, { index: 0 }));   //--&gt; use `emit()` instead of `send()`
+/*!*/a.emit(emission(42, { index: 1 }));  //... to specify context.</code>
+</pre>
+
+<h2 id="context">Context</h2>
+
+You can provide the context for each emission using <a href="/docs/source"><span code>source()</span></a>'s
+<span code>.emit()</span> method instead of its <span code>.send()</span> method:
+
+<pre><code class="javascript">let s = source();
+
+s.send(42);                                                   //--&gt; no context provided
+/*!*/s.emit(emission(42, { thisIs: 'the answer to everything' })); //--&gt; proper context propvided.</code></pre>
+
+<br><br>
+
+You can access the context of the emission (<i>NOT the emission object itself</i>) in various pins and agents,
+as listed below. You can also modify the context wherever you can access it, as the context
+is preserved by reference per emission.
+
+<br><br>
+
+<h3 id="map-or-filter">Inside map()/filter()</span></h3>
+
+You can access the context inside an async func
+of a <a href="/docs/map"><span code>map()</span></a> or an async func of a 
+<a href="/docs/filter"><span code>filter()</span></a>, as the fourth parameter:
+
+<pre try="https://stackblitz.com/edit/connective-em-ex2">
+<code class="javascript">/*!*/import { source, map, emission, Emission } from '@connectv/core';
+
+let a = source();
+/*!*/a.to(map((x, done, err, ctx) =&gt; {  //--&gt; access the context via `ctx`         
+/*!*/  ctx.index = ctx.index + 1;       //--&gt; shift the index by 1
+  done(x * 2);
+}))
+.observable.subscribe((e: Emission) =&gt; {
+  console.log('RECEIVED EMISSION:: ');
+  console.log('- value : ' + e.value);
+  console.log('- index: ' + e.context.index);
+});
+
+a.emit(emission(2, { index: 0 }));
+a.emit(emission(42, { index: 1 }));</code>
+</pre>
+
+<h3 id="sink">Inside sink()</h3>
+
+You can access the context inside a <a href="/docs/sink"><span code>sink()</span></a>
+via the second parameter passed to its callback:
+
+<pre try="https://stackblitz.com/edit/connective-em-ex3">
+<code class="javascript">import { source, map, sink, emission } from '@connectv/core';
+
+let a = source();
+a
+.to(map(x =&gt; x * 2))
+/*!*/.to(sink((v, ctx) =&gt; {
+/*!*/  console.log(ctx.index + ' :: ' + v);
+}))
+.subscribe();
+
+a.emit(emission(2, { index: 0 }));
+a.emit(emission(42, { index: 1 }));</code>
+</pre>
+
+<h3 id="expr">Inside expr()</h3>
+
+Within an <a href="/docs/expr"><span code>expr()</span></a>, the context is accessible via the rest parameters
+of your function:
+
+<pre try="https://stackblitz.com/edit/connective-em-ex4">
+<code class="javascript">import { source, expr, emission } from '@connectv/core';
+
+let a = source();
+
+/*!*/let e = expr((x, ...[ctx]) => {  //--&gt; get the context from rest params
+/*!*/  console.log(ctx.index);
+  return x * 2;
+});
+
+a.to(e.in(0));
+e.result.subscribe(console.log);
+
+a.emit(emission(2, { index: 0 }));
+a.emit(emission(42, { index: 1 }));</code>
+</pre>
+
+<h3 id="node">Inside node()</h3>
+
+The context is accessible within <a href="/docs/node"><span code>node()</span></a> on the fourth
+parameter provided to the node function:
+
+<pre try="https://stackblitz.com/edit/connective-em-ex5">
+<code class="javascript">import { source, node, emission } from '@connectv/core';
+
+let N = node(
+  { inputs: ['i'], outputs: ['o'] },
+/*!*/  (inputs, output, err, context) =&gt; {
+/*!*/    console.log('index:: ' + context.index);
+    output('o', inputs.i * 2);
+  }
+);
+
+let a = source();
+let n = N();
+a.to(n.in('i'));
+n.out('o').subscribe(console.log);
+
+a.emit(emission(2, { index: 0 }));
+a.emit(emission(42, { index: 1 }));</code>
+</pre>
+
+<h2 id="access-emission">Accessing emissions</h2>
+
+The simplest way for accessing an emission is to subscribe to the underlying
+<a href="https://rxjs-dev.firebaseapp.com/guide/observable" target="_blank">Observable</a> of 
+a <a href="/docs/pin">Pin</a> instead of subscribing to the pin itself:
+
+<pre><code class="javascript">let p = pin();
+
+...
+
+p.subscribe(v =&gt; ...);           //--&gt; `v` is raw value
+/*!*/p.obesrvable.subscribe(e =&gt; ...) //--&gt; `e` is emission object</code></pre>
+
+You can then read the emission's value using its <span code>.value</span> property and its
+context using its <span code>.context</span> property:
+
+<pre><code class="javascript">let p = pin();
+
+...
+
+p.observable.subscribe(e =&gt; {
+/*!*/  let value = e.value;            //--&gt; the value of the emission
+/*!*/  let ctx = e.context;            //--&gt; the context of the emission
+});</code></pre>
+
+<br><br>
+
+<h3 id="pipes">Pipes</h3>
+
+<b>RxJS</b>'s pipeable operators combined with <a href="/docs/pipe"><span code>pipe()</span></a> pin will
+receive <span code>Emission</span> observables and are expected to return emission observables
+(<span code>Observable&lt;Emission&gt;</span>):
+
+<pre try="https://stackblitz.com/edit/connective-pipe-ex3">
+<code class="javascript">import { value, spread, pipe } from '@connectv/core';
+import { timer } from 'rxjs';
+/*!*/import { delayWhen } from 'rxjs/operators';
+
+value([1, 2, 3, 4])
+.to(spread())
+/*!*/.to(pipe(delayWhen(e =&gt; timer(1000 - e.value * 10)))) //--&gt; delay proportional to inverse of the value 
+/*!*/                                                      //... so that the array is reversed
+.subscribe(console.log);</code>
+</pre>
+
+You can read more about this <a href="/docs/pipe#emission">here</a>.
+
+<br><br>
+
+<h2 id="fork">Modifying emissions</h2>
+
+The value of each emission is constant. If you want to modify the value of the emission through-out its life-cylce, you
+can use its <span code>.fork()</span> method, which will create a new emission with the same context and new value:
+
+<pre try="https://stackblitz.com/edit/connective-em-ex6">
+<code class="javascript">import { emission } from '@connectv/core';
+
+let e = emission(42, { thisIs: "the ultimate answer"});
+
+/*!*/let e2 = e.fork(21); //--&gt; HERESEY!!
+console.log(e2);</code>
+</pre>
+
+<h2 id="from">Merging emissions</h2>
+
+In many cases multiple emissions come from different sources and are merged into one new emission.
+If you need to merge emissions on your self, you can use the static function <span code>Emission.from()</span>:
+
+<pre try="https://stackblitz.com/edit/connective-em-ex7">
+<code class="javascript">import { emission, Emission } from '@connectv/core';
+
+let e1 = emission(42, { someKey: 'some value' });
+let e2 = emission(31, { someOtherKey: 'some other value' });
+
+/*!*/let merged = Emission.from([e1, e2]);
+console.log(merged.value);
+console.log(merged.context);</code>
+</pre>
+
+When merged, the context of the emission's will be merged. If a key is shared in multiple emission
+contexts with different values (by reference), the merged emission will replace the value with an
+instance of <span code>MergedEmissionContextVal</span>, which contains all of the merged values:
+
+<pre try="https://stackblitz.com/edit/connective-em-ex8">
+<code class="javascript">/*!*/import { emission, Emission, MergedEmissionContextVal } from '@connectv/core';
+
+let e1 = emission(42, { a: 2, b: 3, c: 5 });  //--&gt; a is repeated with the same value,
+let e2 = emission(31, { a: 2, b: 4, d : 6 }); //... b is repeated with different values.
+
+let merged = Emission.from([e1, e2]);
+console.log(merged.value);
+console.log(merged.context);
+/*!*/console.log(merged.context.b instanceof MergedEmissionContextVal);
+/*!*/console.log(merged.context.b.values); //--&gt; the merged values for b</code>
+</pre>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/shared/test/emission.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/shared/emission.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+
+
+      <br><br>
+
+      
+      <div id="prevnext">
+  <div id="prev">Prev</div>
+  <hr>
+  <div id="next">Next</div>
+</div>
+
+      
+
+      
+      <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
+      
+    </div>
+
+    <div id="toc">
+    </div>
+
+    <div id="nav">
+  <div class="contents">
+    <a href="/">Home</a>
+    <hr>
+    <a href="/docs/overview">Overview</a>
+
+    <br><br>
+
+    <h3>Pins</h3>
+    <a href="/docs/pin">pin</a>
+    <hr>
+    <a href="/docs/source">source</a>
+    <hr>
+    <a href="/docs/wrap">wrap</a>
+    <hr>
+    <a href="/docs/map">map</a>
+    <hr>
+    <a href="/docs/filter">filter</a>
+    <hr>
+    <a href="/docs/control">control</a>
+    <hr>
+    <a href="/docs/value">value</a>
+    <hr>
+    <a href="/docs/pack">pack</a>
+    <hr>
+    <a href="/docs/spread">spread</a>
+    <hr>
+    <a href="/docs/group">group</a>
+    <hr>
+    <a href="/docs/sink">sink</a>
+    <hr>
+    <a href="/docs/pipe">pipe</a>
+    <hr>
+    <a href="/docs/fork">fork</a>
+    <hr>
+    <a href="/docs/reduce">reduce</a>
+
+    <br><br>
+
+    <h3>Agents</h3>
+    <a href="/docs/agent">Agent</a>
+    <hr>
+    <a href="/docs/expr">expr</a>
+    <hr>
+    <a href="/docs/state">state</a>
+    <hr>
+    <a href="/docs/gate">gate</a>
+    <hr>
+    <a href="/docs/handle-error">handleError</a>
+    <hr>
+    <a href="/docs/composition">Composition</a>
+    <hr>
+    <a href="/docs/node">node</a>
+    <hr>
+    <a href="/docs/invoke">invoke</a>
+    <hr>
+    <a href="/docs/sequence">sequence</a>
+    <!--<hr>
+    <a href="/docs/switch">switch</a>-->
+    <hr>
+    <a href="/docs/proxy">proxy</a>
+    <hr>
+    <a href="/docs/join">join</a>
+
+    <br><br>
+
+    <h3>Advanced</h3>
+    <a href="/docs/memory">Memory management</a>
+    <hr>
+    <a href="/docs/emission">Emission and context</a>
+    <hr>
+    <a href="/docs/interfaces">Interfaces</a>
+    <hr>
+    <a href="/docs/under-the-hoold">Under the hood</a>
+
+  </div>
+  <div class="search">
+    <input id="navsearch" type="text" placeholder="Search..."/>
+    <p><b>NOTE:</b> GitHub limits the rate for searching to 10 queries per minute.</p>
+    <div id="navsearchicon" class="icon">
+      <img class="handle" src="/docs/assets/search-handle.svg"/>
+      <img class="ring" src="/docs/assets/search-ring.svg"/>
+    </div>
+  </div>
+</div>
+
+
+    <div class="footer">
+  <a href="/docs/overview">Docs</a>
+  <hr>
+  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+
+  <div id="dmtoggle">
+    <div class="arc"></div>
+    <div class="darc"></div>
+    <div class="ray one"></div>
+    <div class="ray two"></div>
+    <div class="ray three"></div>
+    <div class="ray four"></div>
+    <div class="ray five"></div>
+    <div class="ray six"></div>
+    <div class="ray seven"></div>
+    <div class="ray eight"></div>
+  </div>
+
+  <a id="navtoggle" class="nav no-underline">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </a>
+</div>
+
+
+    <div id="copy-confirm" class="overlay">
+      Copied to Clipboard!
+    </div>
+  </body>
+</html>
