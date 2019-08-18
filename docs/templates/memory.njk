@@ -1,0 +1,120 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Memory Management</h1>
+
+The need for memory management arises mostly in situations where you are constantly creating new pins, agents and flows,
+while discarding the old ones. Typically these flows are subscribed to, i.e. there are callback functions
+that are supposed to respond to some event/data coming through the flow. Elements of the flow can hold references to
+these callbacks and vice-versa, while also these callbacks can hold references to their clojure. This means after you
+are done with some flow if you do not dispose of its subsriptions properly, it can lead to some obscure
+reference path to a lot of objects that the garbage collector cannot clear (because of the reference), and so will
+stack-up and start taking a toll on memory consumption in cases where you constantly create new copies of them.
+
+<br><br>
+
+<h2 id="clear">Clearing up</h2>
+
+<b>CONNECTIVE</b>'s pins and agents generally track all subscriptions made to them via their standard API, i.e.
+with the use of <span code>.subscribe()</span> or <span code>.bind()</span> methods. Every pin and agent is also
+equipped with a <span code>.clear()</span> method, which will unsubscribe all internal subscriptions alongside
+all tracked external subscriptions.
+
+<pre><code class="javascript">let myAgent = ...;
+let myPin = ...;
+
+...
+...
+
+/*!*/myAgent.clear();
+/*!*/myPin.clear();</code></pre>
+
+<br><br>
+
+<b>WARNING</b>: Calling <span code>.clear()</span> will effectively make the pin or the agent useless, so you
+must call it WHEN you are truly want to dispose the pin or the agent. 
+
+<br><br>
+
+Additionally, clearing sources will cause them to send a <i>complete</i> notification through-out the flow, 
+which will cause receiving pins who do not have any other sources to also become unusable. Note that
+in this case you might need to clear out such pins on your own, as receiving a <i>complete</i> signal
+does not mean the pin will be cleared out. You can read more about this behavior 
+<a href="/docs/source#clear">here</a>.
+
+<br><br>
+
+<h3 id="custom-agents">Custom Agents</h3>
+
+When creating custom agents, you must be extra careful with tracking internal subscriptions, pins and agents,
+and clear them when necessary. This is partly the reason why it is highly recommended to utilize the
+<a href="/docs/composition"><span code>Composition</span></a> class for creating custom agents and using
+its <span code>.add()</span> method to add components of your sub-flow:
+
+<pre><code class="javascript">class X extends Composition {
+  ...
+
+  build() {
+/*!*/    this.someState = this.add(state()) as State; // --&gt; this will now be cleared properly
+/*!*/    this.add('whatever', expr((x, y) => x + y)); // --&gt; so will this guy
+  }
+
+  ...
+}</code></pre>
+
+<br><br>
+
+<h2 id="other-subs">Other subscriptions</h2>
+
+All subscriptions you create via <b>CONNECTIVE</b>'s API are 
+<a href="https://rxjs-dev.firebaseapp.com/guide/subscription" target="_blank"><b>RxJS</b>'s Subscription</a>s,
+which means you can hold a reference to them and call their <span code>.unsubscribe()</span> method
+later. This is specifically useful when you create subscriptions that are not tracked by default, 
+for example for when you subscribe to the underlying
+<a href="https://rxjs-dev.firebaseapp.com/guide/observable" target="_blank">Observable</a> of a pin
+directly:
+
+<pre><code class="javascript">let p = pin();
+
+...
+
+let sub = p.subscribe(() => ...);
+...
+/*!*/sub.unsubscribe();</code></pre>
+
+<br><br>
+
+<h3 id="proxy">Proxies</h3>
+
+A common case of constantly disposed agents is when you have a static-flow and you use
+<a href="/docs/proxy"><span code>proxy()</span></a> to swap in and out a lot of shorter-lived agents.
+Though you need to clear up these proxied agents using their <span code>.clear()</span> methods,
+you also need to <i>un-proxy</i> them from your flow.
+
+<br><br>
+
+The <span code>.proxy()</span> method of a <span code>proxy()</span> returns a <span code>Subscription</span>
+object, holding references to all internal subscriptions that cause the agent to be proxied.
+Simply calling <span code>.unsubscribe()</span> method of this <span code>Subscription</span> will
+cause the agent to be <i>un-proxied</i>:
+
+<pre><code class="javascript">let p = proxy();
+...
+
+let myAgent = ...;
+/*!*/let sub = p.proxy(myAgent);
+
+...
+
+/*!*/sub.unsubscribe(); // --&gt; now myAgent is unproxied
+myAgent.clear();   // --&gt; clear it up if this was its only use.</code></pre>
+
+<br><br>
+
+You can see a more elaborate example of this behaviour <a href="/docs/proxy#clear">here</a>.
+
+<br><br>
+
+{% endblock %}

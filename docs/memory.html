@@ -1,0 +1,294 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CONNECTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="subject" content='Reactive Programming At Scale'/>
+    <meta name="robots" content='index,follow'/>
+    <meta name="description" content='A thin library enabling large-scale, efficient reactive programming in Javascript/Typescript.'/>
+    <meta name="keywords" content="reactive, rxjs, programming, asynchronous, async, agent, actor, library, asynchronous programming, javascript, typescript, rx"/>
+    <meta name="theme-color" content="#212121">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" href="/docs/assets/favicon.ico"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
+
+    <link href="/docs/assets/styles.css" rel="stylesheet">
+    <script src="/docs/assets/main.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      
+      <a class="github-button" href="https://github.com/connect-platform/connective" data-icon="octicon-star" data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star</a>
+      
+    </div>
+    <div class="container">
+
+      
+<br><br>
+
+<h1 id="">Memory Management</h1>
+
+The need for memory management arises mostly in situations where you are constantly creating new pins, agents and flows,
+while discarding the old ones. Typically these flows are subscribed to, i.e. there are callback functions
+that are supposed to respond to some event/data coming through the flow. Elements of the flow can hold references to
+these callbacks and vice-versa, while also these callbacks can hold references to their clojure. This means after you
+are done with some flow if you do not dispose of its subsriptions properly, it can lead to some obscure
+reference path to a lot of objects that the garbage collector cannot clear (because of the reference), and so will
+stack-up and start taking a toll on memory consumption in cases where you constantly create new copies of them.
+
+<br><br>
+
+<h2 id="clear">Clearing up</h2>
+
+<b>CONNECTIVE</b>'s pins and agents generally track all subscriptions made to them via their standard API, i.e.
+with the use of <span code>.subscribe()</span> or <span code>.bind()</span> methods. Every pin and agent is also
+equipped with a <span code>.clear()</span> method, which will unsubscribe all internal subscriptions alongside
+all tracked external subscriptions.
+
+<pre><code class="javascript">let myAgent = ...;
+let myPin = ...;
+
+...
+...
+
+/*!*/myAgent.clear();
+/*!*/myPin.clear();</code></pre>
+
+<br><br>
+
+<b>WARNING</b>: Calling <span code>.clear()</span> will effectively make the pin or the agent useless, so you
+must call it WHEN you are truly want to dispose the pin or the agent. 
+
+<br><br>
+
+Additionally, clearing sources will cause them to send a <i>complete</i> notification through-out the flow, 
+which will cause receiving pins who do not have any other sources to also become unusable. Note that
+in this case you might need to clear out such pins on your own, as receiving a <i>complete</i> signal
+does not mean the pin will be cleared out. You can read more about this behavior 
+<a href="/docs/source#clear">here</a>.
+
+<br><br>
+
+<h3 id="custom-agents">Custom Agents</h3>
+
+When creating custom agents, you must be extra careful with tracking internal subscriptions, pins and agents,
+and clear them when necessary. This is partly the reason why it is highly recommended to utilize the
+<a href="/docs/composition"><span code>Composition</span></a> class for creating custom agents and using
+its <span code>.add()</span> method to add components of your sub-flow:
+
+<pre><code class="javascript">class X extends Composition {
+  ...
+
+  build() {
+/*!*/    this.someState = this.add(state()) as State; // --&gt; this will now be cleared properly
+/*!*/    this.add('whatever', expr((x, y) => x + y)); // --&gt; so will this guy
+  }
+
+  ...
+}</code></pre>
+
+<br><br>
+
+<h2 id="other-subs">Other subscriptions</h2>
+
+All subscriptions you create via <b>CONNECTIVE</b>'s API are 
+<a href="https://rxjs-dev.firebaseapp.com/guide/subscription" target="_blank"><b>RxJS</b>'s Subscription</a>s,
+which means you can hold a reference to them and call their <span code>.unsubscribe()</span> method
+later. This is specifically useful when you create subscriptions that are not tracked by default, 
+for example for when you subscribe to the underlying
+<a href="https://rxjs-dev.firebaseapp.com/guide/observable" target="_blank">Observable</a> of a pin
+directly:
+
+<pre><code class="javascript">let p = pin();
+
+...
+
+let sub = p.subscribe(() => ...);
+...
+/*!*/sub.unsubscribe();</code></pre>
+
+<br><br>
+
+<h3 id="proxy">Proxies</h3>
+
+A common case of constantly disposed agents is when you have a static-flow and you use
+<a href="/docs/proxy"><span code>proxy()</span></a> to swap in and out a lot of shorter-lived agents.
+Though you need to clear up these proxied agents using their <span code>.clear()</span> methods,
+you also need to <i>un-proxy</i> them from your flow.
+
+<br><br>
+
+The <span code>.proxy()</span> method of a <span code>proxy()</span> returns a <span code>Subscription</span>
+object, holding references to all internal subscriptions that cause the agent to be proxied.
+Simply calling <span code>.unsubscribe()</span> method of this <span code>Subscription</span> will
+cause the agent to be <i>un-proxied</i>:
+
+<pre><code class="javascript">let p = proxy();
+...
+
+let myAgent = ...;
+/*!*/let sub = p.proxy(myAgent);
+
+...
+
+/*!*/sub.unsubscribe(); // --&gt; now myAgent is unproxied
+myAgent.clear();   // --&gt; clear it up if this was its only use.</code></pre>
+
+<br><br>
+
+You can see a more elaborate example of this behaviour <a href="/docs/proxy#clear">here</a>.
+
+<br><br>
+
+
+      <br><br>
+
+      
+      <div id="prevnext">
+  <div id="prev">Prev</div>
+  <hr>
+  <div id="next">Next</div>
+</div>
+
+      
+
+      
+      <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
+      
+    </div>
+
+    <div id="toc">
+    </div>
+
+    <div id="nav">
+  <div class="contents">
+    <a href="/">Home</a>
+    <hr>
+    <a href="/docs/overview">Overview</a>
+
+    <br><br>
+
+    <h3>Pins</h3>
+    <a href="/docs/pin">pin</a>
+    <hr>
+    <a href="/docs/source">source</a>
+    <hr>
+    <a href="/docs/wrap">wrap</a>
+    <hr>
+    <a href="/docs/map">map</a>
+    <hr>
+    <a href="/docs/filter">filter</a>
+    <hr>
+    <a href="/docs/control">control</a>
+    <hr>
+    <a href="/docs/value">value</a>
+    <hr>
+    <a href="/docs/pack">pack</a>
+    <hr>
+    <a href="/docs/spread">spread</a>
+    <hr>
+    <a href="/docs/group">group</a>
+    <hr>
+    <a href="/docs/sink">sink</a>
+    <hr>
+    <a href="/docs/pipe">pipe</a>
+    <hr>
+    <a href="/docs/fork">fork</a>
+    <hr>
+    <a href="/docs/reduce">reduce</a>
+
+    <br><br>
+
+    <h3>Agents</h3>
+    <a href="/docs/agent">Agent</a>
+    <hr>
+    <a href="/docs/expr">expr</a>
+    <hr>
+    <a href="/docs/state">state</a>
+    <hr>
+    <a href="/docs/gate">gate</a>
+    <hr>
+    <a href="/docs/handle-error">handleError</a>
+    <hr>
+    <a href="/docs/composition">Composition</a>
+    <hr>
+    <a href="/docs/node">node</a>
+    <hr>
+    <a href="/docs/invoke">invoke</a>
+    <hr>
+    <a href="/docs/sequence">sequence</a>
+    <!--<hr>
+    <a href="/docs/switch">switch</a>-->
+    <hr>
+    <a href="/docs/proxy">proxy</a>
+    <hr>
+    <a href="/docs/join">join</a>
+
+    <br><br>
+
+    <h3>Advanced</h3>
+    <a href="/docs/memory">Memory management</a>
+    <hr>
+    <a href="/docs/emission">Emission and context</a>
+    <hr>
+    <a href="/docs/interfaces">Interfaces</a>
+    <hr>
+    <a href="/docs/under-the-hoold">Under the hood</a>
+
+  </div>
+  <div class="search">
+    <input id="navsearch" type="text" placeholder="Search..."/>
+    <p><b>NOTE:</b> GitHub limits the rate for searching to 10 queries per minute.</p>
+    <div id="navsearchicon" class="icon">
+      <img class="handle" src="/docs/assets/search-handle.svg"/>
+      <img class="ring" src="/docs/assets/search-ring.svg"/>
+    </div>
+  </div>
+</div>
+
+
+    <div class="footer">
+  <a href="/docs/overview">Docs</a>
+  <hr>
+  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+
+  <div id="dmtoggle">
+    <div class="arc"></div>
+    <div class="darc"></div>
+    <div class="ray one"></div>
+    <div class="ray two"></div>
+    <div class="ray three"></div>
+    <div class="ray four"></div>
+    <div class="ray five"></div>
+    <div class="ray six"></div>
+    <div class="ray seven"></div>
+    <div class="ray eight"></div>
+  </div>
+
+  <a id="navtoggle" class="nav no-underline">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </a>
+</div>
+
+
+    <div id="copy-confirm" class="overlay">
+      Copied to Clipboard!
+    </div>
+  </body>
+</html>
