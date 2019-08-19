@@ -1,0 +1,394 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CONNECTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="subject" content='Reactive Programming At Scale'/>
+    <meta name="robots" content='index,follow'/>
+    <meta name="description" content='A thin library enabling large-scale, efficient reactive programming in Javascript/Typescript.'/>
+    <meta name="keywords" content="reactive, rxjs, programming, asynchronous, async, agent, actor, library, asynchronous programming, javascript, typescript, rx"/>
+    <meta name="theme-color" content="#212121">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" href="/docs/assets/favicon.ico"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+    <script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
+
+    <link href="/docs/assets/styles.css" rel="stylesheet">
+    <script src="/docs/assets/main.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      
+      <a class="github-button" href="https://github.com/connect-platform/connective" data-icon="octicon-star" data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star</a>
+      
+    </div>
+    <div class="container">
+
+      
+<br><br>
+
+<h1 id="">Under the hood</h1>
+
+<b>CONNECTIVE</b> is a thin-layer on top of 
+<b><a href="https://rxjs-dev.firebaseapp.com/" target="_blank">RxJS</a></b>. At a base level, it just offers a more
+intuitive interface for creating observable sequences, by encapsulating any node in a given sequence as a
+<a href="/docs/pin">pin</a>, which then can be connected to other pins in any fashion suitable
+to your situation.
+
+<br><br>
+
+More specifically, each pin can be thought of as a lazy observable of an emission (
+  <a href="https://rxjs-dev.firebaseapp.com/guide/observable" target="_blank"><span code>Observable</span></a>
+  <a href="/docs/emission"><span code>&lt;Emission&gt;</span></a>
+). This observable is accessible via a pin's 
+<span code>.observable</span> property. It is not resolved until it is needed
+to be resolved, which allows defining pins and connecting them to each other freely.
+
+<br><br>
+
+<h2 id="resolution">Observable resolution</h2>
+
+The <span code>.observable</span> of a pin is resolved when one of the following happens:
+
+<ul>
+<li>The <span code>.observable</span> property is accessed,</li>
+<li>The <span code>.subscribe()</span> method is invoked,</li>
+<li>The <span code>.bind()</span> method is invoked (when available).</li>
+</ul>
+
+<br>
+
+<h3 id="resolution-process">Resolution process</h3>
+
+The observable resolution of a pin, say <span code>P</span>, typically involves the following steps:
+
+<ol>
+<li>The <span code>.observable</span>s of all pins connected to <span code>P</span> are fetched,</li>
+<li>These observables are combined using a combination operator, typically 
+<a href="https://rxjs-dev.firebaseapp.com/api/index/function/merge" target="_blank"><span code>merge()</span></a>,
+though for example <a href="/docs/control"><span code>control()</span></a> uses
+<a href="https://rxjs-dev.firebaseapp.com/api/index/function/zip" target="_blank"><span code>zip()</span></a>,</li>
+<li>The combined observable is transformed by some other pipeable operators. For example, 
+<a href="/docs/map"><span code>map()</span></a> might pipe this combined observable either through <b>RxJS</b>'s
+<a href="https://rxjs-dev.firebaseapp.com/api/operators/map" target="_blank">
+<span code>map()</span></a> operator or through 
+<a href="https://rxjs-dev.firebaseapp.com/api/operators/mergeMap" target="_blank">
+<span code>mergeMap()</span></a> operator, depending on whether its transformation function is sync or async,</li>
+<li>The transformed observable is set as the <span code>.observable</span> of the pin.</li>
+</ol>
+
+<br>
+
+<h3 id="propagation">Propagation and locking</h3>
+
+Because of the process outlined above, once the <span code>.observable</span> property of <span code>P</span> 
+is resolved, it cannot be changed. This is when <span code>P</span> is <i>locked</i>
+ (<span code>P.locked == true</span>). 
+ Since resolution of the observable is just dependant on pins connected to <span code>P</span>, you can no longer
+ connect other pins to <span code>P</span>, though you still can connect <span code>P</span> to other unlocked
+ pins.
+
+<br><br>
+
+This also means that for <span code>P</span> to be resolved, all pins connected to <span code>P</span> must also be
+resolved (and hence locked) first. This behavior means that at any point in time exactly the part of the flow that
+needs to be locked is locked and the rest can still be modified.
+
+<pre try="https://stackblitz.com/edit/connective-pin-ex4">
+  <code class="javascript">import { pin } from '@connectv/core';
+
+let a = pin();
+let b = pin();
+let c = pin();
+
+a.to(b, c);
+
+/*!*/b.subscribe();         //--&gt; so we will lock b
+/*!*/console.log(a.locked); //--&gt; a is locked as well
+/*!*/console.log(c.locked); //--&gt; but c is not.</code>
+</pre>
+
+<h2 id="subscribing">Subscribing</h2>
+
+Calling the <span code>.subscribe()</span> method of a pin basically results in the provided functions to be subscribed
+to the underlying observable (and hence results in its resolution). This is why the <span code>.subscribe()</span>
+method of a pin has the exact same signature as 
+<a href="https://rxjs-dev.firebaseapp.com/api/index/class/Observable#subscribe-"><span code>.subscribe()</span></a>
+method of an <span code>Observable</span>.
+
+<br><br>
+
+The inner observable of a pin is not a generic observable but of type <span code>Observable&lt;Emission&gt;</span>.
+So when you subscribe on <span code>.observable</span> directly, you will receive the emission objects instead of
+raw values. When you call <span code>.subscribe()</span> on the pin, it will map the emission objects to their raw
+values before passing them to your subscription functions.
+
+<pre try="https://stackblitz.com/edit/connective-uth-ex1">
+<code class="javascript">import { source, map } from '@connectv/core';
+
+let a = source();
+let m = a.to(map(x =&gt; x * 2));
+
+/*!*/m.subscribe(console.log);            //--&gt; logs raw values
+/*!*/m.observable.subscribe(console.log); //--&gt; logs emissions
+
+a.send(2);
+a.send(42);</code>
+</pre>
+
+The pin's <span code>.subscribe()</span> method also returns the exact same 
+<a href="https://rxjs-dev.firebaseapp.com/api/index/class/Subscription" target="_blank">
+<span code>Subscription</span></a> object, which you can use to unsubscribe later. The pin itself will hold
+a reference to this subscription and unsubscribe when its <span code>.clear()</span> method is invoked.
+
+<br><br>
+
+<h3 id="bind">Binding</h3>
+
+Calling the <span code>.bind()</span> method on pins that have it is exactly the same as calling 
+<span code>.subscribe()</span> without any parameters. Calling it on an agent (for example, 
+<a href="/docs/state"><span code>state()</span></a>) also entails the <span code>.subscribe()</span> method
+being invoked on some of its internal pins. Be careful as this might result in <span code>.subscribe()</span>
+being invoked on an internal observable multiple times.
+
+<br><br>
+
+<h2 id="share">Observable sharing</h2>
+
+By default, the resolved observables <i>ARE NOT SHARED</i>. This means that when a pin is connected to multiple
+other pins, or when a pin is subscribed to multiple times, its side effects will be executed multiple times.
+
+<pre try="https://stackblitz.com/edit/connective-uth-ex2">
+<code class="javascript">import { source, map, pin, control } from '@connectv/core';
+
+let a = source();
+
+a.to(map(x =&gt; {
+/*!*/  console.log('SIDE EFFECT!');   //--&gt; so this side effect will be called multiple times
+  return x;
+}))
+/*!*/.to(pin(), pin())                //--&gt; because of this
+.to(control())
+.subscribe(console.log);
+
+a.send(2);
+a.send(3);</code>
+</pre>
+
+This is why your sync <span code>map()</span> functions must be side-effect-free, as otherwise their side-effects might
+be invoked multiple times without you properly realising it.
+
+<br><br>
+
+However, in some cases the observable <i>is shared</i>. These are typically cases when it is important to
+not have undesired side-effects. For example, async map functions are shared, since async transformations
+generally mean some time-consuming process which should not be repeated unnecessarily.
+
+<pre try="https://stackblitz.com/edit/connective-uth-ex2">
+<code class="javascript">import { source, map, pin, control } from '@connectv/core';
+
+let a = source();
+
+/*!*/a.to(map((x, done) =&gt; {          //--&gt; async function is passed
+/*!*/  console.log('SIDE EFFECT!');   //--&gt; so this side effect will be called once
+  done(x);
+}))
+.to(pin(), pin())
+.to(control())
+.subscribe(console.log);
+
+a.send(2);
+a.send(3);</code>
+</pre>
+
+The following pins and agents typically share their internal observables:
+
+<ul>
+<li><a href="/docs/map"><span code>map()</span></a> with an async function,</li>
+<li><a href="/docs/filter"><span code>filter()</span></a> with an async function,</li>
+<li><a href="/docs/fork"><span code>fork()</span></a>,</li>
+<li><a href="/docs/node"><span code>node()</span></a>,</li>
+<li><a href="/docs/expr"><span code>expr()</span></a>,</li>
+<li><a href="/docs/handle-error"><span code>handleError()</span></a>,</li>
+<li><a href="/docs/state"><span code>state()</span></a></li>
+</ul>
+
+Note that this list might change over time, as already there are other situations under consideration
+to make sharing the default behaviour.
+
+<br><br>
+
+You can always enforce sharing in your flow, by using <a href="/docs/pipe"><span code>pipe()</span></a>
+pin and <b>RxJS</b>'s <a href="https://rxjs-dev.firebaseapp.com/api/operators/share" target="_blank">
+<span code>share()</span></a> operator:
+
+<pre try="https://stackblitz.com/edit/connective-uth-ex2">
+<code class="javascript">import { source, map, pin, control, pipe } from '@connectv/core';
+import { share } from 'rxjs/operators';
+
+let a = source();
+
+a.to(map(x =&gt; {
+/*!*/  console.log('SIDE EFFECT!');   //--&gt; side effect called once
+  return x;
+}))
+/*!*/.to(pipe(share()))               //--&gt; because of this
+.to(pin(), pin())
+.to(control())
+.subscribe(console.log);
+
+a.send(2);
+a.send(3);</code>
+</pre>
+
+
+      <br><br>
+
+      
+      <div id="prevnext">
+  <div id="prev">Prev</div>
+  <hr>
+  <div id="next">Next</div>
+</div>
+
+      
+
+      
+      <img class="bottom-logo" src="/docs/assets/logo-unframed.svg"/>
+      
+    </div>
+
+    <div id="toc">
+    </div>
+
+    <div id="nav">
+  <div class="contents">
+    <a href="/">Home</a>
+    <hr>
+    <a href="/docs/overview">Overview</a>
+
+    <br><br>
+
+    <h3>Pins</h3>
+    <a href="/docs/pin">pin</a>
+    <hr>
+    <a href="/docs/source">source</a>
+    <hr>
+    <a href="/docs/wrap">wrap</a>
+    <hr>
+    <a href="/docs/map">map</a>
+    <hr>
+    <a href="/docs/filter">filter</a>
+    <hr>
+    <a href="/docs/control">control</a>
+    <hr>
+    <a href="/docs/value">value</a>
+    <hr>
+    <a href="/docs/pack">pack</a>
+    <hr>
+    <a href="/docs/spread">spread</a>
+    <hr>
+    <a href="/docs/group">group</a>
+    <hr>
+    <a href="/docs/sink">sink</a>
+    <hr>
+    <a href="/docs/pipe">pipe</a>
+    <hr>
+    <a href="/docs/fork">fork</a>
+    <hr>
+    <a href="/docs/reduce">reduce</a>
+
+    <br><br>
+
+    <h3>Agents</h3>
+    <a href="/docs/agent">Agent</a>
+    <hr>
+    <a href="/docs/expr">expr</a>
+    <hr>
+    <a href="/docs/state">state</a>
+    <hr>
+    <a href="/docs/gate">gate</a>
+    <hr>
+    <a href="/docs/handle-error">handleError</a>
+    <hr>
+    <a href="/docs/composition">Composition</a>
+    <hr>
+    <a href="/docs/node">node</a>
+    <hr>
+    <a href="/docs/invoke">invoke</a>
+    <hr>
+    <a href="/docs/sequence">sequence</a>
+    <!--<hr>
+    <a href="/docs/switch">switch</a>-->
+    <hr>
+    <a href="/docs/proxy">proxy</a>
+    <hr>
+    <a href="/docs/join">join</a>
+
+    <br><br>
+
+    <h3>Advanced</h3>
+    <a href="/docs/memory">Memory management</a>
+    <hr>
+    <a href="/docs/emission">Emission and context</a>
+    <hr>
+    <a href="/docs/interfaces">Interfaces & Types</a>
+    <hr>
+    <a href="/docs/under-the-hood">Under the hood</a>
+
+  </div>
+  <div class="search">
+    <input id="navsearch" type="text" placeholder="Search..."/>
+    <p><b>NOTE:</b> GitHub limits the rate for searching to 10 queries per minute.</p>
+    <div id="navsearchicon" class="icon">
+      <img class="handle" src="/docs/assets/search-handle.svg"/>
+      <img class="ring" src="/docs/assets/search-ring.svg"/>
+    </div>
+  </div>
+</div>
+
+
+    <div class="footer">
+  <a href="/docs/overview">Docs</a>
+  <hr>
+  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+
+  <div id="dmtoggle">
+    <div class="arc"></div>
+    <div class="darc"></div>
+    <div class="ray one"></div>
+    <div class="ray two"></div>
+    <div class="ray three"></div>
+    <div class="ray four"></div>
+    <div class="ray five"></div>
+    <div class="ray six"></div>
+    <div class="ray seven"></div>
+    <div class="ray eight"></div>
+  </div>
+
+  <a id="navtoggle" class="nav no-underline">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </a>
+</div>
+
+
+    <div id="copy-confirm" class="overlay">
+      Copied to Clipboard!
+    </div>
+  </body>
+</html>
