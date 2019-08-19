@@ -103,6 +103,27 @@ s.output.subscribe(v =&gt; p.innerHTML = 'state: ' + v);
 /*!*/  });</code>
 </pre>
 
+<h2 id="initial-value">Initial value</h2>
+
+You can provide an initial value to <span code>state()</span> as well:
+
+<pre try="https://stackblitz.com/edit/connective-st-ex5">
+  <code class="javascript">import { wrap, map, state } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let i = document.getElementById('i') as HTMLInputElement;
+let p = document.getElementById('p');
+
+let s = state(42);   //--&gt; so lets start with 42
+
+wrap(fromEvent(i, 'input'))
+  .to(map(() =&gt; i.value))
+  .to(map(x =&gt; x * 2))
+  .to(s.input);
+
+s.output.subscribe(v =&gt; p.innerHTML = v);</code>
+</pre>
+
 <h2 id="change-detection">Change detection</h2>
 
 <span code>state()</span> only changes its value and emits when it receives a value that is

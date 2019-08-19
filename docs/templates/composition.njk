@@ -35,15 +35,12 @@ import { debounceTime, delay } from 'rxjs/operators';
   }
 
 /*!*/  build() {
-    this.add('initial', value(0));                   //--&gt; our initial value for the counter is 0
-    this.count = this.add(state()) as State;         //--&gt; initialize the state and add it to comp's children
+    this.count = this.add(state(0)) as State;        //--&gt; initialize the state and add it to comp's children
     this.incr = this.add(expr(c =&gt; c + 1)) as Expr;  //--&gt; same with increment expr
     this.multi = this.add(expr(c =&gt; c &gt; 1)) as Expr; //--&gt; same with multi-click-check expr
   }
 
 /*!*/  wire() {
-    this.pin('initial').to(this.count.input);        //--&gt; connect the initial value to the counter
-
     this.count.output.to(                            //--&gt; the counter's value goes to...
       this.incr.in(0),                               //... the incrementer (so it can increment)
       this.out('count'),                             //... the 'count' output (so people can know the count)
@@ -90,8 +87,7 @@ The <span code>Composition</span> class comes with a <span code>.build()</span> 
 called upon construction. You should define the recurring elements of your composition's flow in build:
 
 <pre><code class="javascript">  build() {
-    this.add('initial', value(0));                   //--&gt; our initial value for the counter is 0
-    this.count = this.add(state()) as State;         //--&gt; initialize the state and add it to comp's children
+    this.count = this.add(state(0)) as State;        //--&gt; initialize the state and add it to comp's children
     this.incr = this.add(expr(c =&gt; c + 1)) as Expr;  //--&gt; same with increment expr
     this.multi = this.add(expr(c =&gt; c > 1)) as Expr; //--&gt; same with multi-click-check expr
   }</code></pre>
@@ -99,11 +95,11 @@ called upon construction. You should define the recurring elements of your compo
 The <span code>.add()</span> method allows you to add child <a href="/docs/pin">pins</a> and <a href="/docs/agent">agents</a>
 to your composition. You can either give each child a name:
 
-<pre><code class="javsacript">this.add('initial', value(0));</code></pre>
+<pre><code class="javsacript">this.add('count', state(0));</code></pre>
 
 or just add them without a name (e.g. for when you want to keep a more restrictly typed reference to them):
 
-<pre><code class="javascript">this.count = this.add(state()) as State;</code></pre>
+<pre><code class="javascript">this.count = this.add(state(0)) as State;</code></pre>
 
 <br><br>
 
@@ -113,8 +109,6 @@ After <span code>.build()</span>, the method <span code>.wire()</span> method wi
 composition's flow in this method:
 
 <pre><code class="javascript">  wire() {
-    this.pin('initial').to(this.count.input);        //--&gt; connect the initial value to the counter
-
     this.count.output.to(                            //--&gt; the counter's value goes to...
       this.incr.in(0),                               //... the incrementer (so it can increment)
       this.out('count'),                             //... the 'count' output (so people can know the count)
@@ -137,7 +131,7 @@ composition's flow in this method:
 
 Here, you can reference the pins you defined in <span code>.build()</span> using the <span code>.pin()</span> method:
 
-<pre><code class="javascript">this.pin('initial').to(this.count.input);</code></pre>
+<pre><code class="javascript">this.pin('name').to(whatever);</code></pre>
 
 Similarly, you could reference named child agents using <span code>.agent()</span> method:
 
@@ -205,15 +199,12 @@ export class ClickCounter extends Composition {
 /*!*/  init(){}
 
   build() {
-    this.add('initial', value(0));
-    this.count = this.add(state()) as State;
+    this.count = this.add(state(0)) as State;
     this.incr = this.add(expr(c =&gt; c + 1)) as Expr;
     this.multi = this.add(expr(c =&gt; c &gt; 1)) as Expr;
   }
 
   wire() {
-    this.pin('initial').to(this.count.input);
-
     this.count.output.to(this.incr.in(0), this.out('count'), this.multi.in(0));
     this.incr.result.to(this.count.input);
     this.in('click').to(this.incr.control);
