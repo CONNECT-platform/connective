@@ -320,8 +320,8 @@ You can break your flow into multiple branches and join them back using <a href=
 value([1, 2, 3, 4, 5, 6])
 .to(spread())
 .to(
-map(v =&gt; v * 10),
-map(v =&gt; v * 100),
+  map(v =&gt; v * 10),
+  map(v =&gt; v * 100),
 )
 /*!*/.to(control()) // --&gt; will wait for all incoming emissions and join them pair-wise
 .subscribe(v =&gt; console.log(v));</code>
@@ -607,8 +607,8 @@ import { fromEvent } from 'rxjs';
 /*!*/wrap(fromEvent(document, 'mouseup'))  .to(click.in(2), drag.in(2));
 
 group(
-click.output.to(map(() =&gt; 'CLICK!!')),
-drag.output.to(map(() =&gt; 'DRAG!!'))
+  click.output.to(map(() =&gt; 'CLICK!!')),
+  drag.output.to(map(() =&gt; 'DRAG!!'))
 ).subscribe(v => console.log(v));</code>
 </pre>
 
@@ -666,9 +666,9 @@ If you need to call your clearing logic when some other flow is finished/cleared
 .to(...)
 .to(...)
 .subscribe(
-value =&gt; do_something_with_value(value),
-undefined,
-() =&gt; clear_everything_up()
+  value =&gt; do_something_with_value(value),
+  undefined,
+  () =&gt; clear_everything_up()
 );</code>
 </pre>
 
