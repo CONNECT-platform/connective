@@ -7,7 +7,7 @@
 
 A <span code>Composition</span> is the main class for writing your own custom <a href="/docs/agent">agents</a>:
 
-<pre try="https://stackblitz.com/edit/connective-comp-ex1?file=click-count.ts">
+<pre try="https://stackblitz.com/edit/connective-comp-ex1?file=click-counter.ts">
   <code class="javascript">/*!*/import { Composition, value, map, pipe, filter,
         state, State, expr, Expr } from '@connectv/core';
 import { debounceTime, delay } from 'rxjs/operators';
@@ -176,7 +176,7 @@ To overcome this, you should override <span code>.init()</span> method, which is
 and by default calls <span code>.build()</span> and <span code>.wire()</span>, and call <span code>.build()</span> and
 <span code>.wire()</span> yourself in your composition's constructor:
 
-<pre try="https://stackblitz.com/edit/connective-comp-ex1?file=click-count.ts">
+<pre try="https://stackblitz.com/edit/connective-comp-ex2?file=click-counter.ts">
   <code class="javascript">import { Composition, value, map, pipe, filter,
         state, State, expr, Expr } from '@connectv/core';
 import { debounceTime, delay } from 'rxjs/operators';

@@ -79,7 +79,7 @@ If you run this code, you'll see that the output will look like this:
 What happens is:
 <ol>
   <li><span code>generateToken</span> first emits <i>"token for john"</i> and then <i>"token for jack"</i></li>
-  <li><span code>authenticate</span> first emits <i>"token for jack"</i> and then <i>"token for john"</i>, as it
+  <li><span code>authenticate</span> first emits <i>"auth for jack"</i> and then <i>"auth for john"</i>, as it
     takes a bit longer for processing <i>"john"</i></li>
   <li><span code>control()</span> just pairs the first emission of each pin and then the second emission of each pin,
     which results in the wrong pairing.</li>
