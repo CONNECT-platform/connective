@@ -1,7 +1,8 @@
 import isequal from 'lodash.isequal';
-import { shareReplay, distinctUntilKeyChanged } from 'rxjs/operators';
+import { shareReplay, distinctUntilKeyChanged, startWith } from 'rxjs/operators';
 
 import { Bindable } from '../shared/bindable';
+import { emission } from '../shared/emission';
 
 import { PinLike } from '../pin/pin-like';
 import pipe from '../pin/pipe';
@@ -11,13 +12,33 @@ import { Agent } from './agent';
 
 export type EqualityFunc = (a: any, b: any) => boolean;
 
+const _Unset = {};
 
 export class State extends Agent implements Bindable {
-  constructor(readonly compare: EqualityFunc = isequal) {
+  readonly initial: any = _Unset;
+  readonly compare: EqualityFunc;
+
+  constructor(initial?: any);
+  constructor(compare: EqualityFunc);
+  constructor(initial: any, compare: EqualityFunc);
+  constructor(initialOrcompare: EqualityFunc | any = isequal, compare?: EqualityFunc) {
     super({
       inputs: ['value'],
       outputs: ['value']
     });
+
+    if (compare) {
+      this.initial = initialOrcompare;
+      this.compare = compare;
+    }
+    else {
+      if (typeof initialOrcompare === 'function')
+        this.compare = initialOrcompare;
+      else {
+        this.initial = initialOrcompare;
+        this.compare = isequal;
+      }
+    }
   }
 
   get input() { return this.in('value'); }
@@ -29,11 +50,20 @@ export class State extends Agent implements Bindable {
   }
 
   protected createOutput(_: string): PinLike {
-    return this.input
-      .to(pipe(
-        distinctUntilKeyChanged('value', this.compare),
-        shareReplay(1)
-      ))
+    if (this.initial !== _Unset) {
+      return this.input
+        .to(pipe(
+          startWith(emission(this.initial)),
+          distinctUntilKeyChanged('value', this.compare),
+          shareReplay(1)
+        ))
+    }
+    else
+      return this.input
+        .to(pipe(
+          distinctUntilKeyChanged('value', this.compare),
+          shareReplay(1)
+        ));
   }
 }
 

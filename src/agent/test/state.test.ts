@@ -78,6 +78,22 @@ describe('State', () => {
     b.send(42); expect(_s1).to.equal(42); expect(_s2).to.equal(42)
   });
 
+  it('should be possible to provide initial values.', () => {
+    let a = new Source();
+    let s = new State(42);
+
+    let r1 = <number[]>[]; let r2 = <number[]>[];
+
+    a.to(s.input);
+    s.output.subscribe(v => r1.push(v));
+
+    a.send(21);
+    s.output.subscribe(v => r2.push(v));
+
+    r1.should.eql([42, 21]);
+    r2.should.eql([21]);
+  });
+
   describe('.input', () => {
     it('should be equal to `.in("value")`', () => {
       let s = new State();
