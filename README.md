@@ -62,3 +62,24 @@ g.output
   .to(sink(() => p.classList.remove('faded'))) // --> show the <p> again
   .subscribe();                                // --> bind everything.
 ```
+
+# How To Install
+
+Using NPM:
+
+```
+npm i @connectv/core
+```
+
+Using a CDN:
+
+```
+<script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.14/lodash.min.js"></script>
+
+<script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
+```
+
+# How To Use
+
+Check out the [documentation](https://connective.dev).
