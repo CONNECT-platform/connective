@@ -16,4 +16,5 @@ describe('agent', () => {
   require('./invoke.test');
   require('./call.test');
   require('./singleton.test');
+  require('./check.test');
 });
