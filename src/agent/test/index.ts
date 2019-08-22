@@ -17,4 +17,5 @@ describe('agent', () => {
   require('./call.test');
   require('./singleton.test');
   require('./check.test');
+  require('./inline-composition.test');
 });

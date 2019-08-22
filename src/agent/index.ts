@@ -18,6 +18,7 @@ import { check, Check } from './check';
 
 import { exec, call, AgentFactory } from './call';
 import { singleton } from './singleton';
+import { composition } from './inline-composition';
 
 import { ChildNotDefined } from './errors/child-not-defined.error';
 import { ChildIsNotAgent, ChildIsNotPin } from './errors/child-type-mismatch.error';
@@ -28,14 +29,13 @@ export {
   expr, gate, nodeWrap, proxy, state, check, _switch, handleError, sequence, join, peekJoin, invoke, node,
   Expr, Gate, NodeWrap, Proxy, State, Check, Switch, HandleError, Sequence, Join, Invoke, Node,
   Agent, AgentLike, isAgentLike, AgentFactory,
-  Composition, 
+  Composition, composition,
   NodeLike, isNodeLike, NodeInputs, NodeOutput, NodeRunFunc,
   Signature, NodeSignature, isSignature,
   ExprFunc, ExprNoArgFunc, ExprWithArgFunc,
   SequenceToken, SequenceTokenIndicator,
   EqualityFunc,
   exec, call, singleton,
-
   ChildIsNotAgent, ChildIsNotPin, ChildNotDefined,
   InsufficientInputs, InputNotInSignature, OutputNotInSignature,
 }
