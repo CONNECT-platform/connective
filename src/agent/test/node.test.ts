@@ -3,10 +3,11 @@ import { should } from 'chai'; should();
 import emission from '../../shared/emission';
 import { ErrorCallback, ContextType } from '../../shared/types';
 
-import { Source } from '../../pin/source';
+import { source, Source } from '../../pin/source';
 import { Control } from '../../pin/control';
 import { group, Group } from '../../pin/group';
 import pin from '../../pin/pin';
+import sink from '../../pin/sink';
 import map from '../../pin/map';
 
 import { node, Node, NodeInputs, NodeOutput } from '../node';
@@ -217,6 +218,31 @@ describe('Node', () => {
     p2.subscribe();
     a.send();
     r.should.equal(1);
+  });
+
+  it('should be serially connectible.', () => {
+    class N extends Node {
+      constructor(){super({inputs:['a', 'b'], outputs:['zero', 'one', 'two']})}
+      run(_: NodeInputs, __: NodeOutput) {
+        let k = (_.a + _.b) % 3;
+        if (k == 0) __('zero');
+        if (k == 1) __('one');
+        if (k == 2) __('two');
+      }
+    }
+
+    let z = false, o = false, t = false;
+    let a = source(); let b = source();
+    group(a, b).serialTo(new N()).serialTo(
+      sink(() => z = true), sink(() => o = true), sink(() => t = true))
+      .subscribe();
+    
+    a.send(1); b.send(1);
+    a.send(4); b.send(3);
+
+    z.should.be.false;
+    o.should.be.true;
+    t.should.be.true;
   });
 
   describe('.control', () => {

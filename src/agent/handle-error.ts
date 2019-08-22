@@ -43,6 +43,9 @@ export class HandleError extends Agent {
       return this._gate;
   }
 
+  protected createEntries() { return [this.input] }
+  protected createExits() { return [this.output, this.error ] }
+
   public clear() {
     this._err.clear();
     return super.clear();

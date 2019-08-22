@@ -120,6 +120,9 @@ export class Sequence extends Agent {
     }), share()));
   }
 
+  protected createEntries() { return (this.signature.inputs || []).map(i => this.in(i)) }
+  protected createExits() { return [this.output] }
+
   public clear() {
     this.reset();
     this._control.clear();

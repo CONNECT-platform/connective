@@ -7,6 +7,8 @@ import { Clearable } from '../shared/clearable';
 export interface PinLike extends Clearable {
   from(...pins: PinLike[]): PinLike;
   to(...pins: PinLike[]): PinLike;
+  serialFrom(...pins: PinLike[]): PinLike;
+  serialTo(...pins: PinLike[]): PinLike;
 
   observable: Observable<Emission>;
 

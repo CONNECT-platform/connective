@@ -7,6 +7,7 @@ import { ResolveCallback, ErrorCallback, NotifyCallback } from '../shared/types'
 import { GroupObservableError } from './errors/group-subscription';
 
 import { PinLike } from './pin-like';
+import { PartialFlow } from './partial-flow';
 
 
 export class Group implements PinLike, Bindable {
@@ -22,14 +23,38 @@ export class Group implements PinLike, Bindable {
 
   from(...pins: PinLike[]): PinLike {
     pins.forEach(pin => this.pins.forEach(p => p.from(pin)));
-    if (pins.length == 1) return pins[0];
-    else return new Group(pins);
+    return traverseFrom(...pins);
   }
 
   to(...pins: PinLike[]): PinLike {
     pins.forEach(pin => this.pins.forEach(p => p.to(pin)));
-    if (pins.length == 1) return pins[0];
-    else return new Group(pins);
+    return traverseTo(...pins);
+  }
+
+  serialFrom(...pins: PinLike[]): PinLike {
+    (<PartialFlow[]>pins.filter(pin => pin instanceof PartialFlow)).forEach(flow => {
+      for (let i = 0; i < Math.min(this.pins.length, flow.exits.pins.length); i++)
+        this.pins[i].from(flow.exits.pins[i]);
+    });
+
+    let purePins = pins.filter(p => !(p instanceof PartialFlow));
+    for (let i = 0; i < Math.min(this.pins.length, purePins.length); i++)
+      this.pins[i].from(purePins[i]);
+
+    return traverseFrom(...pins);
+  }
+
+  serialTo(...pins: PinLike[]): PinLike {
+    (<PartialFlow[]>pins.filter(pin => pin instanceof PartialFlow)).forEach(flow => {
+      for (let i = 0; i < Math.min(this.pins.length, flow.entries.pins.length); i++)
+        this.pins[i].to(flow.entries.pins[i]);
+    });
+
+    let purePins = pins.filter(p => !(p instanceof PartialFlow));
+    for (let i = 0; i < Math.min(this.pins.length, purePins.length); i++)
+      this.pins[i].to(purePins[i]);
+
+    return traverseTo(...pins);
   }
 
   clear() {
@@ -61,6 +86,32 @@ export class Group implements PinLike, Bindable {
 
 
 export function group(...pins: PinLike[]) { return new Group(pins); }
+
+export function traverseTo(...pins: PinLike[]): PinLike {
+  if (pins.length == 1) {
+    let pin = pins[0];
+
+    if (pin instanceof PartialFlow) return pin.exits;
+    else return pin;
+  }
+  else return group(...pins.reduce((all, pin) => {
+    if (pin instanceof PartialFlow) return all.concat(pin.exits.pins);
+    else return all.concat([pin]);
+  }, <PinLike[]>[]));
+}
+
+export function traverseFrom(...pins: PinLike[]): PinLike {
+  if (pins.length == 1) {
+    let pin = pins[0];
+
+    if (pin instanceof PartialFlow) return pin.entries;
+    else return pin;
+  }
+  else return group(...pins.reduce((all, pin) => {
+    if (pin instanceof PartialFlow) return all.concat(pin.entries.pins);
+    else return all.concat([pin]);
+  }, <PinLike[]>[]));
+}
 
 
 export default group;

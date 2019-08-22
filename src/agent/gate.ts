@@ -27,6 +27,9 @@ export class Gate extends Agent implements NodeLike {
       .to(map(([_, input]: [any, any]) => input));
   }
 
+  protected createEntries() { return [this.input]; }
+  protected createExits() { return [this.output]; }
+
   clear() {
     this.control.clear();
     return super.clear();

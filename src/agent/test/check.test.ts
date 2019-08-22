@@ -2,6 +2,7 @@ import { should } from 'chai'; should();
 
 import emission from '../../shared/emission';
 import source from '../../pin/source';
+import sink from '../../pin/sink';
 
 import check, { Check } from '../check';
 
@@ -65,6 +66,21 @@ describe('Check', () => {
     a.to(c.input);
     c.pass.subscribe();
     a.emit(emission(0, { x : 42 }));
+  });
+
+  it('should be serially connectible.', () => {
+    let a = source();
+    let odd = <number[]>[];
+    let even = <number[]>[];
+
+    a.to(check((x: number) => x % 2 == 0)).serialTo(
+      sink(v => even.push(v)),
+      sink(v => odd.push(v))
+    ).subscribe();
+
+    a.send(1); a.send(2); a.send(3); a.send(4);
+    even.should.eql([2, 4]);
+    odd.should.eql([1, 3]);
   });
 
   describe('.input', () => {

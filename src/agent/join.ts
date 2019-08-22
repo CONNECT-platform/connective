@@ -73,6 +73,9 @@ export class Join extends Agent {
     ).to(pin());
   }
 
+  protected createEntries() { return this.keys.map(key => this.in(key)); }
+  protected createExits() { return [this.output] }
+
   public get output() { return this.out('output'); }
 
   public clear() {

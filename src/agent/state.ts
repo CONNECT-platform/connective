@@ -18,24 +18,23 @@ export class State extends Agent implements Bindable {
   readonly initial: any = _Unset;
   readonly compare: EqualityFunc;
 
-  constructor(initial?: any);
-  constructor(compare: EqualityFunc);
+  constructor(initialOrCompare?: any | EqualityFunc);
   constructor(initial: any, compare: EqualityFunc);
-  constructor(initialOrcompare: EqualityFunc | any = isequal, compare?: EqualityFunc) {
+  constructor(initialOrCompare: EqualityFunc | any = isequal, compare?: EqualityFunc) {
     super({
       inputs: ['value'],
       outputs: ['value']
     });
 
     if (compare) {
-      this.initial = initialOrcompare;
+      this.initial = initialOrCompare;
       this.compare = compare;
     }
     else {
-      if (typeof initialOrcompare === 'function')
-        this.compare = initialOrcompare;
+      if (typeof initialOrCompare === 'function')
+        this.compare = initialOrCompare;
       else {
-        this.initial = initialOrcompare;
+        this.initial = initialOrCompare;
         this.compare = isequal;
       }
     }
@@ -65,10 +64,13 @@ export class State extends Agent implements Bindable {
           shareReplay(1)
         ));
   }
+
+  protected createEntries() { return [this.input] }
+  protected createExits() { return [this.output] }
 }
 
 
-export function state(compare: EqualityFunc = isequal) { return new State(compare); }
+export function state(compare: any | EqualityFunc = isequal) { return new State(compare); }
 
 
 export default state;

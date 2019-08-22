@@ -18,6 +18,8 @@ import { PinMap, PinMapFactory, PinMapSusbcriber } from './pin-map';
 
 import { Connectible } from './connectible';
 
+import { partialFlow, PartialFlow } from './partial-flow';
+
 import { GroupObservableError } from './errors/group-subscription';
 import { PinLockedError } from './errors/locked.error';
 import { UnresolvedPinObservableError } from './errors/unresolved-observable.error';
@@ -27,7 +29,7 @@ export {
   Control, Filter, Group, Map, Pack, Pin, Pipe, Sink, Fork, Source, Spread, Reduce,
   PinLike, isPinLike, 
   PinMap, PinMapFactory, PinMapSusbcriber,
-  Connectible,
+  Connectible, partialFlow, PartialFlow,
   FilterFunc, FilterFuncAsync, FilterFuncSync,
   MapFunc, MapFuncAsync, MapFuncSync,
   SinkFunc,

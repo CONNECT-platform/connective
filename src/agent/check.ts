@@ -37,6 +37,9 @@ export class Check extends Agent {
       .to(map(([v, _]: [any, boolean]) => v))
     }
   }
+
+  createEntries() { return [this.input]; }
+  createExits() { return [this.pass, this.fail]; }
 }
 
 

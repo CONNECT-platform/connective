@@ -71,6 +71,9 @@ export abstract class Node extends Agent implements NodeLike {
     ;
   }
 
+  protected createEntries() {  return (this.signature.inputs || []).map(i => this.in(i)); }
+  protected createExits() { return this.signature.outputs.map(o => this.out(o)); }
+
   clear() {
     this.control.clear();
     return super.clear();

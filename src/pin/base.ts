@@ -5,8 +5,9 @@ import { Emission } from '../shared/emission';
 import { Tracker } from '../shared/tracker';
 import { ResolveCallback, ErrorCallback, NotifyCallback } from '../shared/types';
 
-import group, { Group } from './group';
+import { Group, traverseFrom, traverseTo } from './group';
 import { PinLike } from './pin-like';
+import { PartialFlow } from './partial-flow';
 
 
 //
@@ -18,21 +19,44 @@ export abstract class BasePin extends Tracker implements PinLike {
 
   to(...pins: PinLike[]) {
     pins.forEach(pin => pin.from(this));
-
-    if (pins.length == 1) return pins[0];
-    else return group(...pins);
+    return traverseTo(...pins);
   }
 
   from(...pins: PinLike[]) {
     pins.forEach(pin => {
       if (pin instanceof Group)
         pin.pins.forEach(p => this.connect(p));
+      else if (pin instanceof PartialFlow)
+        pin.exits.pins.forEach(o => this.connect(o));
       else
         this.connect(pin);
     });
 
-    if (pins.length == 1) return pins[0];
-    else return group(...pins);
+    return traverseFrom(...pins);
+  }
+
+  serialTo(...pins: PinLike[]) {
+    pins.forEach(pin => {
+      if (pin instanceof PartialFlow) {
+        if (pin.entries.pins.length > 0)
+          pin.entries.pins[0].from(this);
+      }
+      else pin.from(this);
+    })
+
+    return traverseTo(...pins);
+  }
+
+  serialFrom(...pins: PinLike[]) {
+    pins.forEach(pin => {
+      if (pin instanceof PartialFlow) {
+        if (pin.exits.pins.length > 0)
+          this.connect(pin.exits.pins[0]);
+      }
+      else this.connect(pin);
+    });
+
+    return traverseTo(...pins);
   }
 
   subscribe(observer?: PartialObserver<any>): Subscription;

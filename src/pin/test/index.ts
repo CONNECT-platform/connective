@@ -14,4 +14,5 @@ describe('pin', () => {
   require('./fork.test');
   require('./reduce.test');
   require('./spread.test');
+  require('./partial-flow.test');
 });
