@@ -18,6 +18,7 @@ import { check, Check } from './check';
 
 import { exec, call, AgentFactory } from './call';
 import { singleton } from './singleton';
+import { sampler } from './sampler';
 import { composition } from './inline-composition';
 
 import { ChildNotDefined } from './errors/child-not-defined.error';
@@ -35,7 +36,7 @@ export {
   ExprFunc, ExprNoArgFunc, ExprWithArgFunc,
   SequenceToken, SequenceTokenIndicator,
   EqualityFunc,
-  exec, call, singleton,
+  exec, call, singleton, sampler,
   ChildIsNotAgent, ChildIsNotPin, ChildNotDefined,
   InsufficientInputs, InputNotInSignature, OutputNotInSignature,
 }
