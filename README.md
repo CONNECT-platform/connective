@@ -83,3 +83,18 @@ Using a CDN:
 # How To Use
 
 Check out the [documentation](https://connective.dev).
+
+# How To Contribute
+
+At current super-early stage of **CONNECTIVE**'s life, one of the best contributions is to simply give feedback on it.
+Read the docs, use the library, and drop any feedbacks through one of [these channels](https://connective.dev#contact).
+
+
+The guideline for technical contribution is being drafted. In the mean-while, clone the code, test it, and read it
+to get a better idea of how the code-base works. Do not hesitate to ask any questions that might arise for you.
+
+## Testing
+
+```
+npm test
+```
