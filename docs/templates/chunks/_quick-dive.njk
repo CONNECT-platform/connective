@@ -75,6 +75,38 @@ a.send('hellow!');
 b.send('world!');</code>
 </pre>
 
+<!---------- QUICK-DIVE : SERIAL TO/FROM ---------->
+
+<h3 id="serial">Serial connections</h3>
+
+You can also connect series of pins to each other using <span code>.serialTo()</span>
+and <span code>.serialFrom()</span> methods:
+
+<pre try="https://stackblitz.com/edit/connective-cheat-4">
+<code class="javascript">/*!*/import { source, sink, group } from '@connectv/core';
+
+let a = source();
+let b = source();
+let c = sink(value =&gt; console.log('C::' + value));
+let d = sink(value =&gt; console.log('D::' + value));
+
+/*!*/group(a, b).serialTo(c, d);
+/*!*/group(c, d).bind();
+
+a.send('hellow!');
+b.send('world!');</code>
+</pre>
+
+This basically means the first of <span code>a, b</span> will be connected
+to the first of <span code>c, d</span>, the second of the former to the second of the latter, etc.
+
+<br><br>
+
+Also note how you can call <span code>.bind()</span> on both <span code>c</span> and <span code>d</span>
+simultaenously using <span code>group()</span>.
+
+<br><br>
+
 <!---------- QUICK-DIVE : SUBSCRIBE ---------->
 
 <h3 id="subscribe">Subscribing</h3>
@@ -243,52 +275,57 @@ also be of that type.
 <h3 id="composition">Composition</h3>
 
 You can re-use parts of your reactive flows using the
-<a href="/docs/composition">Composition</a>
-class:
+<a href="/docs/composition"><span code>composition()</span></a>:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-13">
-<code class="javascript">/*!*/import { Composition, source, filter } from '@connectv/core';
+<code class="javascript">/*!*/import { composition, source, pin, filter, sink } from '@connectv/core';
 
-/*!*/class EvenOdd extends Composition {
-  constructor() {
-    super({
-/*!*/      inputs: ['a'],            // --&gt; marks pins that go into the flow
-/*!*/      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
-    });
-  }
-
-/*!*/  build() {
-/*!*/    //
-/*!*/    // build all the elements of the flow
-/*!*/    //
-/*!*/    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
-/*!*/    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
-/*!*/  }
+/*!*/const evenOdd = composition(() =&gt; {             //--&gt; define the composition
+/*!*/  let input = pin();                            //--&gt; it has one input pin
+/*!*/  let odd = input.to(filter(x =&gt; x % 2 == 1));  
+/*!*/  let even = input.to(filter(x =&gt; x % 2 == 0));
 /*!*/
-/*!*/  wire() {
-/*!*/    //
-/*!*/    // wire the flow together
-/*!*/    //
-/*!*/    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
-/*!*/    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
-/*!*/  }
-}
+/*!*/  return [{ input }, { odd, even }];            //--&gt; return the inputs and outputs in the end
+/*!*/});
 
 //
 // now using the composition:
 //
 
 let a = source();
-let eo = new EvenOdd();
-
-/*!*/a.to(eo.in('a'));
-/*!*/eo.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
-/*!*/eo.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
+/*!*/a.to(evenOdd()).serialTo(                      //--&gt; `serialTo()` here connects ...
+  sink(v =&gt; console.log('ODD:: ' + v)),        //... the first output of `evenOdd()` to this sink ...
+  sink(v =&gt; console.log('EVEN:: ' + v))        //... and the second output to this sink.
+).subscribe();
 
 a.send(2);
 a.send(3);
 a.send(4);</code>
 </pre>
+
+The composition is just a part of your reactive flow, with some pins going into it (i.e. inputs)
+and some pins coming out of it (i.e. outputs). These two groups of pins are marked in the
+composition definition:
+
+<pre><code class="javascript">  return [{ input }, { odd, even }];</code></pre>
+
+Which means <span code>input</span> is the input pin of this composition and
+<span code>odd</span> and <span code>even</span> are the output pins.
+
+<br><br>
+
+In the example above, <span code>a.to(evenOdd())</span> connects <span code>a</span> to all of the input
+pins of <span code>evenOdd()</span> (which is one pin, <span code>input</span>), and the 
+<span code>serialTo()</span> connects the outputs (<span code>odd</span> and <span code>even</span>) correspondingly
+to provided sinks. You can access these input and output pins individually as well:
+
+<pre><code class="javascript">let e = evenOdd();
+
+e.in('input');
+e.out('even');
+e.out('odd');</code></pre>
+
+<br><br>
 
 <!---------- QUICK-DIVE : AGENT ---------->
 <h3 id="agent">Agent</h3>
@@ -313,21 +350,32 @@ denote the possible names of the incoming and outgoing pins of the Agent.
 
 
 <pre try="https://stackblitz.com/edit/connective-cheat-14">
-<code class="javascript">/*!*/import { source, expr } from '@connectv/core';
+<code class="javascript">/*!*/import { source, expr, group } from '@connectv/core';
 
 let a = source();
 let b = source();
-/*!*/let e = expr((a, b) =&gt; `${a} + ${b} = ${a + b}`);
-/*!*/
-/*!*/a.to(e.in(0));
-/*!*/b.to(e.in(1));
-/*!*/e.result.subscribe(v =&gt; console.log(v));  // --&gt; this is a short-hand for `e.out('result')`
+
+group(a, b)
+/*!*/.serialTo(expr((a, b) => `${a} + ${b} = ${a + b}`)) //--> a is connected to the first input of the expr,
+                                                    //... b to the second
+.subscribe(console.log);                            //... and the output is subscribed to.
 
 a.send(2); b.send(3);
 a.send(42); b.send(30);</code>
 </pre>
 
 Notice how the expr is called for every new value provided by the sources after the two initial values.
+
+<br><br>
+
+In the example above, we have again used <span code>.serialTo()</span> to directly connect to inputs
+of the <span code>expr()</span>, but you could retrieve them individually as well:
+
+<pre><code class="javascript">let e = expr((a, b) => a + b);
+
+e.in(0);  //--> this goes to parameter `a`
+e.in(1);  //--> this goes to parameter `b`
+e.result; //--> this is the result of the expression.</code></pre>
 
 <br><br>
 
@@ -359,10 +407,34 @@ a.send(4);
 a.send(5);</code>
 </pre>
 
+In this example we have fetched each input and output pin of <span code>n</span> individually and connected
+to it. You can of-course shorten this code using <span code>.serialTo()</span>:
+
+<pre try="https://stackblitz.com/edit/connective-cheat-15b">
+<code class="javascript">import { source, node, sink } from '@connectv/core';
+
+let N = node({ inputs: ['a'], outputs: ['even', 'odd']}, // --> set the signature
+  (input, output) => {
+    if (input.a % 2 == 0) output('even', input.a);
+    else output('odd', input.a);
+  });
+
+
+let a = source();
+/*!*/a.to(N()).serialTo(
+/*!*/  sink(v => console.log('EVEN:: ' + v)),
+/*!*/  sink(v => console.log('ODD:: ' + v))
+/*!*/).subscribe();
+
+a.send(3);
+a.send(4);
+a.send(5);</code>
+</pre>
+
 <!---------- QUICK-DIVE : GATE ---------->
 <h3 id="gate">Gate</h3>
 
-You can control when some emission passes through via another emission using <a href="/docs/gate"><span code>gate()</span></a>
+You can control when some emission passes through using <a href="/docs/gate"><span code>gate()</span></a>
 
 <pre try="https://stackblitz.com/edit/connective-cheat-16">
 <code class="javascript">/*!*/import { source, gate, map, spread, pipe, group, control } from '@connectv/core';
@@ -400,50 +472,32 @@ introduces a composition that represents the state of a <i>html input</i>, which
 and then uses that composition to bind two inputs together:
 
 <pre try="https://stackblitz.com/edit/connective-cheat-17">
-<code class="javascript">/*!*/import { wrap, map, state, sink, Composition } from '@connectv/core';
+<code class="javascript">/*!*/import { wrap, map, state, sink, composition, pin } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-class InputState extends Composition {
-  constructor(readonly el: HTMLInputElement) {
-    super({
-      inputs: ['value'],
-      outputs: ['value']
-    });
+function inputState(el: HTMLInputElement) {
+  return composition(track =&gt; {
+    let input = pin(), output = pin();
+/*!*/    let model = state(); track(model);   //--&gt; track the state for later cleaning it up ...
 
-    //
-    // we need access to `this.el` in wire(), but if parent class calls it,
-    // we will not get that access. as a result we need to call them ourselves.
-    //
-    this.build();
-    this.wire();
-  }
+/*!*/    input.to(model)                      //--&gt; the input sets the state
+/*!*/      .to(sink(v =&gt; el.value = v))       //--&gt; the HTML element value is also set based on that
+/*!*/      .to(output);                       //--&gt; and it all goes to the output
 
-  init() {}       // --&gt; prevent parent class from calling build() and wire()
+    wrap(fromEvent(el, 'input'))         //--&gt; when the user changes the input as well
+      .to(map(() =&gt; el.value))           //--&gt; we will fetch the new value of the input
+      .to(model);                        //--&gt; and update the state using it
 
-  build() {
-/*!*/    this.add('model', state());
-    this.add('sink', sink(val =&gt; this.el.value = val));
-  }
-
-  wire() {
-/*!*/    this.in('value').to(this.agent('model').in('value'));
-
-    wrap(fromEvent(this.el, 'input'))
-    .to(map(() =&gt; this.el.value))
-/*!*/    .to(this.agent('model').in('value'));
-
-/*!*/    this.agent('model').out('value')
-    .to(this.pin('sink'))
-    .to(this.out('value'));
-  }
+    return [{input}, {output}];
+  })();
 }
 
 
-let a = new InputState(document.getElementById('a') as HTMLInputElement);
-let b = new InputState(document.getElementById('b') as HTMLInputElement);
+let a = inputState(document.getElementById('a') as HTMLInputElement);
+let b = inputState(document.getElementById('b') as HTMLInputElement);
 
-/*!*/a.out('value').to(b.in('value')); // --&gt; literal two-way binding
-/*!*/b.out('value').to(a.in('value'));
+/*!*/a.to(b);  // --&gt; literal two-way binding
+/*!*/b.to(a);
 
 a.bind(); // --&gt; .bind() on composition will call .bind() on all child nodes having that method
 b.bind();</code>
@@ -459,17 +513,19 @@ coming from various sources:
 <code class="javascript">/*!*/import { wrap, map, sequence, group } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-/*!*/let click = sequence(1, 0, 1);  // --&gt; a click is one mousedown, no mousemove, and one mouseup
-/*!*/let drag = sequence(1, '+', 1); // --&gt; a drag is one mousedown, some mousemove, and one mouseup
-/*!*/
-/*!*/wrap(fromEvent(document, 'mousedown')).to(click.in(0), drag.in(0));
-/*!*/wrap(fromEvent(document, 'mousemove')).to(click.in(1), drag.in(1));
-/*!*/wrap(fromEvent(document, 'mouseup'))  .to(click.in(2), drag.in(2));
-
 group(
-  click.output.to(map(() =&gt; 'CLICK!!')),
-  drag.output.to(map(() =&gt; 'DRAG!!'))
-).subscribe(v => console.log(v));</code>
+  wrap(fromEvent(document, 'mousedown')),
+  wrap(fromEvent(document, 'mousemove')),
+  wrap(fromEvent(document, 'mouseup'))
+)
+.serialTo(
+/*!*/  sequence(1, 0, 1),   //--&gt; click is 1 mouse down, 0 mousemove, 1 mouse up
+/*!*/  sequence(1, '+', 1)  //--&gt; drag is 1 mouse down, +1 mousemoves, 1 mouse up
+)
+.serialTo(
+  map(() =&gt; 'CLICK'),
+  map(() =&gt; 'DRAG')
+).subscribe(console.log);</code>
 </pre>
 
 <!---------- QUICK-DIVE : MEMORY ---------->
