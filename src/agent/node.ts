@@ -40,8 +40,8 @@ export abstract class Node extends Agent implements NodeLike {
     .to(map((all, callback, error, context) => {
       if (this._control.connected)
         this._control_required = true;
-      if (signature.required && signature.required.some(label => !(label in all[0])))
-        error(new InsufficientInputs(signature.required.filter(label => !(label in all[0]))));
+      if (signature.required && signature.required.some(label => !(all && all[0] && label in all[0])))
+        error(new InsufficientInputs(signature.required.filter(label => !(all && all[0] && label in all[0]))));
       else {
         this.run(all[0], (out: string, data?: any) => {
           if (!this.signature.outputs.includes(out)) {

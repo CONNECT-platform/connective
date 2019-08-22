@@ -5,13 +5,13 @@ export class EmissionError extends Error {
   readonly original: Error;
 
   constructor(original: Error | string, readonly emission: Emission) {
-    super();
+    super(original instanceof Error?original.message:original);
     if (original instanceof Error) this.original = original;
     else this.original = new Error(original);
   }
 
-  get message(): string { return this.original.message; }
-  get stack(): string | undefined { return this.original.stack; }
+  public get message(): string { return this.original.message; }
+  public get stack(): string | undefined { return this.original.stack; }
 }
 
 
