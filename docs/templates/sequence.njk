@@ -8,12 +8,12 @@
 <span code>sequence()</span> allows you to detect a specific sequence of emissions from multiple sources:
 
 <pre try="https://stackblitz.com/edit/connective-seq-ex1">
-  <code class="javascript">/*!*/import { wrap, sequence } from '@connectv/core';
+  <code class="javascript">/*!*/import { group, wrap, sequence, sink } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
 let p = document.getElementById('p');
 
-// 'drag' is a sequence of
+// 'drag' is a sequence of 
 // - 1 mouse down
 // - one or more mouse moves ('+')
 // - 1 mouse up
@@ -27,12 +27,17 @@ let p = document.getElementById('p');
 
 // now lets connect the 'mousedown', 'mousemove' and 'mouseup' events
 // to drag and click ...
-/*!*/wrap(fromEvent(document, 'mousedown')).to(drag.in(0), click.in(0));
-/*!*/wrap(fromEvent(document, 'mousemove')).to(drag.in(1), click.in(1));
-/*!*/wrap(fromEvent(document, 'mouseup')).to(drag.in(2), click.in(2));
-
-/*!*/drag.output.subscribe(() =&gt; p.textContent = 'DRAG');
-/*!*/click.output.subscribe(() =&gt; p.textContent = 'CLICK');</code>
+group(
+  wrap(fromEvent(document, 'mousedown')),
+  wrap(fromEvent(document, 'mousemove')),
+  wrap(fromEvent(document, 'mouseup'))
+)
+/*!*/.serialTo(click, drag)
+.serialTo(
+  sink(() =&gt; p.textContent = 'CLICK'),    //--&gt; click is connected to this
+  sink(() =&gt; p.textContent = 'DRAG')      //--&gt; drag is connected to this
+)
+.subscribe();</code>
 </pre>
 
 You can pass any number of arguments to <span code>sequence()</span>. Each argument corresponds to an incoming
@@ -82,6 +87,33 @@ wrap(fromEvent(D, 'click')).to(seq.in(3));
 seq.output.to(sink(() =&gt; p.textContent = 'SEQUENCE!'))
   .to(pipe(delay(2000)))
   .subscribe(() =&gt; p.textContent = '');</code>
+</pre>
+
+<b>NOTE</b>: this example is written intentionally without use of <span code>.serialTo()</span> so that
+you can see how you can explicitly connect to and from a sequence's input and output pins. Re-writing it
+with <span code>.serialTo()</span> would look like this:
+
+<pre try="https://stackblitz.com/edit/connective-seq-ex3?file=index.ts">
+<code class="javascript">/*!*/import { group, wrap, sequence, pipe, sink } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { delay } from 'rxjs/operators';
+
+let A = document.getElementById('A');
+let B = document.getElementById('B');
+let C = document.getElementById('C');
+let D = document.getElementById('D');
+let p = document.getElementById('p');
+
+group(
+  wrap(fromEvent(A, 'click')),
+  wrap(fromEvent(B, 'click')),
+  wrap(fromEvent(C, 'click')),
+  wrap(fromEvent(D, 'click')),
+)
+/*!*/.serialTo(sequence('+', 0, '*', 2))
+.to(sink(() =&gt; p.textContent = 'SEQUENCE!'))
+.to(pipe(delay(2000)))
+.subscribe(() =&gt; p.textContent = '');</code>
 </pre>
 
 <h2 id="signature">Signature</h2>
