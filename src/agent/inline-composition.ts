@@ -43,12 +43,15 @@ export function composition(factoryOrSignature: CompositionFactory | Signature, 
     let tracked = <_ChildType[]>[];
     let s = factory((...children) => { tracked = tracked.concat(children); });
     signature = { inputs: Object.keys(s[0]), outputs: Object.keys(s[1]) };
+    tracked.forEach(thing => thing.clear());
   }
   else {
     signature = factoryOrSignature as Signature;
   }
 
-  return () => new InlineComposition(factory as CompositionFactory, signature);
+  let func = () => new InlineComposition(factory as CompositionFactory, signature);
+  (func as any).signature = signature;
+  return func;
 }
 
 

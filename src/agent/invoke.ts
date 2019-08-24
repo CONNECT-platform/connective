@@ -20,7 +20,7 @@ export class Invoke extends Agent implements NodeLike {
   private _control_required = true;
 
   constructor(readonly ref: AgentFactory, signature?: Signature) {
-    super(signature || ref().signature);
+    super(signature || (ref as any).signature || ref().clear().signature);
 
     this._control = new Control();
 

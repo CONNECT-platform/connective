@@ -101,11 +101,13 @@ describe('Invoke', () => {
   });
 
   it('should clear out the created agents when the result is given.', done => {
+    let count = 0;
+
     class C extends Composition {
       constructor() { super({inputs: ['i'], outputs: ['o']})}
       build() {}
       wire() { this.in('i').to(this.out('o')); }
-      clear() { done(); return super.clear(); }
+      clear() { count++; if (count >= 2) done(); return super.clear(); }
     }
 
     let i = invoke(() => new C());
