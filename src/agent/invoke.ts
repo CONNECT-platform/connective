@@ -41,6 +41,9 @@ export class Invoke extends Agent implements NodeLike {
       .to(map((data: ExecResult) => data.value));
   }
 
+  protected createEntries() { return (this.signature.inputs || []).map(i => this.in(i)); }
+  protected createExits() { return this.signature.outputs.map(o => this.out(o)); }
+
   public get control() { return this._control; }
 
   public clear() {
