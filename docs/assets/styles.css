@@ -469,6 +469,57 @@ body.dark-mode #nav hr {
   }
 }
 
+/*********** tabs ***********/
+
+[tabs] [tab] {
+  display: none;
+}
+
+[tabs] [tab].active {
+  display: block;
+}
+
+.tab-toggles {
+  border-radius: 3px;
+  border: 2px solid #4A90E2;
+  height: 32px;
+  margin: 0 auto;
+  display: flex;
+  width: 50%;
+}
+
+@media screen and (max-width: 1200px) {
+  .tab-toggles {
+    width: 100%;
+  }
+}
+
+.tab-toggles button {
+  flex-grow: 1;
+  cursor: pointer;
+  outline: none;
+  height: 32px;
+  background: transparent;
+  color: #4A90E2;
+  padding: 4px 16px;
+  margin: 0;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+  font-family: inherit;
+  display: inline-flex; justify-content: center; align-items: center;
+  transition: background .15s, color .15s;
+}
+
+.tab-toggles button:not(:last-child) {
+  border-right: 2px solid #4A90E2;
+}
+
+.tab-toggles button.active {
+  color: white;
+  background: #4A90E2;
+}
+
 /*********** prevnext ***********/
 
 #prevnext {

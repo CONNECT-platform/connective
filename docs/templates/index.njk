@@ -45,6 +45,7 @@ would also help, though it is not mandatory. For basic usage and/or for getting 
 {% include 'chunks/_quick-dive.njk' %}
 
 <br><br>
+<br><br>
 
 <h1 id="under-the-hood">Under the Hood</h1>
 
@@ -69,6 +70,26 @@ you would definitely need to be familiar with <b>RxJS</b>.
 
 You can read more in detail on how <b>CONNECTIVE</b> creates observable sequences based on your flows
 <a href="/docs/under-the-hood">here</a>.
+
+<br><br>
+<br><br>
+
+<h1 id="connective-v-rxjs">CONNECTIVE v RxJS</h1>
+
+An important thing to notice is that <b>CONNECTIVE</b> is designed NOT as an alternative
+to <b>RxJS</b>. It is rather meant to act as a <i>complement to <b>RxJS</b></i> specifically in the following
+ways:
+
+<ul>
+<li>It allows description of a reactive flow in any order,</li>
+<li>It provides a different model of reactive flows,</li>
+<li>It provides standard abstractions for flow re-use.</li>
+</ul>
+
+<br><br>
+
+This simply means that for smaller and simpler flows, the difference between the two is negligble. However the benefits of <b>CONNECTIVE</b> become more and more pronounced over larger and more complex reactive flows. 
+You can read more about this <a href="/docs/connective-v-rxjs">in this entry</a>.
 
 <br><br>
 <br><br>

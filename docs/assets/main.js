@@ -121,7 +121,7 @@ window.addEventListener('load', function() {
   // make the toc
   //
   var div = document.createElement('div');
-  var titles = document.querySelectorAll('h1[id], h2[id], h3[id]');
+  var titles = document.querySelectorAll('h1[id], h2[id], h3[id]:not([skip-toc])');
   var tocels = {};
   titles.forEach(function(node) {
     var a = document.createElement('a');
@@ -146,6 +146,32 @@ window.addEventListener('load', function() {
         tocel.classList.remove('visible');
     });
   });
+
+  //
+  // make tabs
+  //
+  (function() {
+    var tabs = document.querySelectorAll('[tabs]');
+    tabs.forEach(function(holder) {
+      var buttons = document.createElement('div');
+      buttons.classList.add('tab-toggles');
+      holder.querySelectorAll('[tab]').forEach(function(tab) {
+        var button = document.createElement('button');
+        button.innerHTML = tab.getAttribute('tab');
+        buttons.appendChild(button);
+        button.addEventListener('click', function() {
+          buttons.querySelectorAll('button').forEach(function(btn) { btn.classList.remove('active'); });
+          holder.querySelectorAll('[tab]').forEach(function(tab) { tab.classList.remove('active'); });
+          button.classList.add('active');
+          tab.classList.add('active');
+        });
+      });
+
+      holder.firstElementChild.classList.add('active');
+      buttons.firstElementChild.classList.add('active');
+      holder.parentElement.insertBefore(buttons, holder);
+    });
+  })();
 
   //
   // dark mode

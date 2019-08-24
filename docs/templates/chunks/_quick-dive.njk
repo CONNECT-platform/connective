@@ -77,7 +77,7 @@ b.send('world!');</code>
 
 <!---------- QUICK-DIVE : SERIAL TO/FROM ---------->
 
-<h3 id="serial">Serial connections</h3>
+<h3 id="serial" skip-toc>Serial connections</h3>
 
 You can also connect series of pins to each other using <span code>.serialTo()</span>
 and <span code>.serialFrom()</span> methods:
@@ -109,7 +109,7 @@ simultaenously using <span code>group()</span>.
 
 <!---------- QUICK-DIVE : SUBSCRIBE ---------->
 
-<h3 id="subscribe">Subscribing</h3>
+<h3 id="subscribe" skip-toc>Subscribing</h3>
 
 You can directly subscribe on any <i>Pin</i> using its <a href="/docs/pin#subscribe"><span code>.subscribe()</span></a> method, so you don't need to use <span code>sink()</span> all the time.
 You can also use <a href="/docs/group"><span code>group()</span></a> to work with a multitude of <i>Pins</i> at once:
@@ -152,7 +152,7 @@ console.log('A:: ' + a.locked + ' B:: ' + b.locked);
 
 <!---------- QUICK-DIVE : OTHER SOURCES ---------->
 
-<h3 id="other-sources">Sources</h3>
+<h3 id="other-sources" skip-toc>Sources</h3>
 
 You can also create sources from plain values or from <i>Observables</i>:
 
@@ -171,7 +171,7 @@ Note that you cannot connect any pin to <a href="/docs/wrap"><span code>wrap()</
 
 <!---------- QUICK-DIVE : SPREAD ---------->
 
-<h3 id="spread">Spread</h3>
+<h3 id="spread" skip-toc>Spread</h3>
 
 You can use <a href="/docs/spread"><span code>spread()</span></a> to turn incoming values into multiple emissions:
 
@@ -185,7 +185,7 @@ value([1, 2, 3, 4, 5, 6])
 
 <!---------- QUICK-DIVE : FILTER & MAP ---------->
 
-<h3 id="filter-n-map">Filter & Map</h3>
+<h3 id="filter-n-map" skip-toc>Filter & Map</h3>
 
 You can change incoming values using <a href="/docs/map"><span code>map()</span></a>, and let them through or block them using
 <a href="/docs/filter"><span code>filter()</span></a>:
@@ -202,7 +202,7 @@ value([1, 2, 3, 4, 5, 6])
 
 <!---------- QUICK-DIVE : CONTROL ---------->
 
-<h3 id="control">Control</h3>
+<h3 id="control" skip-toc>Control</h3>
 
 You can break your flow into multiple branches and join them back using <a href="/docs/control"><span code>control()</span></a>:
 
@@ -221,7 +221,7 @@ value([1, 2, 3, 4, 5, 6])
 
 <!---------- QUICK-DIVE : LOOP ---------->
 
-<h3 id="loop">Loops</h3>
+<h3 id="loop" skip-toc>Loops</h3>
 
 You can even create loops in your flow:
 
@@ -241,7 +241,7 @@ a.send(0);</code>
 
 <!---------- QUICK-DIVE : PIPE ---------->
 
-<h3 id="pipe">Pipe</h3>
+<h3 id="pipe" skip-toc>Pipe</h3>
 
 In the example above, the order is not necessarily preserved. You can for example enforce the order by using
 <b>RxJS</b>'s <span code>delay()</span> operator:
@@ -272,7 +272,7 @@ also be of that type.
 
 <!---------- QUICK-DIVE : COMPOSITION ---------->
 
-<h3 id="composition">Composition</h3>
+<h3 id="composition" skip-toc>Composition</h3>
 
 You can re-use parts of your reactive flows using
 <a href="/docs/composition"><span code>composition()</span></a>:
@@ -328,7 +328,7 @@ e.out('odd');</code></pre>
 <br><br>
 
 <!---------- QUICK-DIVE : AGENT ---------->
-<h3 id="agent">Agent</h3>
+<h3 id="agent" skip-toc>Agent</h3>
 
 Compositions are sub-classes of
 <a href="/docs/agent">Agent</a>
@@ -344,7 +344,7 @@ denote the possible names of the incoming and outgoing pins of the Agent.
 <br><br>
 
 <!---------- QUICK-DIVE : EXPR ---------->
-<h3 id="expr">Expr</h3>
+<h3 id="expr" skip-toc>Expr</h3>
 
 <a href="/docs/expr"><span code>expr()</span></a> allows you to convert any function into an agent:
 
@@ -380,7 +380,7 @@ e.result; //--> this is the result of the expression.</code></pre>
 <br><br>
 
 <!---------- QUICK-DIVE : NODE ---------->
-<h3 id="node">Node</h3>
+<h3 id="node" skip-toc>Node</h3>
 A <a href="/docs/node">Node</a>
 is basically a more complex version of an Expr, allowing you to emit to any outputs denoted in the signature
 (instead of just <span code>"result"</span> pin). You can create nodes easily using <span code>node()</span> function:
@@ -432,7 +432,7 @@ a.send(5);</code>
 </pre>
 
 <!---------- QUICK-DIVE : GATE ---------->
-<h3 id="gate">Gate</h3>
+<h3 id="gate" skip-toc>Gate</h3>
 
 You can control when some emission passes through using <a href="/docs/gate"><span code>gate()</span></a>
 
@@ -465,7 +465,7 @@ the behavior of the agent.
 <br><br>
 
 <!---------- QUICK-DIVE : STATE ---------->
-<h3 id="state">State</h3>
+<h3 id="state" skip-toc>State</h3>
 You can keep reactive state values within your flows using <a href="/docs/state"><span code>state()</span></a>. For example, the following code
 introduces a composition that represents the state of a <i>html input</i>, which is built on top of
 <span code>state()</span>,
@@ -504,7 +504,7 @@ b.bind();</code>
 </pre>
 
 <!---------- QUICK-DIVE : SEQUENCE ---------->
-<h3 id="sequence">Sequence</h3>
+<h3 id="sequence" skip-toc>Sequence</h3>
 
 The <a href="/docs/sequence"><span code>sequence()</span></a> agent allows you to distinguish specific sequences of events
 coming from various sources:
@@ -530,7 +530,7 @@ group(
 
 <!---------- QUICK-DIVE : MEMORY ---------->
 
-<h3 id="memory">Memory Management</h3>
+<h3 id="memory" skip-toc>Memory Management</h3>
 
 All pins and agents in <b>CONNECTIVE</b> come with a <span code>.clear()</span> method that will dispose
 all of their internal references. The <span code>.clear()</span> method of a <i>Composition</i> will also
