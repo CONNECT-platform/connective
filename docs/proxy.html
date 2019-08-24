@@ -52,69 +52,47 @@ need all your inputs to share the same state. For this purpose, we can use a com
 manage the state of any given input:
 
 <pre try="https://stackblitz.com/edit/connective-proxy-ex1?file=input-state.ts">
-<code class="javascript">import { wrap, map, state, State, 
-      group, sink, Composition } from '@connectv/core';
+<code class="javascript">import { wrap, map, state, pin,
+      group, sink, composition } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
+
 //
-// This class is used to work with the state of an html input
-// in another reactive flow.
+// this composition manages the state of an html input element.
 //
-export class InputState extends Composition {
-  model: State;
+export const inputState = (input: HTMLInputElement) =&gt; composition(track =&gt; {
+  let _in = pin(), _out = pin();
 
-  constructor(readonly el: HTMLInputElement) {
-    super({
-      inputs: ['value'],
-      outputs: ['value']
-    });
+  let model = state();
+  let toDom = sink(v =&gt; input.value = v);
+  track(model, toDom);
 
-    //
-    // we need access to `this.el` in wire(), but if parent class calls it,
-    // we will not get that access. as a result we need to call them ourselves.
-    //
-    this.build();
-    this.wire();
-  }
+  group(
+    wrap(fromEvent(input, 'input')).to(map(() =&gt; input.value)), 
+    _in
+  ).to(model).to(toDom).to(_out);
 
-  init() {}       // --&gt; prevent parent class from calling build() and wire()
-
-  build() {
-    this.model = this.add(state()) as State;
-    this.add('sink', sink(val =&gt; this.el.value = val));
-  }
-
-  wire() {
-    group(
-      this.in('value'),
-      wrap(fromEvent(this.el, 'input'))
-        .to(map(() =&gt; this.el.value))
-    ).to(this.model.input);
-
-    this.model.output
-    .to(this.pin('sink'))
-    .to(this.out('value'));
-  }
-}</code>
+  return [{ value: _in }, { value: _out }];
+})();</code>
 </pre>
 
-Our <span code>InputState</span> class acts like a <a href="/docs/state"><span code>state()</span></a> that is also
-bound to the given input. We can bind each single <span code>InputState</span> to another <span code>state()</span>,
-or bind multiple <span code>InputState</span> to a single shared <span code>state()</span>, so that all of them, well,
-share the state.
+Our <span code>inputState()</span> acts like a <a href="/docs/state"><span code>state()</span></a> that is also
+bound to the given input. We can bind each single <span code>inputState()</span> to another <span code>state()</span>,
+or bind multiple <span code>inputState()</span>s to a single shared <span code>state()</span>, so that all of them,
+well, share the state.
 
 <br><br>
 
-However, in our case, we do not have our inputs (and by extension, <span code>InputState</span>s) available at the
+However, in our case, we do not have our inputs (and by extension, <span code>inputState()</span>s) available at the
 time of defining the reactive flow that describes the binding. Instead, we can use a <span code>proxy()</span> that is
-bound to the shared state, and when the <span code>InputState</span>s are created, use our <span code>proxy()</span>
+bound to the shared state, and when the <span code>inputState()</span>s are created, use our <span code>proxy()</span>
 to proxy the newly created agents into our flow:
 
 <pre try="https://stackblitz.com/edit/connective-proxy-ex1?file=index.ts">
 <code>/*!*/import { wrap, proxy, state } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-import { InputState } from './input-state';
+import { inputState } from './input-state';
 
 //
 // GOAL: in this example, we want a dynamic number of inputs
@@ -148,13 +126,13 @@ fromEvent(btn, 'click').subscribe(() =&gt; {                      //--&gt; upon 
   i.setAttribute('placeholder', 'type something ...');         //... set a placeholder
   document.body.appendChild(i);                                //... add it to the document
 
-/*!*/  inputProxy.proxy(new InputState(i));                         //--&gt; and proxy its state
+/*!*/  inputProxy.proxy(inputState(i));                         //--&gt; and proxy its state
 });</code>
 </pre>
 
 Lets unpack whats happening here:
 
-<ul><li>First we create a proxy agent that represents all our future <span code>InputState</span>s in the flow
+<ul><li>First we create a proxy agent that represents all our future <span code>inputState()</span>s in the flow
 (like a placeholder). This proxy naturally has the same signature.</li></ul>
 
 <pre><code class="javascript">let inputProxy = proxy({ inputs: ['value'], outputs: ['value'] });</code></pre>
@@ -166,10 +144,10 @@ inputProxy.out('value').to(shared.input);</code></pre>
 
 <ul><li>Finally, when our actual agents are created, we proxy them into the flow using our proxy's
 <span code>.proxy()</span> method. This simply means that the <span code>inputProxy</span> will 
-send any emissions it receives to the newly created <span code>InputState</span>, and will send
-any emissions coming out of the <span code>InputState</span>, back into the flow, as its own emissions:</li></ul>
+send any emissions it receives to the newly created <span code>inputState()</span>, and will send
+any emissions coming out of the <span code>inputState()</span>, back into the flow, as its own emissions:</li></ul>
 
-<pre><code class="javascript">inputProxy.proxy(new InputState(i));</code></pre>
+<pre><code class="javascript">inputProxy.proxy(inputState(i));</code></pre>
 
 <br><br>
 
@@ -187,7 +165,7 @@ For example, in the case of previous example, imagine we would also want to dyna
 <code>import { wrap, proxy, state } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-import { InputState } from './input-state';
+import { inputState } from './input-state';
 
 
 let p = document.getElementById('p');
@@ -215,7 +193,7 @@ fromEvent(btn, 'click').subscribe(() =&gt; {
 
   document.body.appendChild(d);
 
-/*!*/  let sub = inputProxy.proxy(new InputState(i));
+/*!*/  let sub = inputProxy.proxy(inputState(i));
   fromEvent(b, 'click').subscribe(() =&gt; {
     d.remove();                                                //--&gt; remove the div
 /*!*/    sub.unsubscribe();                                         //--&gt; also un-proxy
