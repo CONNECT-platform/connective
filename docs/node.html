@@ -108,10 +108,37 @@ Note that:
 
 <br><br>
 
+<span code>node()</span>s can also be connected using <span code>serialTo()</span> and <span code>serialFrom()</span>.
+For example you can simplify the previous example like this:
+
+<pre try="https://stackblitz.com/edit/connective-node-ex1b">
+<code class="javascript">import { group, wrap, map } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+import { passwordValidator } from './password-validator';
+
+let pass = document.getElementById('pass') as HTMLInputElement;
+let confirm = document.getElementById('confirm') as HTMLInputElement;
+let hint = document.getElementById('hint');
+
+group(
+  wrap(fromEvent(pass, 'input')).to(map(() =&gt; pass.value)),
+  wrap(fromEvent(confirm, 'input')).to(map(() =&gt; confirm.value)),
+)
+/*!*/.serialTo(passwordValidator())
+/*!*/.serialTo(
+/*!*/  map(() => 'valid password'),
+/*!*/  map(() => 'passwords do not match'),
+/*!*/  map(l => `must be at least ${l} characters`),
+/*!*/  map(symbols => `must include one of ${symbols}`)
+/*!*/)
+.subscribe(v => hint.textContent = v);</code>
+</pre>
+
 <h2 id="control">Control</h2>
 
 Each <span code>node()</span> comes with a <a href="/docs/control"><span code>.control</span></a> property which allows you
-to hold on its execution:
+to control on its execution:
 
 <pre try="https://stackblitz.com/edit/connective-node-ex2?file=index.ts">
   <code class="javascript">import { wrap, map, pipe, sink, group } from '@connectv/core';
@@ -128,8 +155,7 @@ let validator = passwordValidator();
 let $pass = wrap(fromEvent(pass, 'input')).to(map(() =&gt; pass.value));
 let $confirm = wrap(fromEvent(confirm, 'input')).to(map(() =&gt; confirm.value));
 
-$pass.to(validator.in('pass'));
-$confirm.to(validator.in('confirm'));
+group($pass, $confirm).serialTo(validator);
 
 //
 // so lets be a bit less annoying on feedback:
@@ -139,10 +165,12 @@ $confirm.to(validator.in('confirm'));
 /*!*/  .to(pipe(debounceTime(1000)))          //--&gt; wait a bit
 /*!*/  .to(validator.control);                //--&gt; THEN validate
 
-validator.out('valid').subscribe(() =&gt; hint.textContent = 'valid password');
-validator.out('not match').subscribe(() =&gt; hint.textContent = 'passowrds do not match');
-validator.out('too short').subscribe(l =&gt; hint.textContent = `must be at least ${l} characters`);
-validator.out('no symbol').subscribe(symbols =&gt; hint.textContent = `must include one of ${symbols}`);</code>
+validator.serialTo(
+  map(() =&gt; 'valid password'),
+  map(() =&gt; 'passwords do not match'),
+  map(l =&gt; `must be at least ${l} characters`),
+  map(symbols =&gt; `must include one of ${symbols}`)
+).subscribe(v =&gt; hint.textContent = v);</code>
 </pre>
 
 <h2 id="optional">Optional parameters</h2>
