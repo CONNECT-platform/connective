@@ -2,11 +2,13 @@ hljs.initHighlightingOnLoad();
 
 function showOverlay(overlay, time) {
   overlay.classList.add('active');
-  overlay.timeout = setTimeout(function(){ hideOverlay(overlay); }, time);
+  if (time > 0)
+    overlay.timeout = setTimeout(function(){ hideOverlay(overlay); }, time);
 }
 
 function hideOverlay(overlay) {
   clearTimeout(overlay.timeout);
+  overlay.dispatchEvent(new CustomEvent('overlay-closed'));
   overlay.classList.remove('active');
 }
 
@@ -353,5 +355,28 @@ window.addEventListener('load', function() {
         }
       });
     });
+  })();
+
+  //
+  // gitter stuff
+  //
+  (function() {
+    var gitterChat = window.gitter.chat.defaultChat;
+    var chatElement = document.querySelector('.gitter-chat-embed');
+    var gitterOverlay = document.getElementById('gitter-overlay');
+
+    chatElement.addEventListener('gitter-chat-toggle', function (event) {
+      if (event.detail.state)
+        showOverlay(gitterOverlay);
+      else hideOverlay(gitterOverlay);
+    });
+
+    gitterOverlay.addEventListener('overlay-closed', function() {
+      gitterChat.toggleChat();
+    });
+
+    var link = document.querySelector('.gitter-chat-embed-action-bar-item-pop-out');
+    link.textContent = 'open in GITTER';
+    link.classList.add('no-underline');
   })();
 });

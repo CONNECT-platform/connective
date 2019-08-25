@@ -636,10 +636,9 @@ body.dark-mode #prevnext #next:hover::after {
   position: fixed;
   top: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 100;
   padding: 24px;
 }
-
 
 /*********** footer ***********/
 
@@ -802,6 +801,39 @@ body.dark-mode .nav .line {
   }
 }
 
+/*********** gitter ***********/
+
+.gitter-chat-embed {
+  z-index: 1000;
+  transition: transform .3s, opacity .15s;
+  padding-top: 64px;
+  border-left: none;
+}
+
+.gitter-chat-embed.is-collapsed {
+  opacity: 0;
+}
+
+.gitter-chat-embed .gitter-chat-embed-action-bar {
+  padding: 12px;
+}
+
+.gitter-chat-embed .gitter-chat-embed-action-bar-item-pop-out {
+  flex-grow: 1;
+  background-position: 8px center;
+  justify-content: flex-start;
+  padding-left: 48px;
+  color: #424242;
+  font-size: 14px;
+  font-weight: 100;
+  opacity: .5;
+  background-image: url('/docs/assets/gitter.svg');
+}
+
+.gitter-chat-embed .gitter-chat-embed-action-bar-item-collapse-chat {
+  background-image: url('https://www.materialui.co/materialIcons/navigation/close_black_72x72.png');
+}
+
 /*********** overlays ***********/
 
 .overlay {
@@ -813,6 +845,10 @@ body.dark-mode .nav .line {
   left: 0; top: 0; bottom: 0; right: 0;
   user-select: none;
   transition: opacity 0s;
+}
+
+.overlay.fade {
+  background: rgba(0, 0, 0, .5);
 }
 
 .overlay.active {
@@ -881,7 +917,7 @@ body.dark-mode code .line:before {
 }
 
 code .line.highlight {
-  background: #383838;
+  background: #373944;
   color: #ffffff;
 }
 
@@ -890,7 +926,7 @@ code .line:hover {
 }
 
 body.dark-mode code .line.highlight {
-  background: #181818;
+  background: #1B1C22;
 }
 
 body.dark-mode code .line:hover {

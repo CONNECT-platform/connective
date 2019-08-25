@@ -32,7 +32,7 @@
   <body>
     <div id="header">
       
-      <a class="github-button" href="https://github.com/connect-platform/connective" data-icon="octicon-star" data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star</a>
+      <a class="github-button" href="https://github.com/connect-platform/connective"data-show-count="true" aria-label="Star connect-platform/connective on GitHub">Star on GitHub</a>
       
     </div>
     <div class="container">
@@ -277,7 +277,7 @@ For more details on how function purity is handled by <b>CONNECTIVE</b>, you can
     <div class="footer">
   <a href="/docs/overview">Docs</a>
   <hr>
-  <a href="https://github.com/CONNECT-platform/connective" target="_blank">GitHub</a>
+  <a href="javascript:void()" class="gitter">Community</a>
 
   <div id="dmtoggle">
     <div class="arc"></div>
@@ -299,6 +299,17 @@ For more details on how function purity is handled by <b>CONNECTIVE</b>, you can
   </a>
 </div>
 
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'connectv/community',
+    activationElement: '.footer a.gitter',
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+
+
+<div id="gitter-overlay" class="overlay fade">
+</div>
 
     <div id="copy-confirm" class="overlay">
       Copied to Clipboard!
