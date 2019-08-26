@@ -3,7 +3,8 @@
 First of, its so cool of you to contribute to **CONNECTIVE**. We can definitely use more hands on this project,
 and more voices always leads to better results.
 
-Here are guidelines on how to contribute based on what kind of contribution you are thinking of:
+Here are guidelines on how to contribute based on what kind of contribution you are thinking of. Please
+be sure to check out the [code of conduct](CODE_OF_CONDUCT.md) as well.
 
 <br>
 
