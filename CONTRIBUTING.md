@@ -117,6 +117,8 @@ To build the docs from the templates, simply run this:
 This will not just build the docs, but also serve a local instance on `http://localhost:3000`. It will also watch for changes
 to the templates and rebuild.
 
+<br>
+
 ## Current Priorities
 
 These are our current contribution priorities, so if you want to help out, helping with one of these would perhaps be the
