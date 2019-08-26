@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+Describe the bug as precisely as you can. Describe _what_ is the behavior you consider a bug.
 
 **To Reproduce**
 A way to reproduce the behavior. Ideally (in order of ideality):
@@ -17,7 +17,8 @@ A way to reproduce the behavior. Ideally (in order of ideality):
 - A piece of code that highlights the issue
 
 **Expected behavior**
-A clear and concise description of what you expected to happen.
+Describe what do you expect to happen (like what the behavior of the code snippet you provided
+should be). In case you provide a pull-request for a test, you don't need this.
 
 **Additional context**
 Add any other context about the problem here.
