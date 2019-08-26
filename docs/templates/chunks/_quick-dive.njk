@@ -321,9 +321,27 @@ to provided sinks. You can access these input and output pins individually as we
 
 <pre><code class="javascript">let e = evenOdd();
 
-e.in('input');
-e.out('even');
-e.out('odd');</code></pre>
+// --&gt; so basically these are all equivalent:
+
+/*!*/a.to(e.in('input'));
+/*!*/e.out('even').to(sink(v =&gt; console.log('ODD:: ' + v))).subscribe();
+/*!*/e.out('odd').to(sink(v =&gt; console.log('EVEN:: ' + v))).subscribe();
+
+// ... using group:
+
+/*!*/a.to(e.in('input'));
+/*!*/group(e.out('odd'), e.out('even'))
+/*!*/.serialTo(
+/*!*/  sink(v =&gt; console.log('ODD:: ' + v)),
+/*!*/  sink(v =&gt; console.log('EVEN:: ' + v))
+/*!*/).subscribe();
+
+// ... implicit connections:
+
+/*!*/a.to(e).serialTo(
+/*!*/  sink(v =&gt; console.log('ODD:: ' + v)),
+/*!*/  sink(v =&gt; console.log('EVEN:: ' + v))
+/*!*/).subscribe();</code></pre>
 
 <br><br>
 
@@ -368,14 +386,13 @@ Notice how the expr is called for every new value provided by the sources after 
 
 <br><br>
 
-In the example above, we have again used <span code>.serialTo()</span> to directly connect to inputs
+In the example above, we have again used <span code>.serialTo()</span> to implicitly connect to inputs
 of the <span code>expr()</span>, but you could retrieve them individually as well:
 
 <pre><code class="javascript">let e = expr((a, b) => a + b);
 
-e.in(0);  //--> this goes to parameter `a`
-e.in(1);  //--> this goes to parameter `b`
-e.result; //--> this is the result of the expression.</code></pre>
+group(a, b).serialTo(e.in(0), e.in(1));
+e.result.subscribe(console.log);        // --&gt; this is short-hand for `e.out('result')`</code></pre>
 
 <br><br>
 
@@ -443,15 +460,16 @@ import { delay } from 'rxjs/operators';
 let a = source();
 /*!*/let g = gate();
 
+/*!*/group(g.output, control())   // --&gt; when the gate outputs something,
+                             // ... `control()` here ensures one opening of 
+                             // ... the gate before the first output
+.to(pipe(delay(1000)))       // --&gt; wait one second,
+/*!*/.to(g.control);              // --&gt; open the gate
+
 a.to(map(v =&gt; v.split(' '))) // --&gt; get all the words
 .to(spread())                // --&gt; spread them
-/*!*/.to(g.input);                // --&gt; this is shorthand for `g.in('value')`
-
-/*!*/group(g.output, control())   // --&gt; the `control()` causes a signal to be sent before the first output of the gate
-.to(pipe(delay(1000)))       // --&gt; wait one second after each word comes out
-/*!*/.to(g.control);              // --&gt; open the gate again (letting next word through)
-
-/*!*/g.output.subscribe(v =&gt; console.log(v));
+/*!*/.to(g)                       // --&gt; pass it through the gate
+.subscribe(console.log);     // --&gt; log it when it comes out
 
 a.send("Hellow darkness my old friend I've come to talk with you again");</code>
 </pre>
