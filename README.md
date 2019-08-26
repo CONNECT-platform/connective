@@ -63,6 +63,8 @@ wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
   .subscribe();                                // --> bind everything.
 ```
 
+<br>
+
 # How To Install
 
 Using NPM:
@@ -80,14 +82,18 @@ Using a CDN:
 <script src="https://unpkg.com/@connectv/core/dist/bundles/connective.es5.min.js"></script>
 ```
 
+<br>
+
 # How To Use
 
 Check out the [documentation](https://connective.dev).
 
-# Why To Use
+## Why Use This?
 
 **CONNECTIVE** provides a different API on top of **RxJS** that is more suitable for larger and more complex projects.
 You can read more on this [here](https://connective.dev/docs/connective-v-rxjs).
+
+<br>
 
 # How To Contribute
 
