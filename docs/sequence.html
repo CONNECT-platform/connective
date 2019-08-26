@@ -126,9 +126,10 @@ seq.output.to(sink(() =&gt; p.textContent = 'SEQUENCE!'))
   .subscribe(() =&gt; p.textContent = '');</code>
 </pre>
 
-<b>NOTE</b>: this example is written intentionally without use of <span code>.serialTo()</span> so that
-you can see how you can explicitly connect to and from a sequence's input and output pins. Re-writing it
-with <span code>.serialTo()</span> would look like this:
+Note that in this example we have plugged the <span code>sequence()</span> into our flow
+explicitly (by mentioning all of its input and output pins explicitly). However,
+as evident from the first example, <span code>sequence()</span> also supports <br>
+<a href="/docs/agent#implicit-connection">implicit connections</a>:
 
 <pre try="https://stackblitz.com/edit/connective-seq-ex3?file=index.ts">
 <code class="javascript">/*!*/import { group, wrap, sequence, pipe, sink } from '@connectv/core';

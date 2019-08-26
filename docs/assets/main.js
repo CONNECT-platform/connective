@@ -100,8 +100,7 @@ window.addEventListener('load', function() {
     text: function(trigger) {
       showOverlay(copyConfirm, 2000);
       let code = '';
-      let lines = trigger.parentElement.previousElementSibling.childNodes[0].childNodes;
-      console.log(trigger.parentElement.previousElementSibling.childNodes[0]);
+      let lines = trigger.parentElement.previousElementSibling.querySelector('code').childNodes;
       for (var i = 0; i < lines.length; i++)
         code += lines[i].textContent + '\n';
 

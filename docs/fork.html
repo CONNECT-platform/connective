@@ -91,7 +91,7 @@ What happens is:
 using <span code>join()</span>:
 
 <pre try="https://stackblitz.com/edit/connective-fj-ex2">
-  <code class="javascript">/*!*/import { source, map, fork, join } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, map, fork, join, group } from '@connectv/core';
 
 
 let loginReq = source();                              //--&gt; emulates incoming requests
@@ -104,12 +104,10 @@ let authenticate = map((user, done) =&gt; {              //--&gt; check if user 
 
 loginReq
 /*!*/.to(fork())                                           //--&gt; stamp the request
-.to(generateToken, authenticate);                     //--&gt; so check auth and generate token in parallel
-
-/*!*/let j = join('token', 'auth');                        //--&gt; join() is an agent
-/*!*/generateToken.to(j.in('token'));                      //--&gt; generateToken goes to 'token' field
-/*!*/authenticate.to(j.in('auth'));                        //--&gt; authenticate goes to 'auth' field
-/*!*/j.output.subscribe(console.log);
+.to(generateToken, authenticate)                      //--&gt; so check auth and generate token in parallel
+/*!*/.serialTo(join('token', 'auth'))                      //--&gt; join the results in an object 
+                                                      //... with 'token' and 'auth' keys respectively
+.subscribe(console.log);                              //--&gt; log it
 
 loginReq.send('john');                                //--&gt; first john sends a login request
 loginReq.send('jack');                                //--&gt; then jack does</code>
@@ -125,7 +123,12 @@ Now the result becomes:
 Note that while <span code>fork()</span> is a <a href="/docs/pin">pin</a>, <span code>join()</span>
 is an <a href="/docs/agent">agent</a>. Unlike <a href="/docs/control"><span code>control()</span></a>
 or <a href="/docs/pack"><span code>pack()</span></a>, it will generate an object with given fields,
-and will have one input pin for each of those fields.
+and will have one input pin for each of those fields, named respectively. So if you wanted to connect
+to the inputs and outputs of the <span code>join()</span> explicitly, it would look like this:
+
+<pre><code class="javascript">let j = join('token', 'auth');
+group(generateToken, authenticate).serialTo(j.in('token'), j.in('auth'));
+j.output.subscribe(console.log); //--&gt; this is short-hand for `j.out('output')`</code></pre>
 
 <br><br>
 

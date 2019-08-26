@@ -9,7 +9,7 @@
 it receives on its <span code>.control</span>:
 
 <pre try="https://stackblitz.com/edit/connective-gate-ex1">
-  <code class="javascript">/*!*/import { wrap, pipe, gate, map, pin } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, pipe, gate, map, pin, sink } from '@connectv/core';
 import { fromEvent} from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -21,48 +21,50 @@ let p2 = document.getElementById('p2');
 /*!*/let g = gate();
 let p = pin();
 
+/*!*/wrap(fromEvent(btn, 'click')).to(g.control);         //--&gt; open gate when button is clicked
+
 wrap(fromEvent(a, 'input'))                          //--&gt; when input comes in
   .to(map(() =&gt; a.value))                            //--&gt; map it to input's value
   .to(pipe(debounceTime(1000)))                      //--&gt; wait for typing to finish
-/*!*/  .to(g.input, p);                                   //--&gt; pass it to the gate and some pin
-
-/*!*/wrap(fromEvent(btn, 'click')).to(g.control);         //--&gt; open gate when button is clicked
-
-p.subscribe(v =&gt; p1.innerHTML += v + '&lt;br&gt;');        //--&gt; display what the pin receives
-/*!*/g.output.subscribe(v =&gt; p2.innerHTML += v + '&lt;br&gt;'); //--&gt; display what the gate lets through</code>
+/*!*/  .to(g, p)                                          //--&gt; pass it to the gate and some pin
+  .serialTo(
+    sink(v =&gt; p2.innerHTML += v + '&lt;br&gt;'),           //--&gt; display what the gate lets through
+    sink(v =&gt; p1.innerHTML += v + '&lt;br&gt;')            //--&gt; display what the pin receives
+  )
+  .subscribe();</code>
 </pre>
 
 <span code>gate()</span> will either pass on each received value or drop it based on the boolean value
 it receives on <span code>.control</span>:
 
 <pre try="https://stackblitz.com/edit/connective-gate-ex2">
-  <code class="javascript">/*!*/import { wrap, pipe, gate, map } from '@connectv/core';
+  <code class="javascript">/*!*/import { wrap, pipe, gate, map, sink } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 let a = document.getElementById('a') as HTMLInputElement;
 let p = document.getElementById('p');
 
-let validator = map(v =&gt; v.startsWith('q'));
+/*!*/let validator = map(v =&gt; v.startsWith('q'));
 /*!*/let g = gate();
-
-wrap(fromEvent(a, 'input'))
-  .to(map(() =&gt; a.value))
-  .to(pipe(debounceTime(1000)))
-/*!*/  .to(g.input, validator);       //--&gt; each value goes to the gate and the validator
 
 /*!*/validator.to(g.control);         //--&gt; if the validator sends `true`, the gate will
 /*!*/                                 //... let the value pass. otherwise, it will
 /*!*/                                 //... drop the value.
 
-/*!*/g.output.subscribe(v =&gt; p.innerHTML += v + '&lt;br&gt;');</code>
+wrap(fromEvent(a, 'input'))
+  .to(map(() =&gt; a.value))
+  .to(pipe(debounceTime(1000)))
+/*!*/  .to(g, validator)              //--&gt; each value goes to the gate and the validator
+  .serialTo(sink(v =&gt; p.innerHTML += v + '&lt;br&gt;'))
+  .subscribe();</code>
 </pre>
 
 When multiple sources are connected to a <span code>gate</span>'s control, it will only pass values for which
 all sources emit <span code>true</span>, and drop the rest:
 
 <pre try="https://stackblitz.com/edit/connective-gate-ex3">
-  <code class="javascript">import { wrap, pipe, gate, map } from '@connectv/core';
+  <code class="javascript">import { wrap, pipe, gate, map, sink } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -71,18 +73,18 @@ let p = document.getElementById('p');
 
 let validator1 = map(v =&gt; v.startsWith('q'));
 let validator2 = map(v =&gt; v.length &gt; 5);
-/*!*/let g = gate();
-
-wrap(fromEvent(a, 'input'))
-  .to(map(() =&gt; a.value))
-  .to(pipe(debounceTime(1000)))
-  .to(g.input, validator1, validator2);
+let g = gate();
 
 /*!*/validator1.to(g.control);               //--&gt; only values will be passed
 /*!*/validator2.to(g.control);               //... that both validators send `true` for,
 /*!*/                                        //... the rest will be dropped.
 
-g.output.subscribe(v =&gt; p.innerHTML += v + '&lt;br&gt;');</code>
+wrap(fromEvent(a, 'input'))
+  .to(map(() =&gt; a.value))
+  .to(pipe(debounceTime(1000)))
+/*!*/  .to(g, validator1, validator2)
+  .serialTo(sink(v =&gt; p.innerHTML += v + '&lt;br&gt;'))
+  .subscribe();</code>
 </pre>
 
 <h2 id="signature">Signature</h2>

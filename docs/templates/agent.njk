@@ -68,8 +68,9 @@ let p = document.getElementById('p');
 </pre>
 
 <b>NOTICE</b>: This is just an example of how you could define custom agents and it is <b>NOT</b> the recommended method.
-The recommended way of creating your custom agents is using the <a href="/docs/composition"><span code>Composition</span></a>
-class, as it also takes care of a lot of boilerplate stuff related to custom agents such as memory management.
+The recommended way of creating your custom agents is using 
+<a href="/docs/composition"><span code>composition()</span></a>
+as it also takes care of a lot of boilerplate stuff related to custom agents such as memory management.
 
 <br><br>
 
@@ -123,6 +124,88 @@ when certain criteria is met, or signal it to reset its internal state.
 <br><br>
 
 Note that <span code>.control</span> is not mentioned in an agent's signature.
+
+<br><br>
+
+<h2 id="implicit-connection">Implicit connection</h2>
+
+Take another look at how we used the agent defined in the first example:
+
+<pre><code class="javascript">let m = new Multi();
+
+wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value)).to(m.in('n'));
+wrap(fromEvent(k, 'input')).to(map(() =&gt; k.value)).to(m.in('k'));
+m.out('o').subscribe(v =&gt; p.innerHTML = v);</code></pre>
+
+Because we needed to connect different input and output pins of our agent to different
+parts of our reactive flow, we had to store it in a variable <span code>m</span>,
+and then connect each pin to the flow in a separate statement.
+
+<br><br>
+
+This method of injecting an agent into a reactive flow can be cumbersome and lead to clutter,
+specifically when you have large flows with multiple agents. To resolve the issue,
+an agent can support <i>implicit connection</i>, which looks like this:
+
+<pre><code class="javascript">group(
+  wrap(fromEvent(n, 'input')).to(map(() =&gt; n.value)),
+  wrap(fromEvent(k, 'input')).to(map(() =&gt; k.value))
+).serialTo(new Multi()).subscribe(v =&gt; p.innerHTML = v);</code></pre>
+
+This is an <i>implicit connection</i>, because we have not explicitly mentioned which inputs
+of <span code>new Multi()</span> we want to serially connect to with this code:
+
+<pre><code class="javascript">group(...).serialTo(new Multi())</code></pre>
+
+similarly we are not explicitly mentioning which outputs we want to connect from (or in this case,
+subscribe to) with this:
+
+<pre><code class="javascript">...serialTo(new Multi()).subscribe(...)</code></pre>
+
+For this to work, our agent would need to specify which inputs and outputs are to be considered
+when doing implicit connection (and in which order):
+
+<pre try="https://stackblitz.com/edit/connective-agent-ex2?file=multi.ts">
+<code class="javascript">import { Agent, sink, map, block } from '@connectv/core';
+
+export class Multi extends Agent {
+  private k = 1;
+
+  constructor() {
+    super({
+      inputs: ['n', 'k'],
+      outputs: ['o']
+    });
+
+    this.in('n').to(map(n => n * this.k)).to(this.out('o'));
+    this.in('k').to(sink(k => this.k = k)).to(block()).to(this.out('o'));
+  }
+
+/*!*/  createEntries() { return [this.in('n'), this.in('k')]; } //--&gt; use n & k for implicit connection
+/*!*/  createExits() { return [this.out('o')]; }                //--&gt; use o for implicit connection
+}</code>
+</pre>
+
+which in turn would allow us to simplify how we re-use this agent with implicit connection:
+
+<pre try="https://stackblitz.com/edit/connective-agent-ex2?file=index.ts">
+<code class="javascript">import { wrap, map, group } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { Multi } from './multi';
+
+let n = document.getElementById('n') as HTMLInputElement;
+let k = document.getElementById('k') as HTMLInputElement;
+let p = document.getElementById('p');
+
+/*!*/group(
+/*!*/  wrap(fromEvent(n, 'input')).to(map(() => n.value)),
+/*!*/  wrap(fromEvent(k, 'input')).to(map(() => k.value))
+/*!*/).serialTo(new Multi()).subscribe(v => p.innerHTML = v);</code>
+</pre>
+
+Almost all default agents in <b>CONNECTIVE</b> support implicit connection,
+including custom agents created by <a href="/docs/composition"><span code>composition()</span></a>,
+<a href="/docs/expr"><span code>expr()</span></a>, or <a href="/docs/node"><span code>node()</span></a>.
 
 <br><br>
 

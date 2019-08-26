@@ -95,6 +95,26 @@ let c = pin();
 /*!*/group(b, c).from(a); //--&gt; a is connected to b and c.</code>
 </pre>
 
+You can also use <span code>.serialTo()</span> and <span code>.serialFrom()</span>
+to connect groups of pins to each other serially:
+
+<pre>
+<code class="javascript">import { pin, group } from '@connectv/core';
+
+let a = pin(), b = pin(), c = pin(), d = pin();
+
+// a -> c
+// b -> d
+/*!*/group(a, b).serialTo(c, d);</code>
+</pre>
+
+<span code>.serialTo()</span> and <span code>.serialFrom()</span> also return a
+group consisting of pins passed to them, similar to <span code>.to()</span> and <span code>.from()</span>:
+
+<pre>
+<code class="javascript">group(a, b).serialTo(c, d).to(e);</code>
+</pre>
+
 <br><br>
 
 <h2 id="subscribing-and-binding">Subscribing and binding</h2>

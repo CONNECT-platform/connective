@@ -46,12 +46,12 @@ By default, if an error is thrown somewhere in a reactive flow, the whole flow o
 <span code>handleError()</span> allows you to catch errors and handle them gracefully:
 
 <pre try="https://stackblitz.com/edit/connective-he-ex1">
-  <code class="javascript">/*!*/import { source, map, handleError } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, map, handleError, sink } from '@connectv/core';
 
 let a = source();
 
 //
-//--&gt;this flow does not have error handling, so it will die
+//--&gt; this flow does not have error handling, so it will die
 //--&gt; out after an error occurs..
 //
 a.to(map(x =&gt; {
@@ -63,12 +63,13 @@ a.to(map(x =&gt; {
 //--&gt; this flow has error handling, so it will continue after
 //--&gt; an error occurs.
 //
-/*!*/let h = handleError();
 a.to(map(x =&gt; {
-  if (x == 2) throw new Error();
+/*!*/  if (x == 2) throw new Error();
   else return x;
-/*!*/})).to(h.input);
-/*!*/h.output.subscribe(v =&gt; console.log('B:: ' + v));
+}))
+/*!*/.to(handleError())
+.serialTo(sink(v =&gt; console.log('B:: ' + v)))
+.subscribe();
 
 a.send(1);  //--&gt; logged by both
 a.send(2);  //--&gt; ignored by both
@@ -77,28 +78,42 @@ a.send(3);  //--&gt; logged by 'B:: ' only, since 'A:: ' flow is dead.</code>
 
 <h2 id="catch">Catching errors</h2>
 
-You can access thrown errors using <span code>.error</span> (or <span code>.out("error")</span>):
+Accessing the thrown error object with <a href="/docs/agent#implicit-connection">implicit connection</a>
+looks like this:
 
 <pre try="https://stackblitz.com/edit/connective-he-ex2">
-  <code class="javascript">/*!*/import { source, map, group, handleError } from '@connectv/core';
+  <code class="javascript">/*!*/import { source, map, group, handleError, pin } from '@connectv/core';
 
 let a = source();
-/*!*/let h = handleError();
+
 a.to(map(x =&gt; {
   if (x == 2) throw new Error();
   else return x;
-})).to(h.input);
-
-group(
-  h.output,                                         //--&gt; the usual output
-/*!*/  h.error                                           //--&gt; the error output,
-/*!*/    .to(map(e =&gt; `error for  ${e.emission.value}`)) //... lets make it presentable
+}))
+/*!*/.to(handleError())
+/*!*/.serialTo(
+/*!*/  pin(),                                     //--&gt; the usual output
+/*!*/  map(e =&gt; `error for  ${e.emission.value}`) //--&gt; the error output
 ).subscribe(console.log);
 
 a.send(1);
 a.send(2);
 a.send(3);</code>
 </pre>
+
+You could have also accessed it explicitly via its <span code>.out("error")</span> output
+(or using <span code>.error</span> shortcut property):
+
+<pre><code class="javascript">/*!*/let h = handleError();
+
+...
+
+/*!*/h.error
+  .to(map(e =&gt; `error for ${e.emission.value}`))
+  .subscribe(console.log);</code>
+</pre>
+
+<br><br>
 
 <h2 id="signature">Signature</h2>
 

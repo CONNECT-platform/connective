@@ -69,6 +69,23 @@ wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
 /*!*/s.output.subscribe(v =&gt; p.innerHTML += '&gt; state change: ' + v + '&lt;br&gt;');</code>
 </pre>
 
+<span code>state()</span>s support implicit connection, so you could shorten the code above like this:
+
+<pre try="https://stackblitz.com/edit/connective-st-ex1b">
+<code class="javascript">import { wrap, map, state, pipe } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+let a = document.getElementById('a') as HTMLInputElement;
+let p = document.getElementById('p');
+
+wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
+  .to(map(() =&gt; a.value))        //--&gt; map it to the input value
+  .to(pipe(debounceTime(1000)))  //--&gt; wait for the typing to finish
+  .to(state())                  //--&gt; set the state
+  .subscribe(v =&gt; p.innerHTML += '&gt; state change: ' + v + '&lt;br&gt;');</code>
+</pre>
+
 <h2 id="late-sub">Late subscription</h2>
 
 <span code>state()</span> emits its value to late subscribers as well:
@@ -83,14 +100,13 @@ let btn = document.getElementById('btn');
 let p = document.getElementById('p');
 let p2 = document.getElementById('p2');
 
-/*!*/let s = state();
+let s = state();
 
 wrap(fromEvent(a, 'input'))      //--&gt; when something is typed
   .to(map(() =&gt; a.value))        //--&gt; map it to the input value
   .to(pipe(debounceTime(1000)))  //--&gt; wait for the typing to finish
-  .to(s.input);                  //--&gt; set the state
-
-s.output.subscribe(v =&gt; p.innerHTML = 'state: ' + v);
+  .to(s)                         //--&gt; set the state
+  .subscribe(v =&gt; p.innerHTML = 'state: ' + v);
 
 /*!*/wrap(fromEvent(btn, 'click'))
 /*!*/  .subscribe(() =&gt; {
@@ -99,7 +115,7 @@ s.output.subscribe(v =&gt; p.innerHTML = 'state: ' + v);
 /*!*/    // the latest value was emitted to it, but still
 /*!*/    // receives the latest value:
 /*!*/    //
-/*!*/    s.output.subscribe(v =&gt; p2.innerHTML = 'received: ' + v).unsubscribe();
+/*!*/    s.subscribe(v =&gt; p2.innerHTML = 'received: ' + v).unsubscribe();
 /*!*/  });</code>
 </pre>
 
@@ -114,14 +130,11 @@ import { fromEvent } from 'rxjs';
 let i = document.getElementById('i') as HTMLInputElement;
 let p = document.getElementById('p');
 
-let s = state(42);   //--&gt; so lets start with 42
-
 wrap(fromEvent(i, 'input'))
   .to(map(() =&gt; i.value))
   .to(map(x =&gt; x * 2))
-  .to(s.input);
-
-s.output.subscribe(v =&gt; p.innerHTML = v);</code>
+/*!*/  .to(state(42))             //--&gt; so lets start with 42
+  .subscribe(v =&gt; p.innerHTML = v);</code>
 </pre>
 
 <h2 id="change-detection">Change detection</h2>
@@ -133,10 +146,8 @@ s.output.subscribe(v =&gt; p.innerHTML = v);</code>
   <code class="javascript">import { source, state } from '@connectv/core';
 
 let a = source();
-/*!*/let s = state();
 
-a.to(s.input);
-s.output.subscribe(console.log);
+a.to(state()).subscribe(console.log);
 
 /*!*/a.send([1, 2, 3]);
 /*!*/a.send([1, 2, 3]);    //--&gt; this one does not get logged
@@ -149,10 +160,9 @@ You can change this behavior by providing a custom equality function:
   <code class="javascript">import { source, state } from '@connectv/core';
 
 let a = source();
-/*!*/let s = state((x, y) =&gt; x == y);  //--&gt; provide custom equality check
 
-a.to(s.input);
-s.output.subscribe(console.log);
+/*!*/a.to(state((x, y) =&gt; x == y)) //--&gt; provide custom equality check
+  .subscribe(console.log);
 
 /*!*/a.send([1, 2, 3]);
 /*!*/a.send([1, 2, 3]);                //--&gt; this is logged too

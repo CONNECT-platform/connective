@@ -163,7 +163,20 @@ group(d, e).from(b, c).from(a);
 //
 // or even loop back if you need to:
 //
-a.to(b).to(c).to(b).to(d).to(e);</code>
+a.to(b).to(c).to(b).to(d).to(e);
+
+//
+// or connect stuff serially, which means
+// a is connected to c,
+// b is connected to d,
+// c and d are connected to e
+//
+group(a, b).serialTo(c, d).to(e);
+
+//
+// the same thing in reverse
+//
+e.from(c, d).serialFrom(a, b);</code>
 </pre>
 
 When you are done declaring your flow(s), you should then bind the pins (for example using <span code>.bind()</span> on sinks,
@@ -199,53 +212,65 @@ and then emitting some other events/data/messages.
 
 <br><br>
 
-The main way to define your own custom agent is the <a href="/docs/composition">Composition</a> class. It is called
-<i>Composition</i> as it directly represents a part of a reactive flow (while other agents might not even utilize reactive
-flows in their description):
+The main way to define your own custom agent is <a href="/docs/composition"><span code>composition()</span></a>. 
+It is called <i>composition</i> as it directly represents a part of a reactive flow (while other agents might not even
+utilize reactive flows in their description):
 
 <pre try="https://stackblitz.com/edit/connective-cheat-13">
-<code class="javascript">/*!*/import { Composition, source, filter } from '@connectv/core';
+<code class="javascript">/*!*/import { composition, source, pin, filter, sink } from '@connectv/core';
 
-/*!*/class EvenOdd extends Composition {
-  constructor() {
-    super({
-/*!*/      inputs: ['a'],            // --&gt; marks pins that go into the flow
-/*!*/      outputs: ['even', 'odd']  // --&gt; marks pins that go out of the flow
-    });
-  }
-
-/*!*/  build() {
-/*!*/    //
-/*!*/    // build all the elements of the flow
-/*!*/    //
-/*!*/    this.add('oddFilter', filter(x =&gt; x % 2 == 1));
-/*!*/    this.add('evenFilter', filter(x =&gt; x % 2 == 0));
-/*!*/  }
-
-/*!*/  wire() {
-/*!*/    //
-/*!*/    // wire the flow together
-/*!*/    //
-/*!*/    this.in('a').to(this.pin('oddFilter')).to(this.out('odd'));
-/*!*/    this.in('a').to(this.pin('evenFilter')).to(this.out('even'));
-/*!*/  }
-}
+/*!*/const evenOdd = composition(() =&gt; {              // --&gt; define the composition ...
+/*!*/  let input = pin();                             // ... define the pins that go in
+/*!*/  let odd = input.to(filter(x => x % 2 == 1));   // ... and the two pins that go out
+/*!*/  let even = input.to(filter(x => x % 2 == 0));
+/*!*/
+/*!*/  return [{ input }, { odd, even }];             // --&gt; return the input and output pins
+/*!*/});
 
 //
 // now using the composition:
 //
 
 let a = source();
-let eo = new EvenOdd();
-
-a.to(eo.in('a'));
-eo.out('even').subscribe(v =&gt; console.log('EVEN:: ' + v));
-eo.out('odd').subscribe(v =&gt; console.log('ODD:: ' + v));
+/*!*/a.to(evenOdd()).serialTo(
+  sink(v =&gt; console.log('ODD:: ' + v)),
+  sink(v =&gt; console.log('EVEN:: ' + v))
+).subscribe();
 
 a.send(2);
 a.send(3);
 a.send(4);</code>
 </pre>
+
+Notice how the composition is used:
+
+<pre><code class="javascript">a.to(evenOdd()).serialTo(...)</code></pre>
+
+When you connect something <i>to</i> an agent or composition, basically you
+are connecting it to all of its inputs, and when you connect an agent or composition
+to something, you are basically connecting all of its outputs. So this snippet
+simply means that <span code>a</span> is connected to all of the <span code>evenOdd()</span>'s
+inputs, and its outputs are serially connected to what is provided to <span code>.serialTo()</span>.
+
+<br><br>
+
+Alternatively, you could access inputs and outputs of a composition explicitly:
+
+<pre><code class="javascript">// this code does the same thing
+let e = evenOdd();
+a.to(e.in('input'));
+group(e.out('odd'), e.out('even')).serialTo(
+  sink(v =&gt; console.log('ODD:: ' + v)),
+  sink(v =&gt; console.log('EVEN:: ' + v))
+).subscribe();</code></pre>
+
+<pre><code class="javascript">// this does the same thing too
+let e = evenOdd();
+a.to(e.in('input'));
+e.out('odd').to(sink(v =&gt; console.log('ODD:: ' + v))).subscribe();
+e.out('even').to(sink(v =&gt; console.log('EVEN:: ' + v))).subscribe();</code></pre>
+
+<br><br>
 
 Besides full-fledged compositions, you can also utilize <a href="/docs/expr"><span code>expr()</span></a>
 to turn simpler functions into agents or <a href="/docs/node"><span code>node()</span></a> to turn much
