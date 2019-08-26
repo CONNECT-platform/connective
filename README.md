@@ -35,7 +35,9 @@ wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
 Example ([Stackblitz](https://stackblitz.com/edit/connective-delayed-broadcast)):
 
 ```typescript
-import { wrap, gate, control, map, pin, pipe, group, spread, sink  } from '@connectv/core';
+import './style.css';
+
+import { wrap, gate, control, map, pin, pipe, group, spread, sink } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 import { delay, debounceTime } from 'rxjs/operators';
 
@@ -44,18 +46,16 @@ let p = document.getElementById('p');
 
 let g = gate();                       // --> gate helps us control the flow of the words
 
-wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
-  .to(pipe(debounceTime(2000)))       // --> debounce for 2 seconds so people are done typing
-  .to(map(() => a.value.split(' ')))  // --> map the event to value of input, splitted
-  .to(spread())                       // --> spread the array to multiple emissions
-  .to(g.input);                       // --> pass those emissions to the gate
-
-group(control(), g.output)            // --> open the gate every time it outputs something (also initially)
+group(control(), g.output)            // --> open the gate every time it outputs something (also once initially)
   .to(pin())                          // --> this relays either gate output or initial `control()` emit
   .to(pipe(delay(500)))               // --> but wait 500ms before opening the gate
   .to(g.control);                     // --> controls when the gate opens up.
 
-g.output
+wrap(fromEvent(a, 'input'))           // --> wrap the `Observable` in a `Pin`
+  .to(pipe(debounceTime(2000)))       // --> debounce for 2 seconds so people are done typing
+  .to(map(() => a.value.split(' ')))  // --> map the event to value of input, splitted
+  .to(spread())                       // --> spread the array to multiple emissions
+  .to(g)                              // --> pass those emissions to the gate
   .to(sink(() => p.classList.add('faded')))    // --> fade the <p> when something comes out of the gate.
   .to(pipe(delay(100)))                        // --> wait 100 ms
   .to(sink(v => p.innerHTML = v))              // --> write the new word
@@ -84,17 +84,11 @@ Using a CDN:
 
 Check out the [documentation](https://connective.dev).
 
+# Why To Use
+
+**CONNECTIVE** provides a different API on top of **RxJS** that is more suitable for larger and more complex projects.
+You can read more on this [here](https://connective.dev/docs/connective-v-rxjs).
+
 # How To Contribute
 
-At current super-early stage of **CONNECTIVE**'s life, one of the best contributions is to simply give feedback on it.
-Read the docs, use the library, and drop any feedbacks through one of [these channels](https://connective.dev#contact).
-
-
-The guideline for technical contribution is being drafted. In the mean-while, clone the code, test it, and read it
-to get a better idea of how the code-base works. Do not hesitate to ask any questions that might arise for you.
-
-## Testing
-
-```
-npm test
-```
+Check out the [contribution guide](CONTRIBUTING.md). Also check out the [code of conduct](CODE_OF_CONDUCT.md).
