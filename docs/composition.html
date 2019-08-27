@@ -42,232 +42,178 @@
 
 <h1 id="">Composition</h1>
 
-A <span code>Composition</span> is the main class for writing your own custom <a href="/docs/agent">agents</a>:
+A <span code>composition()</span> allows you to write your own custom <a href="/docs/agent">agents</a>:
 
 <pre try="https://stackblitz.com/edit/connective-comp-ex1?file=click-counter.ts">
-  <code class="javascript">/*!*/import { Composition, value, map, pipe, filter,
-        state, State, expr, Expr } from '@connectv/core';
+  <code class="javascript">/*!*/import { composition, pin, map, pipe, state, check, expr, sampler } from '@connectv/core';
 import { debounceTime, delay } from 'rxjs/operators';
 
 //
-//--&gt; this composition counts subsequent clicks
+// --&gt; this composition will count consecutive clicks and also determine
+// --&gt; if it was a single or multi click
 //
-/*!*/export class ClickCounter extends Composition {
-  count: State;   //--&gt; this state holds the count
-  incr: Expr;     //--&gt; this expr increases the count
-  multi: Expr;    //--&gt; this expr determines whether it was a single or multi click
+/*!*/export const clickCounter = composition(track =&gt; {
+/*!*/  let click = pin(), reset = pin();                  //--&gt; inputs
+/*!*/  let out = pin(), single = pin(), multi = pin();    //--&gt; outputs
 
-  constructor() {
-/*!*/    super({
-/*!*/      inputs: [
-/*!*/        'click',  //--&gt; receives click events on this input
-/*!*/        'reset'   //--&gt; receives 'reset' commands on this input
-/*!*/      ],
-/*!*/      outputs: [
-/*!*/        'count',  //--&gt; this emits the number of subsequent clicks
-/*!*/        'single', //--&gt; this emits when it was a single click
-/*!*/        'multi'   //--&gt; this emits when it was a multi click
-/*!*/      ]
-/*!*/    });
-  }
+  let count = state(0); //--&gt; a state for click count
+/*!*/  track(count);         //--&gt; track it so its cleared later on      
 
-/*!*/  build() {
-    this.count = this.add(state(0)) as State;        //--&gt; initialize the state and add it to comp's children
-    this.incr = this.add(expr(c =&gt; c + 1)) as Expr;  //--&gt; same with increment expr
-    this.multi = this.add(expr(c =&gt; c &gt; 1)) as Expr; //--&gt; same with multi-click-check expr
-  }
+  let incr = expr(x =&gt; x + 1); //--&gt; this increases the count
+  let docheck = sampler();     //--&gt; this determines when should the
+                               //... "single v multi" check happen
 
-/*!*/  wire() {
-    this.count.output.to(                            //--&gt; the counter's value goes to...
-      this.incr.in(0),                               //... the incrementer (so it can increment)
-      this.out('count'),                             //... the 'count' output (so people can know the count)
-      this.multi.in(0)                               //... the multi-checker (so it can check)
+  click.to(incr.control);      //--&gt; increase only when a click happens
+
+  count.to(incr).to(count)     //--&gt; increase the count and store it
+        .to(out, docheck);     //--&gt; also send the result to output `out`
+                               //... and the "single v multi" check sampler
+                               
+  reset.to(map(() =&gt; 0)).to(count); //--&gt; set the count to 0 in case of reset
+
+  //
+  // --&gt; when the sampler allows the click-count through,
+  // ... check if the count is bigger than one,
+  // ... if so, send it to the `multi` output,
+  // ... if not, send it to the `single` output.
+  //
+  docheck.to(check(x =&gt; x &gt; 1))
+    .serialTo(multi, single);
+
+  //
+  // --&gt; 200ms after a click without another click,
+  // ... commence the "single v multi" check (signal `docheck.control`)
+  // ... also reset the counter (with a 1 ms delay)
+  //
+  click.to(pipe(debounceTime(200)))
+    .to(
+      docheck.control,
+      reset.from(pipe(delay(1)))
     );
 
-    this.incr.result.to(this.count.input);           //--&gt; wire back incremented value to the counter
-    this.in('click').to(this.incr.control);          //--&gt; but only increment when a click event is received
-
-    this.in('reset').to(map(() =&gt; 0)).to(this.count.input); //--&gt; when reset signal received, set the counter to 0
-
-    this.in('click').to(pipe(debounceTime(200))).to(  //--&gt; after 200ms without new clicks ...
-      this.in('reset').from(pipe(delay(1))),          //... send a reset signal (with a delay, so multi finishes first)
-      this.multi.control                              //... and signal mutli to assess if it was a multi-click
-    );
-
-    this.multi.result.to(filter(multi =&gt; !multi)).to(this.out('single')); //--&gt; if multi says no, its single
-    this.multi.result.to(filter(multi =&gt; multi)).to(this.out('multi'));   //--&gt; if multi says yes, its multi
-  }
-}</code>
+/*!*/  return [{ click, reset }, { out, single, multi }]; //--&gt; return the inputs and the outputs
+});</code>
 </pre>
 
 Which you can subsequently re-use in other flows:
 
 <pre try="https://stackblitz.com/edit/connective-comp-ex1?file=index.ts">
-  <code class="javascript">import { wrap } from '@connectv/core';
+  <code class="javascript">import { wrap, map, filter } from '@connectv/core';
 import { fromEvent } from 'rxjs';
 
-/*!*/import { ClickCounter } from './click-counter';
+/*!*/import { clickCounter } from './click-counter';
 
 let p = document.getElementById('p');
 
-/*!*/let counter = new ClickCounter();
-
-/*!*/wrap(fromEvent(document, 'click')).to(counter.in('click'));
-/*!*/counter.out('count').subscribe(v =&gt; { if (v) p.innerHTML = v });
-/*!*/counter.out('multi').subscribe(() =&gt; p.innerHTML = 'MULTI CLICK!');
-/*!*/counter.out('single').subscribe(() =&gt; p.innerHTML = 'single click');</code>
+wrap(fromEvent(document, 'click'))    //--> get the click event
+/*!*/.serialTo(clickCounter())             //--> send it to click-counter
+.serialTo(
+  filter(x => x > 0),                 //--> the `out` output goes here
+  map(() => 'single click'),          //--> the `single` output goes here
+  map(() => 'MULTI CLICK!')           //--> the `multi` output goes here
+)
+.subscribe(v => p.innerHTML = v);</code>
 </pre>
 
-<h2 id="build">Build</h2>
+<h2 id="anatomy">Anatomy</h2>
 
-The <span code>Composition</span> class comes with a <span code>.build()</span> method which will be
-called upon construction. You should define the recurring elements of your composition's flow in build:
+So each <span code>composition()</span> has the following form:
 
-<pre><code class="javascript">  build() {
-    this.count = this.add(state(0)) as State;        //--&gt; initialize the state and add it to comp's children
-    this.incr = this.add(expr(c =&gt; c + 1)) as Expr;  //--&gt; same with increment expr
-    this.multi = this.add(expr(c =&gt; c > 1)) as Expr; //--&gt; same with multi-click-check expr
-  }</code></pre>
+<pre><code class="javascript">import { composition, pin } from '@connectv/core';
 
-The <span code>.add()</span> method allows you to add child <a href="/docs/pin">pins</a> and <a href="/docs/agent">agents</a>
-to your composition. You can either give each child a name:
+let C = composition(track =&gt; {
+  let inputPinA = pin(), inputPinB = pin(), ...   //--&gt; define input pins
+  let outputPinA = pin(), outputPinB = pin(), ... //--&gt; define output pins
 
-<pre><code class="javsacript">this.add('count', state(0));</code></pre>
+  // connect everything to each other
 
-or just add them without a name (e.g. for when you want to keep a more restrictly typed reference to them):
+  return [
+    { inputPinA, inputPinB, ... },    //--&gt; return input pins
+    { outputPinA, outputPinB, ... }   //--&gt; return output pins
+  ]
+});</code></pre>
 
-<pre><code class="javascript">this.count = this.add(state(0)) as State;</code></pre>
-
-<br><br>
-
-<h2 id="wire">Wire</h2>
-
-After <span code>.build()</span>, the method <span code>.wire()</span> method will be invoked. You should wire your
-composition's flow in this method:
-
-<pre><code class="javascript">  wire() {
-    this.count.output.to(                            //--&gt; the counter's value goes to...
-      this.incr.in(0),                               //... the incrementer (so it can increment)
-      this.out('count'),                             //... the 'count' output (so people can know the count)
-      this.multi.in(0)                               //... the multi-checker (so it can check)
-    );
-
-    this.incr.result.to(this.count.input);           //--&gt; wire back incremented value to the counter
-    this.in('click').to(this.incr.control);          //--&gt; but only increment when a click event is received
-
-    this.in('reset').to(map(() =&gt; 0)).to(this.count.input); //--&gt; when reset signal received, set the counter to 0
-
-    this.in('click').to(pipe(debounceTime(200))).to(  //--&gt; after 200ms without new clicks ...
-      this.in('reset').from(pipe(delay(1))),          //... send a reset signal (with a delay, so multi finishes first)
-      this.multi.control                              //... and signal mutli to assess if it was a multi-click
-    );
-
-    this.multi.result.to(filter(multi =&gt; !multi)).to(this.out('single')); //--&gt; if multi says no, its single
-    this.multi.result.to(filter(multi =&gt; multi)).to(this.out('multi'));   //--&gt; if multi says yes, its multi
-  }</code></pre>
-
-Here, you can reference the pins you defined in <span code>.build()</span> using the <span code>.pin()</span> method:
-
-<pre><code class="javascript">this.pin('name').to(whatever);</code></pre>
-
-Similarly, you could reference named child agents using <span code>.agent()</span> method:
-
-<pre><code class="javascript">  build() {
-    // ...
-    this.add('counter', state());
-    this.add('incr', expr(c => c + 1));
-    //...
-  }
-
-  wire() {
-    // ...
-    this.agent('counter').out('value').to(this.agent('incr').in(0));
-    // ...
-  }</code></pre>
-
-As with any other agent, you can reference input and output pins using <span code>.in()</span> and <span code>.out()</span>
-methods:
-
-<pre><code class="javascript">    this.in('click').to(this.incr.control);
-    // ...
-    this.multi.result.to(filter(multi =&gt; !multi)).to(this.out('single'));</code></pre>
+Essentially, this is the simplest form of describing any partial reactive flow, i.e.
+a set of input pins, a set of output pins, and how they are connected to each other.
 
 <br><br>
 
-<h2 id="parametric">Parametric compositions</h2>
+You would re-use this partial flow in other reactive flows simply like this:
 
-Because <span code>.build()</span> and <span code>.wire()</span> are called by the parent class's constructor,
-during their normal execution properties of the child class are not yet initialized. This is problematic for
-parametric compositions who would receive some parameter in the constructor of the child class, but would also
-need to use them in <span code>.build()</span> and <span code>.wire()</span>.
+<pre><code class="javascript">somePins
+/*!*/.serialTo(C())
+.serialTo(someOtherPinA, someOtherPinB, ...)</code></pre>
 
-<br><br>
-
-To overcome this, you should override <span code>.init()</span> method, which is always invoked by parent's constructor
-and by default calls <span code>.build()</span> and <span code>.wire()</span>, and call <span code>.build()</span> and
-<span code>.wire()</span> yourself in your composition's constructor:
-
-<pre try="https://stackblitz.com/edit/connective-comp-ex2?file=click-counter.ts">
-  <code class="javascript">import { Composition, value, map, pipe, filter,
-        state, State, expr, Expr } from '@connectv/core';
-import { debounceTime, delay } from 'rxjs/operators';
-
-
-export class ClickCounter extends Composition {
-  count: State;
-  incr: Expr;
-  multi: Expr;
-
-  // take the debounce time as a parameter
-  constructor(private debounce: number = 200) {
-    super({
-      inputs: [ 'click', 'reset' ],
-      outputs: [ 'count', 'single', 'multi' ]
-    });
-
-    // .build() and .wire() should be called by child class
-    // so when they are called, this.debounce is initialized
-/*!*/    this.build();
-/*!*/    this.wire();
-  }
-
-  // override init() so that parent class does not call
-  // .build() and .wire()
-/*!*/  init(){}
-
-  build() {
-    this.count = this.add(state(0)) as State;
-    this.incr = this.add(expr(c =&gt; c + 1)) as Expr;
-    this.multi = this.add(expr(c =&gt; c &gt; 1)) as Expr;
-  }
-
-  wire() {
-    this.count.output.to(this.incr.in(0), this.out('count'), this.multi.in(0));
-    this.incr.result.to(this.count.input);
-    this.in('click').to(this.incr.control);
-
-    this.in('reset').to(map(() =&gt; 0)).to(this.count.input);
-    this.in('click').to(pipe(debounceTime(this.debounce)))
-      .to(this.in('reset').from(pipe(delay(1))), this.multi.control);
-
-    this.multi.result.to(filter(multi =&gt; !multi)).to(this.out('single'));
-    this.multi.result.to(filter(multi =&gt; multi)).to(this.out('multi'));
-  }
-}</code>
-</pre>
-
-<h2 id="why">Why composition</h2>
-
-The main advantage of using <span code>Composition</span> over <a href="/docs/agent"><span code>Agent</span></a> for
-creating custom agents is that <span code>Composition</span> knows the elements of its internal flow
-(as they were added using <span code>.add()</span> method), so for example when the composition is being cleared up
-(e.g. <span code>.clear()</span> called), it will automatically clear up all its child elements as well.
+As you can <span code>C()</span> is basically a factory function that creates instances of your
+described partial flow.
 
 <br><br>
 
-Similarly, when a composition is being bound using its <span code>.bind()</span> method, it will also bind all of
-its <a href="/docs/interfaces#bindable">bindable</a> children (such as <a href="/docs/sink">sinks</a> and
-<a href="/docs/state">states</a>).
+All <span code>composition()</span>s support <a href="/docs/agent#implicit-connection">implicit connections</a>,
+with the entry pins being the inputs and the exit pins being the outputs, in the provided order. You can of-course
+connect to them explicitly as well:
+
+<pre><code class="javascript">let c = C();
+
+somePin.to(c.in('inputPinA'));
+c.out('outputPinB').to(someOtherPinB);
+...</code></pre>
+
+<br><br>
+
+<h2 id="tracking">Tracking</h2>
+
+Take another look at this bit in the first example:
+
+<pre><code class="javascript">/*!*/export const clickCounter = composition(track =&gt; {
+  let click = pin(), reset = pin();                  //--&gt; inputs
+  let out = pin(), single = pin(), multi = pin();    //--&gt; outputs
+
+  let count = state(0); //--&gt; a state for click count
+/*!*/  track(count);         //--&gt; track it so its cleared later on</code></pre>
+
+The <span code>track()</span> function here registers the state <span code>count</span> with the resulting
+composition. This means that when <span code>.clear()</span> is invoked on the composition, it will
+also be invoked on <span code>count</span>, and when <span code>.bind()</span> is invoked on the composition,
+it will also be invoked on <span code>count</span>.
+
+<br><br>
+
+The <span code>track()</span> function basically syncs life-cycle of internal pins and agents of the
+composition to the composition instance itself. It is recommended to <span code>track()</span> states,
+sinks, and more complex agents of your compositions.
+
+<br><br><br>
+
+<h2 id="construction-purity">Construction purity</h2>
+
+The factory function you provide <span code>composition()</span> will be invoked at least once
+to determine the signature of the resulting agent. This signature will be used as the signature
+for all future instances, so you cannot change it later on. This also means that your factory function
+must be pure, i.e. the state of the program should not change by invoking it.
+
+<br><br>
+
+If you need dynamic signatures, for example based on some parameter, you can utilize the following pattern:
+
+<pre><code class="javascript">let C = param =&gt; composition(track =&gt; {
+  ...
+
+  return [inputsBasedOn(param), outputsBasedOn(param)];
+})();</code></pre>
+
+If your factory function needs to be impure, then you can provide <span code>composition()</span>
+with a signature as its first argument. This way your factory will only be called when an instance is
+created:
+
+<pre><code class="javascript">let C = composition({
+  inputs: ['a', 'b', 'c'],
+  outputs: ['d', 'e']
+}, track =&gt; {
+  ...
+
+  return [{a, b, c}, {d, e}]
+})</code></pre>
 
 <br><br>
 
@@ -275,13 +221,23 @@ its <a href="/docs/interfaces#bindable">bindable</a> children (such as <a href="
 
 <ul>
   <li>
-    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/composition.test.ts" target="_blank">
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/inline-composition.test.ts" target="_blank">
       Specification (test suite)
     </a>
   </li>
   <li>
-    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/composition.ts" target="_blank">
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/composition.test.ts" target="_blank">
+      Base Class Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/inline-composition.ts" target="_blank">
       Source code
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/composition.ts" target="_blank">
+      Base Class Source code
     </a>
   </li>
 </ul>
