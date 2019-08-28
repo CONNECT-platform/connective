@@ -1,0 +1,88 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Check</h1>
+
+A <span code>check()</span> is like a <a href="/docs/filter"><span code>filter()</span></a>,
+except that it has two outputs, one for passing values and one for failing values:
+
+<pre try="https://stackblitz.com/edit/connective-check-ex1?file=index.ts">
+<code class="javascript">/*!*/import { wrap, check, sink } from '@connectv/core';
+import { interval } from 'rxjs';
+
+let even = document.getElementById('even');
+let odd = document.getElementById('odd');
+
+
+wrap(interval(1000))
+/*!*/.to(check(x => x % 2 == 0))  //--> separate by being even or odd
+/*!*/.serialTo(
+/*!*/  sink(v => even.innerHTML += ' ' + v),
+/*!*/  sink(v => odd.innerHTML += ' ' + v)
+).subscribe();</code>
+</pre>
+
+If you need to connect to a <span code>check()</span> explicitly instead of
+<a href="/docs/agent#implicit-connection">implicitly</a>, you can do it like this:
+
+<pre><code class="javascript">let c = check(x => x % 2 == 0);
+
+wrap(interval(1000)).to(c.input);
+c.pass.subscribe(v =&gt; even.innerHTML += ' ' + v);
+c.fail.subscribe(v =&gt; even.innerHTML += ' ' + v);</code></pre>
+
+<br><br>
+
+Similar to <a href="/docs/filter"><span code>filter()</span></a>, you can pass
+asynchronous predicates to <span code>check()</span>:
+
+<pre try="https://stackblitz.com/edit/connective-check-ex1?file=index.ts">
+<code class="javascript">/*!*/import { wrap, check, sink } from '@connectv/core';
+import { interval } from 'rxjs';
+
+let timer = document.getElementById('timer');
+let even = document.getElementById('even');
+let odd = document.getElementById('odd');
+
+
+wrap(interval(500))
+.to(sink(v =&gt; timer.innerHTML = v))          //--&gt; display timer for reference
+/*!*/.to(check((x, done) =&gt;                       //--&gt; return results with a delay
+/*!*/  setTimeout(() =&gt; done(x % 2 == 0), 2000)))
+.serialTo(
+  sink(v =&gt; even.innerHTML += ' ' + v),
+  sink(v =&gt; odd.innerHTML += ' ' + v)
+).subscribe();</code>
+</pre>
+
+<h2 id="signature">Signature</h2>
+
+Every <span code>check()</span> has one <span code>"value"</span> input,
+one <span code>"pass"</span> output and one <span code>"fail"</span> output:
+
+<pre><code class="javascript">let c = check(x => x % 2 == 0);
+
+x.in('value') == x.input;
+x.out('pass') == x.pass;
+x.out('fail') == x.fail;</code></pre>
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/check.test.ts" target="_blank">
+      Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/check.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
