@@ -1,0 +1,38 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Sampler</h1>
+
+A <span code>sampler()</span> will hold incoming values, passing the latest one when it receives a signal on its 
+<span code>.control</span>:
+
+<pre try="https://stackblitz.com/edit/connective-sampler-ex1?file=index.ts">
+<code class="javascript">/*!*/import { wrap, sampler, sink } from '@connectv/core';
+import { fromEvent, interval } from 'rxjs';
+
+let t = document.getElementById('t');
+let p = document.getElementById('p');
+
+/*!*/let s = sampler();
+
+/*!*/wrap(fromEvent(document, 'click')).to(s.control); //--&gt; sample on click
+
+wrap(interval(1000))
+.to(sink(v =&gt; t.innerHTML = v))     //--&gt; display the value of the timer
+/*!*/.to(s)                              //--&gt; send it to sampler
+.subscribe(v =&gt; p.innerHTML = v);   //--&gt; display sampled value</code>
+</pre>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/sampler.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
