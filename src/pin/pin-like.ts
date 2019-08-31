@@ -4,6 +4,11 @@ import { Emission } from '../shared/emission';
 import { Clearable } from '../shared/clearable';
 
 
+/**
+ * 
+ * Represents all objects behaving like a [pin](https://connective.dev/docs/pin)
+ * 
+ */
 export interface PinLike extends Clearable {
   from(...pins: PinLike[]): PinLike;
   to(...pins: PinLike[]): PinLike;
@@ -17,6 +22,13 @@ export interface PinLike extends Clearable {
 }
 
 
+/**
+ * 
+ * Checks if a given object satisfies the `PinLike` interface
+ * 
+ * @param whatever 
+ * 
+ */
 export function isPinLike(whatever: any): whatever is PinLike {
   return whatever !== undefined && (typeof whatever.from == 'function') && (typeof whatever.to == 'function')
       && whatever.observable instanceof Observable &&

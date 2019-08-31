@@ -1,6 +1,13 @@
 import { Emission } from '../emission';
 
 
+/**
+ * 
+ * Represents when an error has occured during handling an emission.
+ * You can retrieve the emission that resulted in the error via `.emission` property,
+ * and you can retrieve the original error via `.original` property.
+ * 
+ */
 export class EmissionError extends Error {
   readonly original: Error;
 
@@ -15,6 +22,12 @@ export class EmissionError extends Error {
 }
 
 
+/**
+ * 
+ * Checks if an object is an `EmissionError` (this is needed due to some issues
+ * with Typescript's typechecking on Errors).
+ *
+ */
 export function isEmissionError(err: any): err is EmissionError {
   return err instanceof Error &&
         (err as any).original instanceof Error &&

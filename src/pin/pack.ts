@@ -9,6 +9,11 @@ import { PinLike } from './pin-like';
 import { PinMap } from './pin-map';
 
 
+/**
+ * 
+ * Represents all [pack](https://connective.dev/docs/pack) pins.
+ * 
+ */
 export class Pack extends Pin {
   constructor(readonly pinmap?: PinMap) {
     super();
@@ -40,6 +45,15 @@ export class Pack extends Pin {
 }
 
 
+/**
+ * 
+ * Creates a [pack](https://connective.dev/docs/pack) pin.
+ * 
+ * @param stuff If passed, the pin will be connected to all given pins.
+ * If any of the stuff is a `PinMap` instead of a `Pin`, then upon resolution
+ * the pack will be connected to all of its realized pins.
+ * 
+ */
 export function pack(...stuff: (PinMap|PinLike)[]) {
   let _mapped = stuff.map(each => (each instanceof PinMap)?new Pack(each):each);
   if (_mapped.length == 0) return new Pack();

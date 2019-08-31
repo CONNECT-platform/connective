@@ -16,7 +16,17 @@ export type MapFuncAsync = (value: any,
 export type MapFunc = MapFuncSync | MapFuncAsync;
 
 
+/**
+ * 
+ * Represents all [map](https://connective.dev/docs/map) pins.
+ * 
+ */
 export class Map extends Pipe {
+  /**
+   * 
+   * The transformation of this map pin.
+   * 
+   */
   readonly map: MapFunc;
 
   constructor(_func: MapFunc) {
@@ -51,6 +61,15 @@ export class Map extends Pipe {
 }
 
 
+/**
+ * 
+ * Creates a [map](https://connective.dev/docs/map) pin using given transformation.
+ * A map pin will transform incoming values based on given transformation.
+ * [Checkout the docs](https://connective.dev/docs/map) for examples and further information.
+ * 
+ * @param map 
+ * 
+ */
 export function map(map: MapFunc) { return new Map(map); }
 
 

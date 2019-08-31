@@ -9,6 +9,11 @@ import { PinLockedError } from './errors/locked.error';
 import { UnresolvedPinObservableError } from './errors/unresolved-observable.error';
 
 
+/**
+ * 
+ * Represents pins that you can connect other pins to.
+ * 
+ */
 export abstract class Connectible extends BasePin {
   private _inbound: PinLike[];
   private _observable: Observable<Emission> | undefined;
@@ -21,6 +26,12 @@ export abstract class Connectible extends BasePin {
     this._inbound = [];
   }
 
+  /**
+   *
+   * @note it will throw an error if this pin is already locked.
+   * You can read more about this [here](https://connective.dev/docs/pin#subscribing-and-binding).
+   *
+   */
   public connect(pin: PinLike) {
     if (this.locked) throw new PinLockedError();
     if (!this._inbound.includes(pin))
@@ -29,6 +40,12 @@ export abstract class Connectible extends BasePin {
     return this;
   }
 
+  /**
+   * 
+   * @note Accessing this property locks the pin.
+   * You can read more about this [here](https://connective.dev/docs/pin#subscribing-and-binding).
+   * 
+   */
   public get observable(): Observable<Emission> {
     if (this.shouldResolve(this._inbound, this._observable)) {
       if (this._resolving) {
@@ -59,6 +76,13 @@ export abstract class Connectible extends BasePin {
     return this._observable;
   }
 
+  /**
+   * 
+   * @note Calling `.clear()` will unlock the pin and disconnect it from
+   * all the pins its connected to (removing their references). There is no guarantee
+   * that the pin will be usable afterwards.
+   * 
+   */
   public clear() {
     this._inbound.length = 0;
     this._observable = undefined;
@@ -72,12 +96,56 @@ export abstract class Connectible extends BasePin {
     return super.clear();
   }
 
+  /**
+   * 
+   * @returns `true` if the pin is locked, `false` if not.
+   * You can read more about this [here](https://connective.dev/docs/pin#subscribing-and-binding).
+   * 
+   */
   public get locked(): boolean { return this.isLocked(this._observable); }
+
+  /**
+   * 
+   * @returns `true` if any other pin is connected to this pin, `false` if not.
+   * 
+   */
   public get connected(): boolean { return this.isConnected(); }
 
+  /**
+   * 
+   * This method allows child classes to determine the value of `.connected` through
+   * other means.
+   * 
+   */
   protected isConnected(): boolean { return this._inbound.length > 0 }
 
+  /**
+   * 
+   * Determines if the pin is locked, based on its currently resolved
+   * observable.
+   * 
+   * @param observable
+   * 
+   */
   protected abstract isLocked(observable: Observable<Emission> | undefined): boolean;
+
+  /**
+   * 
+   * Determines whether the pin's underlying observable should be resolved, based on
+   * inbound connected pins and the currently resolved observable.
+   * 
+   * @param inbound 
+   * @param observable 
+   * 
+   */
   protected abstract shouldResolve(inbound: PinLike[], observable: Observable<Emission> | undefined): boolean;
+
+  /**
+   * 
+   * Resolves the pin's underlying observable. This also locks the pin.
+   * 
+   * @param inbound 
+   * 
+   */
   protected abstract resolve(inbound: PinLike[]): Observable<Emission>;
 }
