@@ -5,7 +5,7 @@ import { Clearable } from './clearable';
 
 /**
  * 
- * A parent class for all sub-classes who would want to track
+ * A parent class for sub-classes who would want to track
  * some [`Subscription`s](https://rxjs-dev.firebaseapp.com/guide/subscription)
  * and clear them later.
  * 
@@ -15,7 +15,7 @@ export class Tracker implements Clearable {
 
   /**
    * 
-   * Will track given subscription, to clear it up later when
+   * Tracks given subscription, to clear it up later when
    * `.clear()` is called.
    * 
    * @param sub 
@@ -33,7 +33,7 @@ export class Tracker implements Clearable {
 
   /**
    * 
-   * Will untrack given subscription, removing it from subscriptions
+   * Untracks given subscription, removing it from subscriptions
    * it will clear up when `.clear()` is called. This is useful when you
    * clear up some subscriptions yourself before clearing the tracker object.
    * 
@@ -47,17 +47,17 @@ export class Tracker implements Clearable {
 
   /**
    * 
-   * Will be `true` if this tracker object was ever tracking anything.
-   * Will remain `true` even after you `.untrack()` everything.
-   * Will become `false` after invoking `.clear()`.
+   * @returns `true` if this tracker object was ever tracking anything.
+   * @returns `true` even after you `.untrack()` everything.
+   * @returns `false` after invoking `.clear()`.
    * 
    */
   protected get tracking(): boolean { return !!this._sub; }
 
   /**
    * 
-   * Will clear out all tracked subscriptions by unsibscribing them.
-   * Will also clear out all references to tracked subscriptions.
+   * Clears out all tracked subscriptions by unsibscribing them.
+   * Also clears out all references to tracked subscriptions.
    * 
    * @warning most tracker objects will become useless after calling `.clear()` on them,
    * so do not call this prematurely! 

@@ -11,7 +11,7 @@ import { PinMap } from './pin-map';
 
 /**
  * 
- * Represents all [pack](https://connective.dev/docs/pack) pins.
+ * Represents [pack](https://connective.dev/docs/pack) pins.
  * 
  */
 export class Pack extends Pin {
@@ -22,6 +22,18 @@ export class Pack extends Pin {
       this.track(pinmap.subscribe((_: string, pin: PinLike) => pin.to(this)));
   }
 
+  /**
+   * 
+   * Resolves the underlying observable by
+   * [combining the latest values](https://rxjs-dev.firebaseapp.com/api/index/function/combineLatest)
+   * from corresponding observables of inbound pins.
+   * 
+   * If a `PinMap` is passed to the constructor, it will instead resolve
+   * by combining the latest values from instantiated pins of the passed `PinMap`.
+   * 
+   * @param inbound 
+   * 
+   */
   protected resolve(inbound: PinLike[]) {
     if (this.pinmap) {
       let _entries = this.pinmap.entries;

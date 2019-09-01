@@ -113,16 +113,15 @@ export abstract class Connectible extends BasePin {
 
   /**
    * 
-   * This method allows child classes to determine the value of `.connected` through
-   * other means.
+   * Override this to determine the value of `.connected` through other means.
    * 
    */
   protected isConnected(): boolean { return this._inbound.length > 0 }
 
   /**
    * 
-   * Determines if the pin is locked, based on its currently resolved
-   * observable.
+   * Override this to determine if the pin is locked.
+   * You can read more about this [here](https://connective.dev/docs/pin#subscribing-and-binding).
    * 
    * @param observable
    * 
@@ -131,7 +130,7 @@ export abstract class Connectible extends BasePin {
 
   /**
    * 
-   * Determines whether the pin's underlying observable should be resolved, based on
+   * Override this to determine if the underlying observable should be resolved, based on
    * inbound connected pins and the currently resolved observable.
    * 
    * @param inbound 
@@ -142,7 +141,8 @@ export abstract class Connectible extends BasePin {
 
   /**
    * 
-   * Resolves the pin's underlying observable. This also locks the pin.
+   * Override this to determine how the underlying observable should be resolved, based on
+   * pins connected to this pin.
    * 
    * @param inbound 
    * 

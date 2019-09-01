@@ -20,6 +20,7 @@ export class Switch extends Agent {
   public case(index: number) { return this.out(index); }
 
   protected createOutput(label: string): PinLike {
+    this.checkOutput(label);
     let _case = this.cases[label as any];
 
     return this.target

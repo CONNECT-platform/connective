@@ -12,7 +12,7 @@ import { PartialFlow } from './partial-flow';
 
 /**
  * 
- * Represents all [groups of pins](https://connective.dev/docs/group).
+ * Represents [groups of pins](https://connective.dev/docs/group).
  * 
  */
 export class Group implements PinLike, Bindable {
@@ -39,7 +39,7 @@ export class Group implements PinLike, Bindable {
 
   /**
    * 
-   * Will connect all given pins to all pins in this group, so
+   * Connects all given pins to all pins in this group, so
    * `group(c, d).from(a, b)` means both `a` and `b` will be connected
    * to both `c` and `d`.
    * 
@@ -59,7 +59,7 @@ export class Group implements PinLike, Bindable {
 
   /**
    * 
-   * Will connect all pins of this group to all of the given pins, so
+   * Connects all pins of this group to all of the given pins, so
    * `group(a, b).to(c, d)` means both `a` and `b` will be connected to
    * both `c` and `d`.
    * 
@@ -78,7 +78,7 @@ export class Group implements PinLike, Bindable {
 
   /**
    * 
-   * Will connect given pins serially to pins of this group, i.e. the first to the first,
+   * Connects given pins serially to pins of this group, i.e. the first to the first,
    * second to the second, etc. If any `PartialFlow` is among the given pins, then
    * its exit pins will be connected serially to pins of this group
    * (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
@@ -106,7 +106,7 @@ export class Group implements PinLike, Bindable {
 
   /**
    * 
-   * Will connect pins of this group serially to given pins, i.e. first to the first,
+   * Connects pins of this group serially to given pins, i.e. first to the first,
    * second to the second, etc. If any `PartialFlow` is among the given pins, pins of
    * this group will be connected serially to its entries
    * (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).

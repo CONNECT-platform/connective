@@ -18,17 +18,37 @@ export type NodeInputs = ContextType;
 export type NodeOutput = (out: string, data?: any) => void;
 
 
+/**
+ * 
+ * Denotes the signature of a [node](https://connective.dev/docs/node).
+ * 
+ */
 export interface NodeSignature extends Signature {
+  /**
+   * 
+   * The list of inputs that are required for the node to run
+   * 
+   */
   required?: string[];
 }
 
 
+/**
+ * 
+ * Represents a [node](https://connective.dev/docs/node).
+ * 
+ */
 export abstract class Node extends Agent implements NodeLike {
   private _control: Control;
   private _res: PinLike;
 
   private _control_required = true;
 
+  /**
+   * 
+   * @param signature the [signature](https://connective.dev/docs/agent#signature) of the node.
+   * 
+   */
   constructor(signature: NodeSignature) {
     super(signature);
 
@@ -55,8 +75,24 @@ export abstract class Node extends Agent implements NodeLike {
     }));
   }
 
+  /**
+   * 
+   * A node waits for its `.control` before each execution, if any pins are
+   * connected to `.control`.
+   * 
+   */
   public get control(): Control { return this._control; }
 
+  /**
+   * 
+   * Override this to outline what should your node do during each execution.
+   * 
+   * @param inputs a named map of inputs
+   * @param output a callback to emit outputs
+   * @param error a callback to emit errors 
+   * @param context the context of the execution
+   * 
+   */
   protected abstract run(
     inputs: NodeInputs,
     output: NodeOutput,
@@ -65,6 +101,7 @@ export abstract class Node extends Agent implements NodeLike {
   ): void;
 
   protected createOutput(label: string): PinLike {
+    this.checkOutput(label);
     return this._res
       .to(filter((res: any) => res.out == label))
       .to(map((res: any) => res.data))
@@ -92,6 +129,16 @@ class _CodeNode extends Node {
     { this._run.apply(this, [inputs, output, error, context])};
 }
 
+
+/**
+ * 
+ * Creates a [node](https://connective.dev/docs/node).
+ * [Checkout the docs](https://connective.dev/docs/node) for examples and further information.
+ * 
+ * @param signature the signature of the node
+ * @param run the execution function of the node
+ * 
+ */
 export function node(signature: Signature, run: NodeRunFunc) { return () => new _CodeNode(signature, run); }
 
 

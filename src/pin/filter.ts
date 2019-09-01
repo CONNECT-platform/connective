@@ -17,7 +17,7 @@ export type FilterFunc = FilterFuncSync | FilterFuncAsync;
 
 /**
  * 
- * Represents all [filter](https://connective.dev/docs/filter) pins.
+ * Represents [filter](https://connective.dev/docs/filter) pins.
  * 
  */
 export class Filter extends Pipe {

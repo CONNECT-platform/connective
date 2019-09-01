@@ -22,14 +22,16 @@ import group, { Group } from './group';
 export abstract class PartialFlow extends Tracker implements PinLike {
   /**
    * 
-   * The group of entry pins of the partial flow
+   * Override this to specify the entry pins of this partial flow.
+   * Read more about this [here](https://connective.dev/docs/agent#implicit-connection).
    * 
    */
   abstract get entries(): Group;
 
   /**
    * 
-   * The group of exit pins of the partial flow
+   * Override this to specify the exit pins of this partial flow.
+   * Read more about this [here](https://connective.dev/docs/agent#implicit-connection).
    * 
    */
   abstract get exits(): Group;

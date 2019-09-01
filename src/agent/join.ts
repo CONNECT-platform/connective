@@ -13,10 +13,21 @@ import { Agent } from './agent';
 
 type _CacheType = {[key: string]: Emission};
 
+/**
+ * 
+ * Represents [join](https://connective.dev/docs/join) agents.
+ * 
+ */
 export class Join extends Agent {
   private _inject: Source;
   private _cache: {[fork: string]: _CacheType} = {};
 
+  /**
+   * 
+   * @param keys the keys of the joined object
+   * @param pop should it pop the fork tag or not? Default is `true`
+   * 
+   */
   constructor(readonly keys: string[], readonly pop = true) {
     super({
       inputs: keys,
@@ -66,7 +77,8 @@ export class Join extends Agent {
     return Object.values(cache).length == this.keys.length;
   }
 
-  protected createOutput() {
+  protected createOutput(label: string) {
+    this.checkOutput(label);
     return group(
       group(...this.keys.map(key => this.in(key).to(pipe(tap(e => this._receive(key, e)))))).to(block()),
       this._inject
@@ -76,6 +88,12 @@ export class Join extends Agent {
   protected createEntries() { return this.keys.map(key => this.in(key)); }
   protected createExits() { return [this.output] }
 
+  /**
+   * 
+   * Shortcut for `.out('output')`, which will emit the joined object.
+   * [Read this](https://connective.dev/docs/handle-error#signature) for more details.
+   * 
+   */
   public get output() { return this.out('output'); }
 
   public clear() {
@@ -86,7 +104,26 @@ export class Join extends Agent {
 }
 
 
+/**
+ * 
+ * Creates a [join](https://connective.dev/docs/join) agent. Join agents
+ * will re-join values created from the same forked emission in parallel, creating
+ * a joined object with given keys.
+ * [Checkout the docs](https://connective.dev/docs/join) for examples and further information.
+ * 
+ * @param keys the keys of the joined object. An input will be created per key.
+ * 
+ */
 export function join(...keys: string[]) { return new Join(keys); }
+
+/**
+ * 
+ * Creates a [join](https://connective.dev/join) agent that does not pop
+ * the fork tag upon joining.
+ * [Checkout the docs](https://connective.dev/docs/join) for examples and further information.
+ * 
+ * @param keys the keys of the joined object. An input will be created per key.
+ */
 export function peekJoin(...keys: string[]) { return new Join(keys, false); }
 
 

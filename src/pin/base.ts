@@ -15,7 +15,7 @@ import { PartialFlow } from './partial-flow';
 //
 /**
  * 
- * The base class for all [pins](https://connective.dev/docs/pin).
+ * The base class for [pins](https://connective.dev/docs/pin).
  * 
  */
 export abstract class BasePin extends Tracker implements PinLike {
@@ -40,7 +40,7 @@ export abstract class BasePin extends Tracker implements PinLike {
 
   /**
    * 
-   * Will connect this pin to given pins. Will invoke `.from()` on the receiving pins.
+   * Connects this pin to given pins. Will invoke `.from()` on the receiving pins.
    * If any `PartialFlow` is among the given pins, the connection will be made to all of
    * its entry pins (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
    * 
@@ -56,7 +56,7 @@ export abstract class BasePin extends Tracker implements PinLike {
 
   /**
    * 
-   * Will connect all given pins to this pin, by calling `.connect()` on each of them.
+   * Connects all given pins to this pin, by calling `.connect()` on each of them.
    * If any `PartialFlow` is among given pins, the exit pins of the partial flow will be
    * connected to this pin 
    * (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).

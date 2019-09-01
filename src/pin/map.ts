@@ -18,7 +18,7 @@ export type MapFunc = MapFuncSync | MapFuncAsync;
 
 /**
  * 
- * Represents all [map](https://connective.dev/docs/map) pins.
+ * Represents [map](https://connective.dev/docs/map) pins.
  * 
  */
 export class Map extends Pipe {

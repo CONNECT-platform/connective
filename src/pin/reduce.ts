@@ -19,9 +19,23 @@ export type ReduceFunc = ReduceFuncSync | ReduceFuncAsync;
 
 const _Unset = {};
 
+//
+// TODO: switch to concat map for async reducers
+//
+/**
+ * 
+ * Represents [reduce](https://connective.dev/docs/reduce) pins.
+ * 
+ */
 export class Reduce extends Pipe {
   private _acc: Emission | undefined = undefined;
 
+  /**
+   * 
+   * @param reduce is the reduction function
+   * @param start is the start value
+   * 
+   */
   constructor(readonly reduce: ReduceFunc, readonly start: any = _Unset) {
     super(
       (reduce.length <= 2)?
@@ -71,6 +85,17 @@ export class Reduce extends Pipe {
 }
 
 
+/**
+ * 
+ * Creates a [reduce](https://connective.dev/docs/reduce) pin.
+ * A reduce pin can be used to aggregate values over multiple emissions, with an
+ * aggregator function updating the aggregate value based on each incoming emission.
+ * [Checkout the docs](https://connective.dev/docs/reduce) for examples and further information.
+ * 
+ * @param reduce the reduction function
+ * @param start the start value. If not provided, the value of first incoming emission will be used.
+ * 
+ */
 export function reduce(reduce: ReduceFunc, start: any = _Unset) { return new Reduce(reduce, start); }
 
 

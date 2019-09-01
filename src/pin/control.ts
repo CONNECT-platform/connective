@@ -12,12 +12,27 @@ const _UNSET = {};
 
 /**
  * 
- * Represents all [control](https://connective.dev/docs/control) pins.
+ * Represents [control](https://connective.dev/docs/control) pins.
  * 
  */
 export class Control extends Pin {
   constructor(readonly val: any = _UNSET) { super(); }
 
+  /**
+   * 
+   * Resolves underlying observable, by
+   * [zipping](https://rxjs-dev.firebaseapp.com/api/index/function/zip)
+   * corresponding observables of inbound pins.
+   * 
+   * If a `PinMap` is passed to the constructor, it will instead
+   * resolve to zip of all of the instantiated pins of that `PinMap`.
+   * 
+   * If a value is passed to the constructor, and there are no inbound
+   * pins, it will resolve to `of(<passed value>)`.
+   * 
+   * @param inbound 
+   * 
+   */
   protected resolve(inbound: PinLike[]): Observable<Emission> {
     if (this.val instanceof PinMap) {
       let _entries = this.val.entries;

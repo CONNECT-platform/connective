@@ -11,7 +11,7 @@ const _DefaultForkTagLength = 10;
 
 /**
  * 
- * Represents all [fork](https://connective.dev/docs/fork) pins.
+ * Represents [fork](https://connective.dev/docs/fork) pins.
  * 
  */
 export class Fork extends Pipe {
