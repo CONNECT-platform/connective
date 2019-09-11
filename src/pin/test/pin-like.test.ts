@@ -2,6 +2,7 @@ import { should } from 'chai'; should();
 
 import { Observable } from 'rxjs';
 
+import { pin } from '../pin';
 import { isPinLike } from '../pin-like';
 
 
@@ -26,12 +27,14 @@ describe('isPinLike()', () => {
       from() {}, to() {}, subscribe() {},
     }).should.be.false;
 
-    isPinLike({
-      from() {}, to() {}, subscribe() {},
-      observable: 42,
-    }).should.be.false;
-
     isPinLike({}).should.be.false;
     isPinLike(undefined).should.be.false;
+  });
+
+  it('should not realize the observable of the pin-like.', () => {
+    let p = pin();
+    p.locked.should.be.false;
+    isPinLike(p);
+    p.locked.should.be.false;
   });
 });

@@ -126,6 +126,6 @@ export interface PinLike extends Clearable {
  */
 export function isPinLike(whatever: any): whatever is PinLike {
   return whatever !== undefined && (typeof whatever.from == 'function') && (typeof whatever.to == 'function')
-      && whatever.observable instanceof Observable &&
-      (typeof whatever.subscribe == 'function');
+      && 'observable' in whatever
+      && (typeof whatever.subscribe == 'function');
 }
