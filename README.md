@@ -5,6 +5,8 @@
 ```
 npm i @connectv/core
 ```
+
+![Minzipped size](https://badgen.net/bundlephobia/minzip/@connectv/core)
 <br>
 
 **CONNECTIVE** facilitates large-scale [reactive programming](https://en.wikipedia.org/wiki/Reactive_programming) in Type(Java)Script. It enables declarative creation of large and complex data/event flows and supports re-use of flows.
