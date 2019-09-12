@@ -6,7 +6,8 @@
 npm i @connectv/core
 ```
 
-![Minzipped size](https://badgen.net/bundlephobia/minzip/@connectv/core)
+[![Minzipped size](https://badgen.net/bundlephobia/minzip/@connectv/core)](https://bundlephobia.com/result?p=@connectv/core)
+[![CodeFactor](https://www.codefactor.io/repository/github/connect-platform/connective/badge)](https://www.codefactor.io/repository/github/connect-platform/connective)
 <br>
 
 **CONNECTIVE** facilitates large-scale [reactive programming](https://en.wikipedia.org/wiki/Reactive_programming) in Type(Java)Script. It enables declarative creation of large and complex data/event flows and supports re-use of flows.
