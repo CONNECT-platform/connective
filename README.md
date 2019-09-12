@@ -7,6 +7,7 @@ npm i @connectv/core
 ```
 
 [![Minzipped size](https://badgen.net/bundlephobia/minzip/@connectv/core)](https://bundlephobia.com/result?p=@connectv/core)
+[![Build Status](https://travis-ci.org/CONNECT-platform/connective.svg?branch=master)](https://travis-ci.org/CONNECT-platform/connective)
 [![CodeFactor](https://www.codefactor.io/repository/github/connect-platform/connective/badge)](https://www.codefactor.io/repository/github/connect-platform/connective)
 [![Chat on Gitter](https://img.shields.io/gitter/room/connectv/community)](https://gitter.im/connectv/community)
 <br>
