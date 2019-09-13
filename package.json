@@ -1,6 +1,6 @@
 {
   "name": "@connectv/core",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "agent-based reactive programming library for typescript/javascript",
   "keywords": [
     "connective",
@@ -30,7 +30,7 @@
   "author": "Eugene Ghanizadeh Khoub <eugene@connect-platform.com>",
   "license": "MIT",
   "bugs": "https://github.com/CONNECT-platform/connective/issues",
-  "main": "dist/es6/index.js",
+  "main": "dist/es5/index.js",
   "module": "dist/es6/index.js",
   "types": "dist/es6/index.d.ts",
   "scripts": {
@@ -41,6 +41,7 @@
   },
   "files": [
     "dist/es6",
+    "dist/es5",
     "dist/bundles",
     "logo.svg"
   ],
