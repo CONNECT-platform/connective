@@ -9,4 +9,4 @@ import expr from './expr';
  * [Checkout the docs](https://connective.dev/docs/sampler) for examples and further information.
  * 
  */
-export const sampler = () => expr((x: any) => x);
+export function sampler() { return expr((x: any) => x); }

@@ -1,6 +1,6 @@
 {
   "name": "@connectv/core",
-  "version": "0.1.18",
+  "version": "0.1.20",
   "description": "agent-based reactive programming library for typescript/javascript",
   "keywords": [
     "connective",
@@ -31,11 +31,12 @@
   "license": "MIT",
   "bugs": "https://github.com/CONNECT-platform/connective/issues",
   "main": "dist/es6/index.js",
+  "module": "dist/es6/index.js",
   "types": "dist/es6/index.d.ts",
   "scripts": {
     "build": "tsc -p conf/typescript/es5.json && tsc -p conf/typescript/es6.json",
     "pack": "rollup -c conf/rollup/es6.js && rollup -c conf/rollup/es5.js",
-    "test": "ts-node --project conf/typescript/es5.json test.ts",
+    "test": "ts-node --project conf/typescript/test.json test.ts",
     "docs": "nodemon ./docs/serve.js --config ./docs/nodemon.json"
   },
   "files": [
@@ -65,7 +66,6 @@
   },
   "dependencies": {
     "@types/lodash.isequal": "^4.5.5",
-    "lodash": "^4.17.14",
     "lodash.isequal": "^4.5.0",
     "rxjs": "^6.5.2"
   }
