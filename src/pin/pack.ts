@@ -10,9 +10,9 @@ import { PinMap } from './pin-map';
 
 
 /**
- * 
+ *
  * Represents [pack](https://connective.dev/docs/pack) pins.
- * 
+ *
  */
 export class Pack extends Pin {
   constructor(readonly pinmap?: PinMap) {
@@ -23,16 +23,16 @@ export class Pack extends Pin {
   }
 
   /**
-   * 
+   *
    * Resolves the underlying observable by
    * [combining the latest values](https://rxjs-dev.firebaseapp.com/api/index/function/combineLatest)
    * from corresponding observables of inbound pins.
-   * 
+   *
    * If a `PinMap` is passed to the constructor, it will instead resolve
    * by combining the latest values from instantiated pins of the passed `PinMap`.
-   * 
-   * @param inbound 
-   * 
+   *
+   * @param inbound
+   *
    */
   protected resolve(inbound: PinLike[]) {
     if (this.pinmap) {
@@ -58,13 +58,13 @@ export class Pack extends Pin {
 
 
 /**
- * 
+ *
  * Creates a [pack](https://connective.dev/docs/pack) pin.
- * 
+ *
  * @param stuff If passed, the pin will be connected to all given pins.
  * If any of the stuff is a `PinMap` instead of a `Pin`, then upon resolution
  * the pack will be connected to all of its realized pins.
- * 
+ *
  */
 export function pack(...stuff: (PinMap|PinLike)[]) {
   let _mapped = stuff.map(each => (each instanceof PinMap)?new Pack(each):each);

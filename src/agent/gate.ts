@@ -9,9 +9,9 @@ import { NodeLike } from './node-like';
 
 
 /**
- * 
+ *
  * Represents [gate](https://connective.dev/docs/gate) agents.
- * 
+ *
  */
 export class Gate extends Agent implements NodeLike {
   private _control: Control;
@@ -22,27 +22,27 @@ export class Gate extends Agent implements NodeLike {
   }
 
   /**
-   * 
+   *
    * Shortcut for `.in('value')`, the input pin receiving values.
    * [Read this](https://connective.dev/docs/gate#signature) for more details.
-   * 
+   *
    */
   public get input() { return this.in('value'); }
 
   /**
-   * 
+   *
    * Shortcut for `.out('value')`, the output emitting allowed values.
    * [Read this](https://connective.dev/docs/gate#signature) for more details.
-   * 
+   *
    */
   public get output() { return this.out('value'); }
 
   /**
-   * 
+   *
    * Each pin connected to this pin should emit a boolean value for each
    * value sent to `.input`, and if all are true, the value is emitted via `.output`.
    * [Read this](https://connective.dev/docs/gate) for more details.
-   * 
+   *
    */
   public get control() { return this._control; }
 
@@ -65,12 +65,12 @@ export class Gate extends Agent implements NodeLike {
 
 
 /**
- * 
+ *
  * Creates a [gate](https://connective.dev/docs/gate) agent.
  * Gate agents await a control signal for each incoming value and either pass it along
  * or drop it based on the boolean value of the control signal.
  * [Checkout the docs](https://connective.dev/docs/gate) for examples and further information.
- * 
+ *
  */
 export function gate() { return new Gate(); }
 

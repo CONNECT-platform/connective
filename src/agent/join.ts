@@ -14,19 +14,19 @@ import { Agent } from './agent';
 type _CacheType = {[key: string]: Emission};
 
 /**
- * 
+ *
  * Represents [join](https://connective.dev/docs/join) agents.
- * 
+ *
  */
 export class Join extends Agent {
   private _inject: Source;
   private _cache: {[fork: string]: _CacheType} = {};
 
   /**
-   * 
+   *
    * @param keys the keys of the joined object
    * @param pop should it pop the fork tag or not? Default is `true`
-   * 
+   *
    */
   constructor(readonly keys: string[], readonly pop = true) {
     super({
@@ -89,10 +89,10 @@ export class Join extends Agent {
   protected createExits() { return [this.output] }
 
   /**
-   * 
+   *
    * Shortcut for `.out('output')`, which will emit the joined object.
    * [Read this](https://connective.dev/docs/handle-error#signature) for more details.
-   * 
+   *
    */
   public get output() { return this.out('output'); }
 
@@ -105,23 +105,23 @@ export class Join extends Agent {
 
 
 /**
- * 
+ *
  * Creates a [join](https://connective.dev/docs/join) agent. Join agents
  * will re-join values created from the same forked emission in parallel, creating
  * a joined object with given keys.
  * [Checkout the docs](https://connective.dev/docs/join) for examples and further information.
- * 
+ *
  * @param keys the keys of the joined object. An input will be created per key.
- * 
+ *
  */
 export function join(...keys: string[]) { return new Join(keys); }
 
 /**
- * 
+ *
  * Creates a [join](https://connective.dev/join) agent that does not pop
  * the fork tag upon joining.
  * [Checkout the docs](https://connective.dev/docs/join) for examples and further information.
- * 
+ *
  * @param keys the keys of the joined object. An input will be created per key.
  */
 export function peekJoin(...keys: string[]) { return new Join(keys, false); }

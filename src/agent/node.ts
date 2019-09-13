@@ -19,24 +19,24 @@ export type NodeOutput = (out: string, data?: any) => void;
 
 
 /**
- * 
+ *
  * Denotes the signature of a [node](https://connective.dev/docs/node).
- * 
+ *
  */
 export interface NodeSignature extends Signature {
   /**
-   * 
+   *
    * The list of inputs that are required for the node to run
-   * 
+   *
    */
   required?: string[];
 }
 
 
 /**
- * 
+ *
  * Represents a [node](https://connective.dev/docs/node).
- * 
+ *
  */
 export abstract class Node extends Agent implements NodeLike {
   private _control: Control;
@@ -45,9 +45,9 @@ export abstract class Node extends Agent implements NodeLike {
   private _control_required = true;
 
   /**
-   * 
+   *
    * @param signature the [signature](https://connective.dev/docs/agent#signature) of the node.
-   * 
+   *
    */
   constructor(signature: NodeSignature) {
     super(signature);
@@ -76,22 +76,22 @@ export abstract class Node extends Agent implements NodeLike {
   }
 
   /**
-   * 
+   *
    * A node waits for its `.control` before each execution, if any pins are
    * connected to `.control`.
-   * 
+   *
    */
   public get control(): Control { return this._control; }
 
   /**
-   * 
+   *
    * Override this to outline what should your node do during each execution.
-   * 
+   *
    * @param inputs a named map of inputs
    * @param output a callback to emit outputs
-   * @param error a callback to emit errors 
+   * @param error a callback to emit errors
    * @param context the context of the execution
-   * 
+   *
    */
   protected abstract run(
     inputs: NodeInputs,
@@ -131,13 +131,13 @@ class _CodeNode extends Node {
 
 
 /**
- * 
+ *
  * Creates a [node](https://connective.dev/docs/node).
  * [Checkout the docs](https://connective.dev/docs/node) for examples and further information.
- * 
+ *
  * @param signature the signature of the node
  * @param run the execution function of the node
- * 
+ *
  */
 export function node(signature: Signature, run: NodeRunFunc) { return () => new _CodeNode(signature, run); }
 

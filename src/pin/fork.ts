@@ -10,9 +10,9 @@ const _DefaultForkTagLength = 10;
 
 
 /**
- * 
+ *
  * Represents [fork](https://connective.dev/docs/fork) pins.
- * 
+ *
  */
 export class Fork extends Pipe {
   constructor(len: number = _DefaultForkTagLength) {
@@ -36,12 +36,12 @@ export class Fork extends Pipe {
 
 
 /**
- * 
+ *
  * Creates a [fork](https://connective.dev/docs/fork) pin.
  * [Checkout the docs](https://connective.dev/docs/fork) for examples and further information.
- * 
+ *
  * @param len the length of the fork-tag that will be added to the context of each emission.
- * 
+ *
  */
 export function fork(len: number = _DefaultForkTagLength) { return new Fork(len); }
 

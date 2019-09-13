@@ -27,7 +27,7 @@ import { UnresolvedPinObservableError } from './errors/unresolved-observable.err
 export {
   control, filter, group, map, pack, pin, pipe, sink, fork, source, spread, reduce, value, wrap, block,
   Control, Filter, Group, Map, Pack, Pin, Pipe, Sink, Fork, Source, Spread, Reduce,
-  PinLike, isPinLike, 
+  PinLike, isPinLike,
   PinMap, PinMapFactory, PinMapSusbcriber,
   Connectible, partialFlow, PartialFlow,
   FilterFunc, FilterFuncAsync, FilterFuncSync,

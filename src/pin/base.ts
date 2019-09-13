@@ -14,40 +14,40 @@ import { PartialFlow } from './partial-flow';
 // TODO: write tests for this
 //
 /**
- * 
+ *
  * The base class for [pins](https://connective.dev/docs/pin).
- * 
+ *
  */
 export abstract class BasePin extends Tracker implements PinLike {
   /**
-   * 
+   *
    * Connects given [pin](https://connective.dev/docs/pin) to this pin.
    * Note that the operation might not be possible and result in an error.
-   * 
+   *
    * @param _  the pin that gets connected to this pin.
-   * 
+   *
    */
   abstract connect(_: PinLike): this;
 
   /**
-   * 
+   *
    * The underlying observable of the pin. You can use this property
    * to access the [emissions](https://connective.dev/docs/emission) instead of
    * values, or to connect your CONNECTIVE flow into another observable sequence.
-   * 
+   *
    */
   abstract observable: Observable<Emission>;
 
   /**
-   * 
+   *
    * Connects this pin to given pins. Will invoke `.from()` on the receiving pins.
    * If any `PartialFlow` is among the given pins, the connection will be made to all of
    * its entry pins (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
-   * 
+   *
    * @param pins the pins to connect to
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its exit pins added to the group.
-   * 
+   *
    */
   to(...pins: PinLike[]) {
     pins.forEach(pin => pin.from(this));
@@ -55,16 +55,16 @@ export abstract class BasePin extends Tracker implements PinLike {
   }
 
   /**
-   * 
+   *
    * Connects all given pins to this pin, by calling `.connect()` on each of them.
    * If any `PartialFlow` is among given pins, the exit pins of the partial flow will be
-   * connected to this pin 
+   * connected to this pin
    * (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
-   * 
+   *
    * @param pins the pins to be connected to this pin
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its entry pins will be added to the group.
-   * 
+   *
    */
   from(...pins: PinLike[]) {
     pins.forEach(pin => {
@@ -80,15 +80,15 @@ export abstract class BasePin extends Tracker implements PinLike {
   }
 
   /**
-   * 
+   *
    * Connectss to given pins. This is same as `.to()`, except that when a `PartialFlow`
    * is among the given pins, this pin will be connected only to its first entry pin
    * (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
-   * 
+   *
    * @param pins pins to connect this pin to
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its exit pins added to the group.
-   * 
+   *
    */
   serialTo(...pins: PinLike[]) {
     pins.forEach(pin => {
@@ -103,15 +103,15 @@ export abstract class BasePin extends Tracker implements PinLike {
   }
 
   /**
-   * 
+   *
    * Connects given pins to this pin. This is same as `.from()`, except that when a `PartialFlow`
    * is among given pins, only its first exit pin will be connected to this pin
    * (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
-   * 
+   *
    * @param pins pins to connect to this pin
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its entry pins will be added to the group.
-   * 
+   *
    */
   serialFrom(...pins: PinLike[]) {
     pins.forEach(pin => {
@@ -128,12 +128,12 @@ export abstract class BasePin extends Tracker implements PinLike {
   subscribe(observer?: PartialObserver<any>): Subscription;
   subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Subscription;
   /**
-   * 
+   *
    * Subscribes given function or partial observer to the observable of this pin.
    * The subscriber will recieve the emitted values and not the emission object itself,
    * so if you need to access the emission (for example, to access its context),
    * use `.observable.subscribe()` instead.
-   * 
+   *
    * @param observerOrNext either an [observer object](https://github.com/ReactiveX/rxjs/blob/master/doc/observer.md),
    * or a callback handling incoming values.
    * @param error a callback handling incoming errors.
@@ -143,7 +143,7 @@ export abstract class BasePin extends Tracker implements PinLike {
    * its `.clear()` is invoked. If you wish to unsubscribe the subscription earlier than the time you clear
    * the pin out, then hold a reference to it and also remove it from subscriptions tracked by the pin
    * using `.untrack()`.
-   * 
+   *
    */
   subscribe(
     observerOrNext?: PartialObserver<any> | ResolveCallback<any>,

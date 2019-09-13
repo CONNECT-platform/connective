@@ -11,27 +11,27 @@ import { PinMap } from './pin-map';
 const _UNSET = {};
 
 /**
- * 
+ *
  * Represents [control](https://connective.dev/docs/control) pins.
- * 
+ *
  */
 export class Control extends Pin {
   constructor(readonly val: any = _UNSET) { super(); }
 
   /**
-   * 
+   *
    * Resolves underlying observable, by
    * [zipping](https://rxjs-dev.firebaseapp.com/api/index/function/zip)
    * corresponding observables of inbound pins.
-   * 
+   *
    * If a `PinMap` is passed to the constructor, it will instead
    * resolve to zip of all of the instantiated pins of that `PinMap`.
-   * 
+   *
    * If a value is passed to the constructor, and there are no inbound
    * pins, it will resolve to `of(<passed value>)`.
-   * 
-   * @param inbound 
-   * 
+   *
+   * @param inbound
+   *
    */
   protected resolve(inbound: PinLike[]): Observable<Emission> {
     if (this.val instanceof PinMap) {
@@ -58,18 +58,18 @@ export class Control extends Pin {
 }
 
 /**
- * 
+ *
  * Creates a [control](https://connective.dev/docs/control) pin.
- * 
+ *
  * @param val if provided, the control pin will emit the given value when
  * all pins connected to it emit, otherwise it will emit the array concatenation
  * of received values. If no pins are connected to it, then it will emit the value
  * to any subscriber (or to any pin that this pin is connected to, when a subscription
  * is called somwhere down the chain).
- * 
+ *
  * If a `PinMap` is given as the value, then after resolution, the control will be
  * connected to all "realised" pins of the given pinmap.
- * 
+ *
  */
 export function control(val?: any) { return new Control(val); }
 

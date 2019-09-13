@@ -1,8 +1,8 @@
 /**
- * 
+ *
  * This error is thrown when a child of a composition is not an agent
  * but is accessed as one.
- * 
+ *
  */
 export class ChildIsNotAgent extends Error {
   constructor(name: string) {
@@ -11,10 +11,10 @@ export class ChildIsNotAgent extends Error {
 }
 
 /**
- * 
+ *
  * This error is thrown when a child of a composition is not a pin
  * but is accessed as one.
- * 
+ *
  */
 export class ChildIsNotPin extends Error {
   constructor(name: string) {

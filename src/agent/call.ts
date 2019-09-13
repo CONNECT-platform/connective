@@ -14,13 +14,13 @@ export type ExecResult = { label: string; value: any };
 
 
 /**
- * 
+ *
  * Creates a [map](https://connective.dev/docs/map) pin. This map pin will
  * expect objects whose keys matches agents that will be created by given factory.
  * For each such object, the factory will be called and a new instance of the agent
  * will be created, the provided inputs (key-values of the incoming object) will
  * be fed to its inputs, and its first ouput will be passed on.
- * 
+ *
  * @param factory the agent factory to create new instances per incoming object
  * @param sub a callback to handle the subscription object holding the reference to all
  * subscriptions created in response to each incoming object
@@ -28,7 +28,7 @@ export type ExecResult = { label: string; value: any };
  * object are unsubscribed from
  * @param outs an optional function to be used to determine possible outputs instead of utilizing
  * each created agent's signature.
- * 
+ *
  */
 export function exec(factory: AgentFactory,
   sub?: (s: Subscription) => void,
@@ -68,13 +68,13 @@ export function exec(factory: AgentFactory,
 
 
 /**
- * 
+ *
  * Creates an agent using given agent factory, feed its inputs based on key-value
  * pairs of given data, and return a pin who will emit the first output of the created agent.
- * 
+ *
  * @param factory
- * @param data 
- * 
+ * @param data
+ *
  */
 export function call(factory: AgentFactory, data: {[input: string]: any}) { return value(data).to(exec(factory)); }
 

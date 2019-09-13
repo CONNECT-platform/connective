@@ -16,15 +16,15 @@ export type FilterFunc = FilterFuncSync | FilterFuncAsync;
 
 
 /**
- * 
+ *
  * Represents [filter](https://connective.dev/docs/filter) pins.
- * 
+ *
  */
 export class Filter extends Pipe {
   /**
-   * 
+   *
    * The predicate of this filter pin.
-   * 
+   *
    */
   readonly filter: FilterFunc;
 
@@ -62,20 +62,20 @@ export class Filter extends Pipe {
 
 
 /**
- * 
+ *
  * Creates a [filter](https://connective.dev/docs/filter) pin using given predicate.
  * A filter pin will pass some values through and not others based on given predicate.
  * [Checkout the docs](https://connective.dev/docs/filter) for examples and further information.
- * 
- * @param filter 
- * 
+ *
+ * @param filter
+ *
  */
 export function filter(filter: FilterFunc) { return new Filter(filter); }
 
 /**
- * 
+ *
  * Creates a [filter](https://connective.dev/docs/filter) that never allows any value through.
- * 
+ *
  */
 export function block() { return new Filter(() => false); }
 

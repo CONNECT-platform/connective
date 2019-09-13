@@ -11,9 +11,9 @@ import { Node } from './node';
 
 
 /**
- * 
+ *
  * A class to wrap an agent so that it behaves like a [node](https://connective.dev/docs/node).
- * 
+ *
  */
 export class NodeWrap extends Agent implements NodeLike {
   private _control: Control;
@@ -22,9 +22,9 @@ export class NodeWrap extends Agent implements NodeLike {
   private _control_required = true;
 
   /**
-   * 
+   *
    * @param core the original agent to be wrapped.
-   * 
+   *
    */
   constructor(readonly core: AgentLike) {
     super(core.signature);
@@ -72,17 +72,17 @@ export class NodeWrap extends Agent implements NodeLike {
 
 
 /**
- * 
- * Wraps given agent in a `NodeWrap`, making it behave like a 
+ *
+ * Wraps given agent in a `NodeWrap`, making it behave like a
  * [node](https://connective.dev/docs/node):
- * 
+ *
  * - It will wait for all of its inputs to emit at least once before first execution
  * - Re-executes any time a new value is emitted from any of the inputs
  * - Waits for its `.control` if its connected before each execution
  * - Responds with the first output of the wrapped agent for each execution
- * 
- * @param agent 
- * 
+ *
+ * @param agent
+ *
  */
 export function nodeWrap(agent: AgentLike): NodeLike {
   if (agent instanceof Node) return agent;

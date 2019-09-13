@@ -35,7 +35,7 @@ describe('composition()', () => {
     c.signature.should.eql({ inputs: ['input'], outputs: ['output'] });
   });
 
-  it('should provide the factory with a function that will add given agents to the children of the composition.', 
+  it('should provide the factory with a function that will add given agents to the children of the composition.',
   done => {
     let C = composition(track => {
       let i = pin();

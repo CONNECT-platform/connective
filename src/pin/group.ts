@@ -11,15 +11,15 @@ import { PartialFlow } from './partial-flow';
 
 
 /**
- * 
+ *
  * Represents [groups of pins](https://connective.dev/docs/group).
- * 
+ *
  */
 export class Group implements PinLike, Bindable {
   /**
-   * 
+   *
    * The array of all pins within the group.
-   * 
+   *
    */
   readonly pins: PinLike[];
 
@@ -28,29 +28,29 @@ export class Group implements PinLike, Bindable {
   }
 
   /**
-   * 
+   *
    * @warning accessing this will result in an error since groups do not have
    * underlying observables of their own.
-   * 
+   *
    */
   get observable(): Observable<Emission> {
     throw new GroupObservableError();
   }
 
   /**
-   * 
+   *
    * Connects all given pins to all pins in this group, so
    * `group(c, d).from(a, b)` means both `a` and `b` will be connected
    * to both `c` and `d`.
-   * 
+   *
    * If any `PartialFlow` is among given pins, all of the exit pins of the partial flow will be
-   * connected to all of the pins of this group 
+   * connected to all of the pins of this group
    * (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
-   * 
+   *
    * @param pins pins to be connected to pins of this group
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its entry pins will be added to the group.
-   * 
+   *
    */
   from(...pins: PinLike[]): PinLike {
     pins.forEach(pin => this.pins.forEach(p => p.from(pin)));
@@ -58,18 +58,18 @@ export class Group implements PinLike, Bindable {
   }
 
   /**
-   * 
+   *
    * Connects all pins of this group to all of the given pins, so
    * `group(a, b).to(c, d)` means both `a` and `b` will be connected to
    * both `c` and `d`.
-   * 
+   *
    * If any `PartialFlow` is among the given pins, all pins of the group will be connected to all of
    * its entry pins (read more about partial flows [here](https://connective.dev/docs/agent#implicit-connection)).
-   * 
+   *
    * @param pins the pins to connect pins of this group to
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its exit pins added to the group.
-   * 
+   *
    */
   to(...pins: PinLike[]): PinLike {
     pins.forEach(pin => this.pins.forEach(p => p.to(pin)));
@@ -77,7 +77,7 @@ export class Group implements PinLike, Bindable {
   }
 
   /**
-   * 
+   *
    * Connects given pins serially to pins of this group, i.e. the first to the first,
    * second to the second, etc. If any `PartialFlow` is among the given pins, then
    * its exit pins will be connected serially to pins of this group
@@ -85,11 +85,11 @@ export class Group implements PinLike, Bindable {
    * If a mixture of `PartialFlow`s and normal pins are given, the normal pins will
    * be connected to pins of this group serially without counting the partial flows, and the
    * partial flows will each be connected to pins of this group as described.
-   * 
+   *
    * @param pins pins to be connected to pins of this group serially.
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its entry pins will be added to the group.
-   * 
+   *
    */
   serialFrom(...pins: PinLike[]): PinLike {
     (<PartialFlow[]>pins.filter(pin => pin instanceof PartialFlow)).forEach(flow => {
@@ -105,7 +105,7 @@ export class Group implements PinLike, Bindable {
   }
 
   /**
-   * 
+   *
    * Connects pins of this group serially to given pins, i.e. first to the first,
    * second to the second, etc. If any `PartialFlow` is among the given pins, pins of
    * this group will be connected serially to its entries
@@ -113,11 +113,11 @@ export class Group implements PinLike, Bindable {
    * If a mixture of `PartialFlow`s and normal pins are given, pins of this group will
    * be connected to the normal pins serially without counting the partial flows, and they
    * will be connected to the partial flows as described.
-   * 
+   *
    * @param pins pins that pins of this group should connect to serially.
    * @returns a [group](https://connective.dev/docs/group) of the given pins. If any `PartialFlow`
    * was among the given pins, its exit pins added to the group.
-   * 
+   *
    */
   serialTo(...pins: PinLike[]): PinLike {
     (<PartialFlow[]>pins.filter(pin => pin instanceof PartialFlow)).forEach(flow => {
@@ -133,9 +133,9 @@ export class Group implements PinLike, Bindable {
   }
 
   /**
-   * 
+   *
    * Calls `.clear()` on all pins of the group
-   * 
+   *
    */
   clear() {
     this.pins.forEach(pin => pin.clear());
@@ -143,9 +143,9 @@ export class Group implements PinLike, Bindable {
   }
 
   /**
-   * 
+   *
    * Calls `.bind()` on all pins of the group
-   * 
+   *
    */
   bind() {
     this.pins.forEach(pin => {
@@ -158,11 +158,11 @@ export class Group implements PinLike, Bindable {
   subscribe(observer?: PartialObserver<any>): Subscription;
   subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Subscription;
   /**
-   * 
+   *
    * Subscribes given observer (or callback functions) to all pins of the group.
-   * 
+   *
    * @returns a composite subscription holding all of the subscriptions made.
-   * 
+   *
    */
   subscribe(
     _?: PartialObserver<any> | ResolveCallback<any>,
@@ -178,23 +178,23 @@ export class Group implements PinLike, Bindable {
 
 
 /**
- * 
+ *
  * Creates a [group of pins](https://connective.dev/docs/group) based on given pins.
- * 
- * @param pins 
- * 
+ *
+ * @param pins
+ *
  */
 export function group(...pins: PinLike[]) { return new Group(pins); }
 
 /**
- * 
+ *
  * Determines which pins should be considered if in a connection chain
  * we are connecting to the given pins. This is typically a `Group` consisting
- * of given pins, but if any `PartialFlow`s are among them, their exit pins are 
+ * of given pins, but if any `PartialFlow`s are among them, their exit pins are
  * added to the group instead.
- * 
- * @param pins 
- * 
+ *
+ * @param pins
+ *
  */
 export function traverseTo(...pins: PinLike[]): PinLike {
   if (pins.length == 1) {
@@ -210,14 +210,14 @@ export function traverseTo(...pins: PinLike[]): PinLike {
 }
 
 /**
- * 
+ *
  * Determines which pins should be considered if in a connection chain
  * we are connecting from the given pins. This is typically a `Group` consisting
- * of given pins, but if any `PartialFlow`s are among them, their entry pins are 
+ * of given pins, but if any `PartialFlow`s are among them, their entry pins are
  * added to the group instead.
- * 
- * @param pins 
- * 
+ *
+ * @param pins
+ *
  */
 export function traverseFrom(...pins: PinLike[]): PinLike {
   if (pins.length == 1) {

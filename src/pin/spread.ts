@@ -7,9 +7,9 @@ import { Pipe } from './pipe';
 
 
 /**
- * 
+ *
  * Represents [spread](https://connective.dev/docs/spread) pins.
- * 
+ *
  */
 export class Spread extends Pipe {
   constructor() {
@@ -25,11 +25,11 @@ export class Spread extends Pipe {
 
 
 /**
- * 
+ *
  * Creates a [spread](https://connective.dev/docs/spread) pin. A spread pin can be used
  * to spread contents of an array over multiple emissions.
  * [Checkout the docs](https://connective.dev/docs/spread) for examples and further information.
- * 
+ *
  */
 export function spread() { return new Spread(); }
 

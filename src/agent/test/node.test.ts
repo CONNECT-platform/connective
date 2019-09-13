@@ -236,7 +236,7 @@ describe('Node', () => {
     group(a, b).serialTo(new N()).serialTo(
       sink(() => z = true), sink(() => o = true), sink(() => t = true))
       .subscribe();
-    
+   
     a.send(1); b.send(1);
     a.send(4); b.send(3);
 

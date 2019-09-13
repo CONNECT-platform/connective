@@ -10,7 +10,7 @@ import { partialFlow, PartialFlow } from '../partial-flow';
 const testFlow = () => {
   let i1 = pin(); let i2 = pin();
   let o1 = pin(); let o2 = pin();
-  i1.to(map((x: any) => '1-2:: ' + x)).to(o2); 
+  i1.to(map((x: any) => '1-2:: ' + x)).to(o2);
   i2.to(map((x: any) => '2-1:: ' + x)).to(o1);
   return <[Pin[], Pin[]]>[[i1, i2], [o1, o2]];
 };

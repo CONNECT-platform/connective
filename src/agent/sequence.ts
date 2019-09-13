@@ -13,45 +13,45 @@ import { Agent } from './agent';
 
 
 /**
- * 
+ *
  * Denotes a token specifying an event sequence.
  * Each token can at each step either accept a new emission,
  * and can complete on a list of emissions.
- * 
+ *
  */
 export interface SequenceToken {
   /**
-   * 
+   *
    * Determines whether the token would accept the new incoming emission
    * (i.e. it could still be satisfied in the future if this emission was accepted),
    * based on the emission itself and the list of emissions without the newly arrived emission.
-   * 
+   *
    * @param val the newly arrived emission
    * @param list the already accepted list of emissions
-   * 
+   *
    */
   accepts(val: Emission, list: Emission[]): boolean;
 
   /**
-   * 
-   * Determines whether the token can be considered completed, i.e. 
+   *
+   * Determines whether the token can be considered completed, i.e.
    * the current list of emissions satisfies its conditions.
-   * 
-   * @param list 
-   * 
+   *
+   * @param list
+   *
    */
   complete(list: Emission[]): boolean;
 }
 
 
 /**
- * 
+ *
  * Creates a sequence token that denotes events happening between `min` and
  * `max` number of times.
- * 
+ *
  * @param min the minimum number of times the event should happen
  * @param max the maximum number of times the event should happen
- * 
+ *
  */
 export function range(min: number, max?: number) {
   return <SequenceToken>{
@@ -61,26 +61,26 @@ export function range(min: number, max?: number) {
 }
 
 /**
- * 
+ *
  * Creates a sequence token that denotes events happening a
  * specified number of times exactly
- * 
+ *
  * @param c the number of times the event should happen.
- * 
+ *
  */
 export function count(c: number) { return range(c, c); }
 
 /**
- * 
+ *
  * Sequence token denoting an event that may or may not happen (multiple times).
- * 
+ *
  */
 export const maybesome = range(0);
 
 /**
- * 
+ *
  * Sequence token denoting an event that happens at least once.
- * 
+ *
  */
 export const some = range(1);
 
@@ -88,9 +88,9 @@ export type SequenceTokenIndicator = number | '*' | '+' | SequenceToken;
 
 
 /**
- * 
+ *
  * Represents [sequence](https://connective.dev/docs/sequence) agents.
- * 
+ *
  */
 export class Sequence extends Agent {
   readonly tokens: SequenceToken[];
@@ -100,13 +100,13 @@ export class Sequence extends Agent {
   private _head = 0;
 
   /**
-   * 
+   *
    * @param tokens the tokens denoting the sequence of desired events. Each token must be
    * - A `SequenceToken`,
    * - A number, meaning that an event should happen that number of times exactly,
    * - `'+'` meaning the event should happen at least once,
    * - `'*'` meaning the event may or may not happen one or multiple times.
-   * 
+   *
    */
   constructor(tokens: SequenceTokenIndicator[]) {
     super({inputs: tokens.map((_, index) => index.toString()), outputs: ['out']});
@@ -202,35 +202,35 @@ export class Sequence extends Agent {
   }
 
   /**
-   * 
+   *
    * Resets the sequence being tracked when receiving emissions
    * on `.control`.
-   * 
+   *
    */
   public get control() { return this._control; }
 
   /**
-   * 
+   *
    * Shortcut for `.out('out')`, which will emit completed sequences.
    * [Read this](https://connective.dev/docs/sequence#signature) for more details.
-   * 
+   *
    */
   public get output() { return this.out('out'); }
 }
 
 
 /**
- * 
+ *
  * Creates a [sequence](https://connective.dev/docs/sequence) agent.
  * Sequence agents can determine if a specific sequence of events has occured.
  * [Checkout the docs](https://connective.dev/docs/sequence) for examples and further information.
- * 
+ *
  * @param tokens the tokens denoting the sequence of desired events. Each token must be
  * - A `SequenceToken`,
  * - A number, meaning that an event should happen that number of times exactly,
  * - `'+'` meaning the event should happen at least once,
  * - `'*'` meaning the event may or may not happen one or multiple times.
- * 
+ *
  */
 export function sequence(...tokens: SequenceTokenIndicator[]) { return new Sequence(tokens); }
 

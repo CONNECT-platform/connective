@@ -37,19 +37,19 @@ class InlineComposition extends Composition {
 export function composition(factory: CompositionFactory): () => InlineComposition;
 export function composition(signature: Signature, factory: CompositionFactory): () => InlineComposition;
 /**
- * 
+ *
  * Creates a [composition](https://connective.dev/docs/composition) using given factory function.
  * [Checkout the docs](https://connective.dev/docs/composition) for examples and further information.
- * 
- * @param factoryOrSignature either the [signature](https://connective.dev/docs/agent#signature) of 
+ *
+ * @param factoryOrSignature either the [signature](https://connective.dev/docs/agent#signature) of
  * the composition or the factory function creating it. If signature is not provided, the factory function
  * will be invoked once to deduce the signature.
  * @param factory the factory function for creating the composition. If provided, the first parameter must
  * be a signature.
- * 
+ *
  */
 export function composition(factoryOrSignature: CompositionFactory | Signature, factory?: CompositionFactory) {
-  let signature: Signature; 
+  let signature: Signature;
   if (!factory) {
     factory = factoryOrSignature as CompositionFactory;
     let tracked = <_ChildType[]>[];
