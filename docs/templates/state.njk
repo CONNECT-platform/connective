@@ -100,6 +100,46 @@ wrap(fromEvent(i, 'input'))
   .subscribe(v =&gt; p.innerHTML = v);</code>
 </pre>
 
+<h2 id="value-access">Accessing state value</h2>
+
+You can read the latest value of a <span code>state()</span> or set it manually
+via <span code>.value</span> property:
+
+<pre try="https://stackblitz.com/edit/connective-st-ex6">
+  <code class="javascript">import { state } from '@connectv/core';
+import { fromEvent } from 'rxjs';
+
+let i = document.getElementById('i') as HTMLInputElement;
+let btn = document.getElementById('btn');
+let d = document.getElementById('d');
+
+//
+// --&gt; so lets display a list tof stuff that we can add to and remove from
+//
+
+let stuff = state([]);
+
+stuff.subscribe(list =&gt; {                     // --&gt; when list updates
+  d.innerHTML = '';                           // --&gt; KIDS, this is why we have vdom
+  list.forEach(thing =&gt; {
+    let div = document.createElement('div');  // --&gt; create a div for each thing
+    div.innerText = thing.text;               // --&gt; show its `.text`
+    fromEvent(div, 'click').subscribe(() =&gt; { // --&gt; when the div is clicked
+/*!*/      stuff.value = 
+/*!*/        stuff.value.filter(t =&gt; t !== thing); // --&gt; remove the thing
+    });
+
+    d.appendChild(div);                       // --&gt; yeah add the div to document
+  });
+});
+
+fromEvent(btn, 'click').subscribe(() =&gt; {     // --&gt; when the 'Add' button is clicked
+/*!*/  stuff.value = 
+/*!*/    stuff.value.concat([{ text: i.value }]);  // --&gt; add a thing
+  i.value = '';
+});</code>
+</pre>
+
 <h2 id="change-detection">Change detection</h2>
 
 <span code>state()</span> only changes its value and emits when it receives a value that is
