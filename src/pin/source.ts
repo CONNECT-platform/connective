@@ -13,7 +13,9 @@ import { Connectible } from './connectible';
  *
  */
 export class Source extends Connectible {
-  private _subject = new Subject<Emission>();
+  constructor(private _subject = new Subject<Emission>()){
+    super();
+  }
 
   /**
    *
@@ -107,7 +109,7 @@ export class Source extends Connectible {
  * [Checkout the docs](https://connective.dev/docs/source) for examples and further information.
  *
  */
-export function source() { return new Source(); }
+export function source(sub?: Subject<Emission>) { return new Source(sub); }
 
 
 export default source;

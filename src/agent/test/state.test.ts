@@ -121,4 +121,45 @@ describe('State', () => {
       });
     });
   });
+
+  describe('.value', () => {
+    it('should be the latest value of the state.', () => {
+      let a = new Source();
+      let s = new State(42);
+      a.to(s).subscribe();
+
+      s.value.should.equal(42);
+      a.send(43);
+      s.value.should.equal(43);
+    });
+
+    it('should be writable.', () => {
+      let s = new State();
+      s.bind();
+      s.value = 42;
+      s.value.should.equal(42);
+    });
+
+    it('should cause the state to emit new values.', done => {
+      let s = new State();
+      
+      s.subscribe(v => {
+        v.should.equal(42);
+        done();
+      });
+
+      s.value = 42;
+    });
+
+    it('should not cause the state to re-emit when value does not truly change', () => {
+      let s = new State();
+      let r = 0;
+      s.subscribe(() => r++);
+
+      s.value = { x : 46 };
+      s.value = { x : 46 };
+      s.value = { x: 46, y : 2 };
+      r.should.equal(2);
+    });
+  });
 })

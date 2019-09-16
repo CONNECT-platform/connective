@@ -1,10 +1,14 @@
 import isequal from 'lodash.isequal';
-import { shareReplay, distinctUntilKeyChanged, startWith } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilKeyChanged, tap } from 'rxjs/operators';
 
 import { Bindable } from '../shared/bindable';
-import { emission } from '../shared/emission';
+import { emission, Emission } from '../shared/emission';
 
 import { PinLike } from '../pin/pin-like';
+import group from '../pin/group';
+import source from '../pin/source';
+import filter, { block } from '../pin/filter';
 import pipe from '../pin/pipe';
 
 import { Agent } from './agent';
@@ -34,6 +38,8 @@ export class State extends Agent implements Bindable {
    */
   readonly compare: EqualityFunc;
 
+  private _subject: BehaviorSubject<Emission>;
+
   constructor(initialOrCompare?: any | EqualityFunc);
   constructor(initial: any, compare: EqualityFunc);
   /**
@@ -59,6 +65,8 @@ export class State extends Agent implements Bindable {
         this.compare = isequal;
       }
     }
+
+    this._subject = new BehaviorSubject<Emission>(emission(this.initial));
   }
 
   /**
@@ -78,6 +86,16 @@ export class State extends Agent implements Bindable {
   get output() { return this.out('value'); }
 
   /**
+   * 
+   * Allows reading or updating `State`'s value directly. It will be equal
+   * to the latest value emitted by the `State`, and setting it, if the value
+   * has changed truly, will cause the `State` to emit the new value.
+   * 
+   */
+  public get value() { return this._subject.value.value }
+  public set value(v: any) { if (!this.compare(v, this.value)) this._subject.next(emission(v)); }
+
+  /**
    *
    * Causes the agent to start receiving values even
    * without any subscribers.
@@ -88,22 +106,28 @@ export class State extends Agent implements Bindable {
     return this;
   }
 
+  /**
+   * 
+   * @note `State`'s `.clear()` also causes a complete 
+   * notification to be sent to observers.
+   * 
+   */
+  public clear(): this {
+    this._subject.complete();
+    return super.clear();
+  }
+
   protected createOutput(_: string): PinLike {
     this.checkOutput(_);
-    if (this.initial !== _Unset) {
-      return this.input
-        .to(pipe(
-          startWith(emission(this.initial)),
-          distinctUntilKeyChanged('value', this.compare),
-          shareReplay(1)
-        ))
-    }
-    else
-      return this.input
-        .to(pipe(
-          distinctUntilKeyChanged('value', this.compare),
-          shareReplay(1)
-        ));
+
+    return group(
+      this.input
+        .to(pipe(distinctUntilKeyChanged('value', this.compare)))
+        .to(pipe(tap(e => this._subject.next(e))))
+        .to(block()),
+      source(this._subject)
+    )
+    .to(filter((v: any) => v !== _Unset));
   }
 
   protected createEntries() { return [this.input] }
