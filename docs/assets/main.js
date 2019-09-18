@@ -94,6 +94,28 @@ window.addEventListener('load', function() {
     holder.appendChild(tryBtn);
 
     node.parentNode.insertBefore(holder, node.nextSibling);
+
+    if (node.hasAttribute('preview')) {
+      var prevholder = document.createElement('div');
+      prevholder.setAttribute('class', 'pre-holder');
+
+      var prevholderC = document.createElement('div');
+      prevholderC.setAttribute('class', 'code-holder');
+
+      var prevholderP = document.createElement('div');
+      prevholderP.setAttribute('class', 'preview-holder');
+
+      var preview = document.createElement('iframe');
+      preview.setAttribute('class', 'preview');
+      preview.setAttribute('src', node.getAttribute('preview'));
+
+      prevholderC.appendChild(node);
+      prevholderP.appendChild(preview);
+      prevholder.appendChild(prevholderC);
+      prevholder.appendChild(prevholderP);
+
+      holder.parentNode.insertBefore(prevholder, holder);
+    }
   });
 
   new ClipboardJS('pre[try] + .buttons .copy-btn', {
