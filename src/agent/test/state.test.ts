@@ -94,6 +94,17 @@ describe('State', () => {
     r2.should.eql([21]);
   });
 
+  it('should share its subscriptions.', () => {
+    let s = new State();
+    let a = new Source(); a.to(s);
+    let b = new Source(); b.to(s);
+    let r = 0;
+    s.subscribe(() => r++);
+    s.subscribe();
+    a.send(3);
+    r.should.equal(1);
+  });
+
   describe('.input', () => {
     it('should be equal to `.in("value")`', () => {
       let s = new State();

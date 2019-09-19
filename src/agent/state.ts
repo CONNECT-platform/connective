@@ -1,6 +1,6 @@
 import isequal from 'lodash.isequal';
 import { BehaviorSubject } from 'rxjs';
-import { distinctUntilKeyChanged, tap } from 'rxjs/operators';
+import { distinctUntilKeyChanged, tap, share } from 'rxjs/operators';
 
 import { Bindable } from '../shared/bindable';
 import { emission, Emission } from '../shared/emission';
@@ -122,8 +122,11 @@ export class State extends Agent implements Bindable {
 
     return group(
       this.input
-        .to(pipe(distinctUntilKeyChanged('value', this.compare)))
-        .to(pipe(tap(e => this._subject.next(e))))
+        .to(pipe(
+          distinctUntilKeyChanged('value', this.compare),
+          tap(e => this._subject.next(e)),
+          share(),
+        ))
         .to(block()),
       source(this._subject)
     )
