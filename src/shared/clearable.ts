@@ -5,7 +5,7 @@
  *
  */
 export interface Clearable {
-  clear(): this;
+  clear(): any;
 }
 
 

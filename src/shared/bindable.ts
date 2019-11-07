@@ -5,7 +5,7 @@
  *
  */
 export interface Bindable {
-  bind(): this;
+  bind(): any;
 }
 
 
