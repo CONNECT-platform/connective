@@ -1,6 +1,5 @@
 import isequal from 'lodash.isequal';
 import { BehaviorSubject } from 'rxjs';
-import { distinctUntilKeyChanged, tap, share } from 'rxjs/operators';
 
 import { Bindable } from '../shared/bindable';
 import { emission, Emission } from '../shared/emission';
@@ -8,11 +7,9 @@ import { emission, Emission } from '../shared/emission';
 import { PinLike } from '../pin/pin-like';
 import group from '../pin/group';
 import source, { Source } from '../pin/source';
-import filter, { block } from '../pin/filter';
-import pipe from '../pin/pipe';
+import filter from '../pin/filter';
 
 import { Agent } from './agent';
-import { sink } from '../pin';
 
 
 export type EqualityFunc = (a: any, b: any) => boolean;
