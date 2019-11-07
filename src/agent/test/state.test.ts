@@ -1,7 +1,7 @@
 import { should, expect } from 'chai'; should();
 
-import { State } from '../state';
-import { Source } from '../../pin/source';
+import state, { State } from '../state';
+import source, { Source } from '../../pin/source';
 import { Pin } from '../../pin/pin';
 
 
@@ -76,6 +76,31 @@ describe('State', () => {
 
     a.send('hellow'); expect(_s1).to.equal('hellow'); expect(_s2).to.equal('hellow');
     b.send(42); expect(_s1).to.equal(42); expect(_s2).to.equal(42)
+  });
+
+  it('should be efficient in syncing up bounded states.', () => {
+    let src = source();
+    let s1 = state(42); let s1c = 0;
+    let s2 = state(); let s2c = 0;
+
+    src.to(s1).to(s2).to(s1);
+
+    s1.bind();
+    s2.bind();
+
+    s1.subscribe(() => s1c++);
+    s2.subscribe(() => s2c++);
+
+    s1c.should.equal(1); // one for initial value
+    s2c.should.equal(1);
+
+    src.send(43);
+    s1c.should.equal(2); // one for changing to 43
+    s2c.should.equal(2);
+
+    s2.value = 44;
+    s1c.should.equal(3); // one for changing to 44
+    s2c.should.equal(3);
   });
 
   it('should be possible to provide initial values.', () => {

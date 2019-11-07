@@ -7,11 +7,12 @@ import { emission, Emission } from '../shared/emission';
 
 import { PinLike } from '../pin/pin-like';
 import group from '../pin/group';
-import source from '../pin/source';
+import source, { Source } from '../pin/source';
 import filter, { block } from '../pin/filter';
 import pipe from '../pin/pipe';
 
 import { Agent } from './agent';
+import { sink } from '../pin';
 
 
 export type EqualityFunc = (a: any, b: any) => boolean;
@@ -39,6 +40,7 @@ export class State extends Agent implements Bindable {
   readonly compare: EqualityFunc;
 
   private _subject: BehaviorSubject<Emission>;
+  private _injector: Source;
 
   constructor(initialOrCompare?: any | EqualityFunc);
   constructor(initial: any, compare: EqualityFunc);
@@ -67,6 +69,7 @@ export class State extends Agent implements Bindable {
     }
 
     this._subject = new BehaviorSubject<Emission>(emission(this.initial));
+    this._injector = source();
   }
 
   /**
@@ -93,7 +96,7 @@ export class State extends Agent implements Bindable {
    * 
    */
   public get value() { return this._subject.value.value }
-  public set value(v: any) { if (!this.compare(v, this.value)) this._subject.next(emission(v)); }
+  public set value(v: any) { this._injector.send(v); }
 
   /**
    *
@@ -120,17 +123,10 @@ export class State extends Agent implements Bindable {
   protected createOutput(_: string): PinLike {
     this.checkOutput(_);
 
-    return group(
-      this.input
-        .to(pipe(
-          distinctUntilKeyChanged('value', this.compare),
-          tap(e => this._subject.next(e)),
-          share(),
-        ))
-        .to(block()),
-      source(this._subject)
-    )
-    .to(filter((v: any) => v !== _Unset));
+    return group(this.input, this._injector)
+            .to(filter((v: any) => !this.compare(v, this.value)))
+            .to(source(this._subject))
+            .to(filter((v: any) => v !== _Unset));
   }
 
   protected createEntries() { return [this.input] }
