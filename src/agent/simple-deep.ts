@@ -27,14 +27,14 @@ export class SimpleDeep extends Agent {
       outputs: ['value']
     });
 
+    this.reemit = new Source();
+
     if (stateOrAccessor instanceof State) this.state = stateOrAccessor;
     else {
       this.accessor = stateOrAccessor;
       this.state = new State(this.accessor.initial, compare);
-      this.accessor.get.to(this.state).to(this.accessor.set);
+      this.accessor.get.to(this).to(this.accessor.set);
     }
-
-    this.reemit = new Source();
   }
 
   public sub(index: string | number): SimpleDeep {
@@ -63,8 +63,6 @@ export class SimpleDeep extends Agent {
   get output() { return this.out('value'); }
 
   bind() {
-    this.output; // --> ensure the output is created and wired before-hand.
-
     if (this.accessor) this.accessor.bind();
     else this.track(this.output.subscribe());
     return this;

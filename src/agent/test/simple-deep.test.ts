@@ -126,5 +126,22 @@ describe('SimpleDeep', () => {
       sub.value = 46;
       r.should.equal(2); // --> change
     });
+
+    it('should propagate changes in grandchild states back to the grandparent state as well.', () => {
+      let gp = new SimpleDeep(new State({x : {y : 3}}));
+      let c = gp.sub('x').bind();
+      let gc = c.sub('y').bind();
+      let r = 0; gp.subscribe(() => r++);
+      r.should.equal(1); // --> initial value
+
+      let r2 = 0; c.subscribe(() => r2++);
+      r2.should.equal(1); // --> initial value
+
+      gc.value = 4;
+      r2.should.equal(2); // --> change
+      r.should.equal(2);  // --> change
+      c.value.should.eql({y: 4});
+      gp.value.should.eql({x : { y : 4 }});
+    });
   });
 });
