@@ -40,13 +40,13 @@ export class State extends Agent implements Bindable {
   private _injector: Source;
 
   constructor(initialOrCompare?: any | EqualityFunc);
-  constructor(initial: any, compare: EqualityFunc);
+  constructor(initial: any, compare: EqualityFunc | undefined);
   /**
    *
    * @param initialOrCompare either initial value or equality function
    * @param compare the equality function, if provided the first parameter must be the initial value.
    */
-  constructor(initialOrCompare: EqualityFunc | any = isequal, compare?: EqualityFunc) {
+  constructor(initialOrCompare: EqualityFunc | any = isequal, compare?: EqualityFunc | undefined) {
     super({
       inputs: ['value'],
       outputs: ['value']
@@ -131,6 +131,8 @@ export class State extends Agent implements Bindable {
 }
 
 
+// TODO: correct the signature of this function
+// TODO: add overloads for this function
 /**
  *
  * Creates a [state](https://connective.dev/docs/state) agent.
