@@ -1,11 +1,11 @@
 import { map, share } from 'rxjs/operators';
 
 import emission from '../shared/emission';
+import createRandomTag from '../util/random-tag';
 
 import { Pipe } from './pipe';
 
 
-const _ForkTagChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
 const _DefaultForkTagLength = 10;
 
 
@@ -27,10 +27,7 @@ export class Fork extends Pipe {
   }
 
   private static _create_fork_tag(len: number = _DefaultForkTagLength): string {
-    let res = '';
-    for (let i = 0; i < len; i++)
-      res += _ForkTagChars[Math.floor(Math.random() * _ForkTagChars.length)];
-    return res;
+    return createRandomTag(len);
   }
 }
 

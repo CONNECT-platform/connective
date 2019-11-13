@@ -1,9 +1,11 @@
+import createRandomTag from "../util/random-tag";
 import { emission } from "../shared";
 
-import { PinLike, map, sink, group, Source } from "../pin";
+import { PinLike, map, sink, group, Source, filter } from "../pin";
 
 import { Agent } from "./agent";
 import { State, EqualityFunc } from "./state";
+import { Signature } from "./signature";
 
 
 export interface DeepAccessor {
@@ -15,25 +17,40 @@ export interface DeepAccessor {
 
 
 export class SimpleDeep extends Agent {
-  private state: State;
-  private accessor: DeepAccessor;
   readonly reemit: Source;
+  protected state: State;
+  private accessor: DeepAccessor;
+  private downPropageteKey: string;
 
   constructor(state: State);
   constructor(accessor: DeepAccessor, compare?: EqualityFunc);
-  constructor(stateOrAccessor: State | DeepAccessor, compare?: EqualityFunc) {
-    super({
+  constructor(stateOrAccessor: State | DeepAccessor, compare?: EqualityFunc | undefined);
+  constructor(stateOrAccessor: State | DeepAccessor, compare?: EqualityFunc | undefined, signature?: Signature);
+  constructor(stateOrAccessor: State | DeepAccessor, compare?: EqualityFunc | undefined, signature?: Signature) {
+    super(signature || {
       inputs: ['value'],
       outputs: ['value']
     });
 
     this.reemit = new Source();
+    this.downPropageteKey = createRandomTag();
 
     if (stateOrAccessor instanceof State) this.state = stateOrAccessor;
     else {
       this.accessor = stateOrAccessor;
       this.state = new State(this.accessor.initial, compare);
-      this.accessor.get.to(this).to(this.accessor.set);
+      this.accessor.get
+        .to(map((_, done, __, context) => {
+          context[this.downPropageteKey] = true;
+          done(_);
+        }))
+        .to(this)
+        .to(filter((_, done, __, context) => {
+          const downPropagated = context[this.downPropageteKey];
+          delete context[this.downPropageteKey];
+          done(!downPropagated);
+        }))
+        .to(this.accessor.set);
     }
   }
 
@@ -68,7 +85,7 @@ export class SimpleDeep extends Agent {
     return this;
   }
 
-  protected createOutput(_: string) {
+  protected createOutput(_: string): PinLike {
     this.checkOutput(_);
 
     return group(

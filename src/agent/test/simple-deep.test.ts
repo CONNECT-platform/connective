@@ -49,6 +49,16 @@ describe('SimpleDeep', () => {
       r.should.equal(2);
     });
 
+    it('should not cause a reemit on parent when it receives a down-propagated value.', () => {
+      let s = new SimpleDeep(new State([42, 43, 44]));
+      s.sub(1).bind();
+      let r = 0; s.subscribe(() => r++);
+      r.should.equal(1);
+
+      s.value = [42, 45, 44];
+      r.should.equal(2);
+    });
+
     it('should sync value of different subs with same index.', () => {
       let s = new SimpleDeep(new State([42, 43, 44]));
       let sub = s.sub(1).bind();
