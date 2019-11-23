@@ -19,4 +19,5 @@ describe('agent', () => {
   require('./check.test');
   require('./inline-composition.test');
   require('./simple-deep.test');
+  require('./keyed-deep.test');
 });

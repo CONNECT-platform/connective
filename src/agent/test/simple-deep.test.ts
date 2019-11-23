@@ -8,7 +8,7 @@ import { testStateSpec } from './state.spec';
 
 describe('SimpleDeep', () => {
   describe('state-like behaviour', () => {
-    testStateSpec((...args: any[]) => new SimpleDeep(new State(...args)));
+    testStateSpec((...args: []) => new SimpleDeep(new State(...args)));
   });
 
   describe('.sub()', () => {
@@ -152,6 +152,46 @@ describe('SimpleDeep', () => {
       r.should.equal(2);  // --> change
       c.value.should.eql({y: 4});
       gp.value.should.eql({x : { y : 4 }});
+    });
+
+    it('should key values of grandchild states sync.', () => {
+      let gp = new SimpleDeep(new State({x : {y : 3}}));
+      let gc1 = gp.sub('x').bind().sub('y').bind();
+      let gc2 = gp.sub('x').bind().sub('y').bind();
+
+      gc1.value = 4;
+      gc2.value.should.equal(4);
+    });
+
+    it('should sync values of grandchild states efficiently.', () => {
+      let gp = new SimpleDeep(new State({x : {y : 3}}));
+      let r = 0; gp.subscribe(() => r++);
+
+      let c1 = gp.sub('x').bind(); let rc1 = 0; c1.subscribe(() => rc1++);
+      let gc1 = c1.sub('y').bind(); let rgc1 = 0; gc1.subscribe(() => rgc1++);
+
+      let c2 = gp.sub('x').bind(); let rc2 = 0; c2.subscribe(() => rc2++);
+      let gc2 = c2.sub('y').bind(); let rgc2 = 0; gc2.subscribe(() => rgc2++);
+
+      r.should.equal(1); // --> initial value
+      rc1.should.equal(1); 
+      rgc1.should.equal(1);
+      rc2.should.equal(1);
+      rgc2.should.equal(1);
+
+      c2.value = {y: 4};
+      r.should.equal(2);
+      rc1.should.equal(2);
+      rgc1.should.equal(2);
+      rc2.should.equal(2);
+      rgc2.should.equal(2);
+
+      gc1.value = 5;
+      r.should.equal(3);
+      rc1.should.equal(3);
+      rgc1.should.equal(3);
+      rc2.should.equal(3);
+      rgc2.should.equal(3);
     });
   });
 });

@@ -118,6 +118,18 @@ export function testStateSpec(stateFactory: (...args: any[]) => any) {
     r2.should.eql([21]);
   });
 
+  it('should work properly with `undefined` as initial value.', () => {
+    let s = stateFactory(undefined);
+    expect(s.value).to.be.undefined;
+  });
+
+  it('should work properly with `undefined` as initial and a compare function', () => {
+    let comp = (x: any, y: any) => x == y;
+    let s = stateFactory(undefined, comp);
+    expect(s.value).to.be.undefined;
+    s.compare.should.equal(comp);
+  });
+
   it('should share its subscriptions.', () => {
     let s = stateFactory();
     let a = new Source(); a.to(s);
@@ -195,6 +207,14 @@ export function testStateSpec(stateFactory: (...args: any[]) => any) {
       s.value = { x : 46 };
       s.value = { x: 46, y : 2 };
       r.should.equal(2);
+    });
+  });
+
+  describe('.compare', () => {
+    it('should be the state\'s compare function.', () => {
+      let comp = (x: any, y: any) => x == y;
+      let s = stateFactory(comp);
+      s.compare.should.equal(comp);
     });
   });
 }

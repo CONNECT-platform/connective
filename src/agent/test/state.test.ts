@@ -4,5 +4,5 @@ import { testStateSpec } from './state.spec';
 
 
 describe('State', () => {
-  testStateSpec((...args: any[]) => new State(...args));
+  testStateSpec((...args: []) => new State(...args));
 });

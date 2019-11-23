@@ -19,8 +19,9 @@ export interface DeepAccessor {
 export class SimpleDeep extends Agent {
   readonly reemit: Source;
   protected state: State;
-  private accessor: DeepAccessor;
+  protected accessor: DeepAccessor;
   private downPropageteKey: string;
+  private bound = false;
 
   constructor(state: State);
   constructor(accessor: DeepAccessor, compare?: EqualityFunc);
@@ -59,14 +60,23 @@ export class SimpleDeep extends Agent {
     let _this = this;
 
     return new SimpleDeep({
-      initial: _this.value[index],
-      get: _this.output.to(map((v: any) => v[index])), 
+      initial: (_this.value || [])[index],
+      get: _this.output.to(map((v: any) => (v || [])[index])), 
       set: sink((v, context) => {
         try {
-          _this.value[index] = v;
+          if (!_this.value) _this.value = [];
+
+          if (this.accessor) {
+            _this.value = (Array.isArray(_this.value))?
+                          Object.assign([], _this.value, {[index]: v}):
+                          Object.assign({}, _this.value, {[index]: v});
+          }
+          else {
+            _this.value[index] = v;
     
-          if (initialized) this.reemit.emit(emission(v, context));
-          else initialized = true;
+            if (initialized) this.reemit.emit(emission(v, context));
+            else initialized = true;
+          }
         } catch(_) {}
       }),
       bind() { return this.set.subscribe(); },
@@ -76,12 +86,17 @@ export class SimpleDeep extends Agent {
   public get value(): any { return this.state.value; }
   public set value(v: any) { this.state.value = v; }
 
+  public get compare() { return this.state.compare; }
+
   get input() { return this.in('value'); }
   get output() { return this.out('value'); }
 
   bind() {
-    if (this.accessor) this.accessor.bind();
-    else this.track(this.output.subscribe());
+    if (!this.bound) {
+      if (this.accessor) this.accessor.bind();
+      else this.track(this.output.subscribe());
+      this.bound = true;
+    }
     return this;
   }
 

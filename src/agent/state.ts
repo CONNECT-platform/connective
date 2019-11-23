@@ -39,20 +39,25 @@ export class State extends Agent implements Bindable {
   private _subject: BehaviorSubject<Emission>;
   private _injector: Source;
 
-  constructor(initialOrCompare?: any | EqualityFunc);
-  constructor(initial: any, compare: EqualityFunc | undefined);
+  constructor();
+  constructor(initialOrCompare: any | EqualityFunc | undefined);
+  constructor(initial: any | undefined, compare: EqualityFunc | undefined);
   /**
    *
    * @param initialOrCompare either initial value or equality function
    * @param compare the equality function, if provided the first parameter must be the initial value.
    */
-  constructor(initialOrCompare: EqualityFunc | any = isequal, compare?: EqualityFunc | undefined) {
+  constructor(initialOrCompare: EqualityFunc | any = _Unset, compare?: EqualityFunc | undefined) {
     super({
       inputs: ['value'],
       outputs: ['value']
     });
 
-    if (compare) {
+    if (initialOrCompare == _Unset && !compare) {
+      this.initial = _Unset;
+      this.compare = isequal;
+    }
+    else if (compare) {
       this.initial = initialOrCompare;
       this.compare = compare;
     }
@@ -92,7 +97,7 @@ export class State extends Agent implements Bindable {
    * has changed truly, will cause the `State` to emit the new value.
    * 
    */
-  public get value() { return this._subject.value.value }
+  public get value() { return (this._subject.value.value !== _Unset)?(this._subject.value.value):undefined }
   public set value(v: any) { this._injector.send(v); }
 
   /**
@@ -131,18 +136,22 @@ export class State extends Agent implements Bindable {
 }
 
 
-// TODO: correct the signature of this function
-// TODO: add overloads for this function
+export function state(): State;
+export function state(initialOrCompare: any | EqualityFunc): State;
+export function state(initial: any, compare: EqualityFunc): State;
 /**
  *
  * Creates a [state](https://connective.dev/docs/state) agent.
  * State agents can hold state in a reactive flow.
  * [Checkout the docs](https://connective.dev/docs/state) for examples and further information.
  *
- * @param compare the equality function to be used to determine state change
+ * @param initialOrCompare the initial value or compare function
+ * @param compare the equality function to be used to determine state change, in case initial value is provided
  *
  */
-export function state(compare: any | EqualityFunc = isequal) { return new State(compare); }
+export function state(initialOrCompare?: any | EqualityFunc | undefined, compare?: EqualityFunc | undefined) {
+    return new State(initialOrCompare, compare); 
+}
 
 
 export default state;
