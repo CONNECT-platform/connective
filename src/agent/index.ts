@@ -21,6 +21,11 @@ import { singleton } from './singleton';
 import { sampler } from './sampler';
 import { composition } from './inline-composition';
 
+import { KeyFunc, ChangeMap, AdditionList, DeletionList, MoveList } from '../util/keyed-array-diff';
+import { KeyedDeep } from './keyed-deep';
+import { SimpleDeep } from './simple-deep';
+import { deep } from './deep';
+
 import { ChildNotDefined } from './errors/child-not-defined.error';
 import { ChildIsNotAgent, ChildIsNotPin } from './errors/child-type-mismatch.error';
 import { InsufficientInputs } from './errors/insufficient-input.error';
@@ -39,4 +44,6 @@ export {
   exec, call, singleton, sampler,
   ChildIsNotAgent, ChildIsNotPin, ChildNotDefined,
   InsufficientInputs, InputNotInSignature, OutputNotInSignature,
+  deep, SimpleDeep, KeyedDeep,
+  KeyFunc, ChangeMap, AdditionList, MoveList, DeletionList,
 }
