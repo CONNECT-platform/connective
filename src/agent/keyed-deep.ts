@@ -1,11 +1,17 @@
-import { emission } from "../shared";
+import { distinctUntilKeyChanged } from "rxjs/operators";
 
+import { emission } from "../shared/emission";
 import { KeyMap, KeyFunc, ChangeMap, diff } from "../util/keyed-array-diff";
-import { map, PinLike, sink, group, value, pipe } from "../pin";
+
+import { map } from "../pin/map";
+import { sink } from "../pin/sink";
+import { group } from "../pin/group";
+import { value } from "../pin/value";
+import { pipe } from "../pin/pipe";
+import { PinLike } from "../pin/pin-like";
 
 import { SimpleDeep, DeepAccessor } from "./simple-deep";
 import { State, EqualityFunc } from "./state";
-import { distinctUntilKeyChanged } from "rxjs/operators";
 
 
 export class KeyedDeep extends SimpleDeep {

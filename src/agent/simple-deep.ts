@@ -1,7 +1,12 @@
 import createRandomTag from "../util/random-tag";
-import { emission } from "../shared";
+import { emission } from "../shared/emission";
 
-import { PinLike, map, sink, group, Source, filter } from "../pin";
+import { map } from "../pin/map";
+import { sink } from "../pin/sink";
+import { group } from "../pin/group";
+import { filter } from "../pin/filter";
+import { Source } from "../pin/source";
+import { PinLike } from "../pin/pin-like";
 
 import { Agent } from "./agent";
 import { State, EqualityFunc } from "./state";
