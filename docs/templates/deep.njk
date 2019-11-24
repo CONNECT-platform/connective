@@ -1,0 +1,295 @@
+{% extends '_base.njk' %}
+
+{% block content %}
+<br><br>
+
+<h1 id="">Deep States</h1>
+
+You can use <span code>deep(state(...))</span> for situations when you need to be able to
+treat indices or properties of a <span code>state()</span> as a reactive states as well:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex1">
+  <code class="javascript">/*!*/import { state, deep } from '@connectv/core';
+
+/*!*/let s = deep(state([1, 2, 3, 4]));    // --&gt; create a deep state
+
+/*!*/s.sub(2).subscribe(console.log);      // --&gt; subscribe on index 2
+
+                                      // &gt; 3 (initial value)
+s.value = [1, 5, 6, 7, 8];            // &gt; 6
+s.value = [8, 5, 3]                   // --&gt; no log since no emission
+s.value = [true, false];              // &gt; undefined
+s.value = ['hellow', 'world', 'wow']; // &gt; wow</code>
+</pre>
+
+In this example, <span code>s.sub(2)</span> is a reactive state whose value is index 2 on
+<span code>s</span>, i.e. its a <i>sub-state</i> of <span code>s</span> on index 2. You can similarly
+create <i>sub-state</i>s on properties of an object:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex2">
+  <code class="javascript">import { state, deep } from '@connectv/core';
+
+let s = deep(state({
+  name: 'John',
+  address: {
+    city: 'Munich',
+    street: 'Theresien St.'
+  }
+}));
+
+/*!*/s.sub('address')
+/*!*/ .sub('street').subscribe(console.log);  // --> subscribe on `address.street`
+
+s.value = {
+  name: 'John',
+  address: {
+    city: 'Munich',
+    street: 'Leopold St.'
+  }
+};</code>
+</pre>
+
+<h2 id="two-way-data">Two-way data flow</h2>
+
+By default, <i>sub-state</i>s only receive data from their parent state, i.e. data only
+<i>down-propagate</i>s from parent to child. You can enable <i>up-propagation</i>, i.e. causing
+a child state to also update parent state's value, by calling <span code>.bind()</span> on the sub-state:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex3">
+  <code class="javascript">import { state, deep } from '@connectv/core';
+
+let s = deep(state({
+  name: 'John',
+  address: {
+    city: 'Munich',
+    street: 'Theresien St.'
+  }
+}));
+
+s.subscribe(console.log);        // --&gt; log changes of parent state
+
+/*!*/let name = s.sub('name').bind(); // --&gt; get `.name` as a bound sub-state
+/*!*/name.value = 'Jack';             // --&gt; change value of `.name`</code>
+</pre>
+
+Note that for <i>up-propagating</i> from grand-child states (for example from a property-chain), you would
+need to bind every sub-state down from the parent state:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex4">
+  <code class="javascript">import { state, deep } from '@connectv/core';
+
+let s = deep(state({
+  name: 'John',
+  address: {
+    city: 'Munich',
+    street: 'Theresien St.'
+  }
+}));
+
+s.subscribe(console.log);          // --&gt; log changes of parent state
+
+/*!*/let city = s.sub('address').bind() // --&gt; get `.address` and bind it
+/*!*/            .sub('city').bind();   // --&gt; get `.city` and bind it
+city.value = 'Berlin';             // --&gt; update `.city`</code>
+</pre>
+
+<h2 id="keyed-deep">Keyed states</h2>
+
+In some cases, it might be more interesting to track entities regardless of their position
+in a collection. For example, if you have a list such as the following:
+
+<pre><code class="javascript">let users = [
+  {
+/*!*/    id: 47391,
+    name: 'John',
+    age: 23
+  },
+  {
+/*!*/    id: 59370,
+    name: 'Jill',
+    age: 32
+  },
+  {
+/*!*/    id: 10400,
+    name: 'Jar Jar',
+    age: 20
+  }
+];</code></pre>
+
+You might be more interested in having a sub-state reflecting the age of Jar Jar instead of age of the third person
+in the list, as the third person in the list might not necessarily be Jar Jar or you might not care about his position
+in the list, just his age (and even if you do, it is a separate concern).
+
+<br><br>
+
+The important distinction in such a case is that your logic needs to identify entities in the collection not by their
+position in the collection but through some other manner, e.g. <span code>id</span> field in the case of above example.
+In that case, you can provide a <i>key function</i> to <span code>deep()</span>, which it will then use to identify
+entities with, and you can access a particular entity with a particular identifier value using
+the <span code>.key()</span> method:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex5">
+  <code class="javascript">import { state, deep } from '@connectv/core';
+
+let s = deep(state([
+  {
+    id: 47391,
+    name: 'John',
+    age: 23
+  },
+  {
+    id: 59370,
+    name: 'Jill',
+    age: 32
+  },
+  {
+    id: 10400,
+    name: 'Jar Jar',
+    age: 20
+  }
+]), 
+/*!*/ u => u.id);                       // --&gt; the key function
+
+/*!*/ let jarjarAge = s
+/*!*/                 .key(10400)      // --&gt; Jar Jar is id 10400 ...
+/*!*/                 .sub('age');     // ... lets look at his age ...
+jarjarAge.subscribe(console.log); // ... and log it
+
+s.value = [
+  {
+    id: 10400,
+    name: 'Jar Jar',
+    age: 21
+  },
+  {
+    id: 39104,
+    name: 'Joseph',
+    age: 71
+  },
+];</code>
+</pre>
+
+<h3 id="two-way-keyed">Two-way data flow</h2>
+
+Similar to normal sub-states, keyed sub-states by default only receive values from parent state.
+You can similarly enable up-propagation of data by calling <span code>.bind()</span> on them:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex6">
+  <code class="javascript">import { state, deep } from '@connectv/core';
+
+let s = deep(state([
+  {
+    id: 47391,
+    name: 'John',
+    age: 23
+  },
+  {
+    id: 59370,
+    name: 'Jill',
+    age: 32
+  },
+  {
+    id: 10400,
+    name: 'Jar Jar',
+    age: 20
+  }
+]), 
+/*!*/u => u.id);
+
+s.subscribe(console.log);
+
+/*!*/let jarjarAge = s.key(10400).bind()
+/*!*/                 .sub('age').bind(); // --&gt; enable up-propagation
+/*!*/jarjarAge.value = 24;                // --&gt; so this causes parent to 
+/*!*/                                     // ... reemit with updated jar jar age</code>
+</pre>
+
+<h3 id="index-tracking">Index tracking</h3>
+
+On a keyed deep state you can also track index changes of a particular entity
+using <span code>.index()</span> method:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex7">
+  <code class="javascript">import { state, deep } from '@connectv/core';
+
+let s = deep(
+          state([{name: 'Jack'}, {name: 'Jill'}]), 
+          u => u.name
+        );
+
+/*!*/s.index('Jack').subscribe(console.log);     // --&gt; log index of 'Jack'
+                                            // &gt; 0  (initial index)
+s.value = [{name: 'Jill'}, {name: 'Jack'}]; // &gt; 1  (index after change)
+s.value = [{name: 'Jill'}];                 // &gt; -1 (index after removal)</code>
+</pre>
+
+<h3 id="change-detection">Change detection</h3>
+
+You can also track collection-wide changes on keyed deep states using <span code>.changes</span>,
+which is a <a href="/docs/pin"><span code>pin</span></a> that emits when entities are added, removed or
+moved around in the collection:
+
+<pre try="https://stackblitz.com/edit/connective-deep-ex8">
+  <code class="javascript">import { state, deep } from '@connectv/core';
+
+let s = deep(
+          state([{name: 'Jack'}, {name: 'Jill'}]), 
+          u => u.name
+        );
+
+/*!*/s.changes.subscribe(console.log);
+
+s.value = [{name: 'Jill'}, {name: 'Jack'}];                    // --&gt; items being moved around
+s.value = [{name: 'Joseph'}, {name: 'Jill'}, {name: 'Jack'}];  // --&gt; item added
+s.value = [{name: 'Joseph'}, {name: 'Jack'}];                  // --&gt; item removed</code>
+</pre>
+
+Each emission of <span code>.changes</span> is an object with three keys:
+
+<ul>
+  <li><b><span code>.additions</span></b>: contains all new entities being added to the collection
+      with the indexes they are added on,</li>
+    <li><b><span code>.deletions</span></b>: contains all new entities being removed from the collection
+      with the indexes they last resided on,</li>
+    <li><b><span code>.moves</span></b>: contains all new entities being moved around in the collection
+      with their old and new indexes.</li>
+</ul>
+
+<b>NOTE</b> that <span code>.changes</span> is <i>ONLY</i> available on keyed deep states as the state requires
+the key function to be able to track entities in the collection independent of their indexes.
+
+<br><br>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/deep.ts" target="_blank">
+      Source code
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/simple-deep.test.ts" 
+      target="_blank">
+      <span code>SimpleDeep</span> Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/simple-deep.ts" target="_blank">
+      <span code>SimpleDeep</span> source code
+    </a>
+  </li>
+    <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/test/keyed-deep.test.ts" 
+      target="_blank">
+      <span code>KeyedDeep</span> Specification (test suite)
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/CONNECT-platform/connective/blob/master/src/agent/keyed-deep.ts" target="_blank">
+      <span code>KeyedDeep</span> source code
+    </a>
+  </li>
+</ul>
+
+{% endblock %}

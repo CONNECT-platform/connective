@@ -51,7 +51,7 @@ export class KeyedDeep extends SimpleDeep {
                                 Object.assign([], _this.value, {[_entry.index]: v}):
                                 Object.assign({}, _this.value, {[_entry.index]: v});
             }
-            else {            
+            else {
               _this.value[_entry.index] = v;
 
               if (initialized) this.reemit.emit(emission(v, context));
