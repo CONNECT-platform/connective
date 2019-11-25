@@ -10,7 +10,7 @@ import { value } from "../pin/value";
 import { pipe } from "../pin/pipe";
 import { PinLike } from "../pin/pin-like";
 
-import { SimpleDeep, DeepAccessor } from "./simple-deep";
+import { SimpleDeep, DeepAccessor, DeepChildFactory } from "./simple-deep";
 import { State, EqualityFunc } from "./state";
 
 
@@ -40,21 +40,22 @@ export class KeyedDeep extends SimpleDeep {
   }
 
   public key(key: string | number): SimpleDeep;
-  public key(key: string | number, subkeyfunc: KeyFunc): KeyedDeep;
+  public key<T extends SimpleDeep>(key: string | number, factory: DeepChildFactory<T>): T;
   /**
    *
    * Creates a sub-state bound to entity identified by given key. Entity `x` is
    * said to be identified by key `k` if `state.keyfunc(x) === k`.
    *
    * @param key the identifier of the entity to track
-   * @param subkeyfunc a key function for the sub-state. provide IF the sub-state also needs to be keyed.
+   * @param factory the factory function to be used to construct the sub-state
    *
    */
-  public key(key: string | number, subkeyfunc?: KeyFunc): SimpleDeep | KeyedDeep {
+  public key<T extends SimpleDeep>(key: string | number, factory?: DeepChildFactory<T>): SimpleDeep | T {
     let initialized = false;
     let _this = this;
+    let _factory = factory || ((accessor: DeepAccessor, compare: EqualityFunc) => new SimpleDeep(accessor, compare));
 
-    let accessor: DeepAccessor = {
+    return _factory({
       initial: (_this._keyMap[key] || {item: undefined}).item
               || (Object.values(this.value) || []).find((i: any) => this.keyfunc(i) == key),
       get: group(_this.changes, _this.reemit).to(map(() => (_this._keyMap[key] || {item: undefined}).item)),
@@ -79,10 +80,7 @@ export class KeyedDeep extends SimpleDeep {
         } catch (err) {}
       }),
       bind() { return this.set.subscribe(); },
-    }
-
-    if (subkeyfunc) return new KeyedDeep(accessor, subkeyfunc, this.state.compare);
-    else return new SimpleDeep(accessor, this.state.compare);
+    }, this.state.compare);
   }
 
   /**

@@ -21,6 +21,8 @@ export interface DeepAccessor {
 }
 
 
+export type DeepChildFactory<T extends SimpleDeep> = (accessor: DeepAccessor, compare: EqualityFunc) => T;
+
 /**
  *
  * Represents non-keyed (simple) [deep states](https://connective.dev/docs/deep).
@@ -78,19 +80,23 @@ export class SimpleDeep extends Agent {
     }
   }
 
+  public sub(index: string | number): SimpleDeep;
+  public sub<T extends SimpleDeep>(index: string | number, factory: DeepChildFactory<T>): T;
   /**
    *
    * Creates a sub-state for given index/property.
    * [Read this](https://connective.dev/docs/deep) for more details
    *
    * @param index
+   * @param factory the factory function to be used to construct the sub-state
    *
    */
-  public sub(index: string | number): SimpleDeep {
+  public sub<T extends SimpleDeep>(index: string | number, factory?: DeepChildFactory<T>): SimpleDeep | T {
     let initialized = false;
     let _this = this;
+    let _factory = factory || ((accessor: DeepAccessor, compare: EqualityFunc) => new SimpleDeep(accessor, compare));
 
-    return new SimpleDeep({
+    return _factory({
       initial: (_this.value || [])[index],
       get: _this.output.to(map((v: any) => (v || [])[index])),
       set: sink((v, context) => {

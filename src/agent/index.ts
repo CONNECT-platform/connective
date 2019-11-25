@@ -23,8 +23,8 @@ import { composition } from './inline-composition';
 
 import { KeyFunc, ChangeMap, AdditionList, DeletionList, MoveList } from '../util/keyed-array-diff';
 import { KeyedDeep } from './keyed-deep';
-import { SimpleDeep } from './simple-deep';
-import { deep } from './deep';
+import { SimpleDeep, DeepAccessor, DeepChildFactory } from './simple-deep';
+import { deep, keyed } from './deep';
 
 import { ChildNotDefined } from './errors/child-not-defined.error';
 import { ChildIsNotAgent, ChildIsNotPin } from './errors/child-type-mismatch.error';
@@ -44,6 +44,7 @@ export {
   exec, call, singleton, sampler,
   ChildIsNotAgent, ChildIsNotPin, ChildNotDefined,
   InsufficientInputs, InputNotInSignature, OutputNotInSignature,
-  deep, SimpleDeep, KeyedDeep,
+  deep, keyed, SimpleDeep, KeyedDeep,
+  DeepAccessor, DeepChildFactory,
   KeyFunc, ChangeMap, AdditionList, MoveList, DeletionList,
 }
