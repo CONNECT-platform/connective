@@ -121,7 +121,7 @@ describe('KeyedDeep', () => {
       let gc2 = c2.sub('name').bind(); let rgc2 = 0; gc2.subscribe(() => rgc2++);
 
       r.should.equal(1); // --> initial value
-      rc1.should.equal(1); 
+      rc1.should.equal(1);
       rgc1.should.equal(1);
       rc2.should.equal(1);
       rgc2.should.equal(1);

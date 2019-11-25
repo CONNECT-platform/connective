@@ -15,14 +15,25 @@ import { Signature } from "./signature";
 
 export interface DeepAccessor {
   initial: any;
-  set: PinLike; 
+  set: PinLike;
   get: PinLike;
   bind(): void;
 }
 
 
+/**
+ *
+ * Represents non-keyed (simple) [deep states](https://connective.dev/docs/deep).
+ *
+ */
 export class SimpleDeep extends Agent {
+  /**
+   *
+   * can be used to force re-emission of state value.
+   *
+   */
   readonly reemit: Source;
+
   protected state: State;
   protected accessor: DeepAccessor;
   private downPropageteKey: string;
@@ -32,6 +43,13 @@ export class SimpleDeep extends Agent {
   constructor(accessor: DeepAccessor, compare?: EqualityFunc);
   constructor(stateOrAccessor: State | DeepAccessor, compare?: EqualityFunc | undefined);
   constructor(stateOrAccessor: State | DeepAccessor, compare?: EqualityFunc | undefined, signature?: Signature);
+  /**
+   *
+   * @param stateOrAccessor underlying state of this deep state or a state tree accessor (for sub-states)
+   * @param compare equality function used to detect changes. If state is passed as first argument this is ignored.
+   * @param signature the signature of the state, to be overriden by child classes.
+   *
+   */
   constructor(stateOrAccessor: State | DeepAccessor, compare?: EqualityFunc | undefined, signature?: Signature) {
     super(signature || {
       inputs: ['value'],
@@ -60,13 +78,21 @@ export class SimpleDeep extends Agent {
     }
   }
 
+  /**
+   *
+   * Creates a sub-state for given index/property.
+   * [Read this](https://connective.dev/docs/deep) for more details
+   *
+   * @param index
+   *
+   */
   public sub(index: string | number): SimpleDeep {
     let initialized = false;
     let _this = this;
 
     return new SimpleDeep({
       initial: (_this.value || [])[index],
-      get: _this.output.to(map((v: any) => (v || [])[index])), 
+      get: _this.output.to(map((v: any) => (v || [])[index])),
       set: sink((v, context) => {
         try {
           if (!_this.value) _this.value = [];
@@ -88,14 +114,45 @@ export class SimpleDeep extends Agent {
     }, this.state.compare);
   }
 
+  /**
+   *
+   * Allows reading or updating state's value directly.
+   *
+   */
   public get value(): any { return this.state.value; }
   public set value(v: any) { this.state.value = v; }
 
+  /**
+   *
+   * The equality function used by this deep state. Is used for change detection.
+   *
+   */
   public get compare() { return this.state.compare; }
 
+  /**
+   *
+   * Shortcut for `.in('value')`, on which the state receives new values.
+   * [Read this](https://connective.dev/docs/state#signature) for more details.
+   *
+   */
   get input() { return this.in('value'); }
+
+  /**
+   *
+   * Shortcut for `.out('value')`, on which the state emits new values.
+   * [Read this](https://connective.dev/docs/state#signature) for more details.
+   *
+   */
   get output() { return this.out('value'); }
 
+  /**
+   *
+   * Binds the underlying state. If this is a sub-state, it will also
+   * allow up-propagation of state value, causing the parent state to pick up
+   * changes made to the value of this sub-state. [Read this](https://connective.dev/docs/deep#two-way-data)
+   * for more details and examples.
+   *
+   */
   bind() {
     if (!this.bound) {
       if (this.accessor) this.accessor.bind();

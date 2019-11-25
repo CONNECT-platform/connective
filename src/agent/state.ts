@@ -91,11 +91,11 @@ export class State extends Agent implements Bindable {
   get output() { return this.out('value'); }
 
   /**
-   * 
+   *
    * Allows reading or updating `State`'s value directly. It will be equal
    * to the latest value emitted by the `State`, and setting it, if the value
    * has changed truly, will cause the `State` to emit the new value.
-   * 
+   *
    */
   public get value() { return (this._subject.value.value !== _Unset)?(this._subject.value.value):undefined }
   public set value(v: any) { this._injector.send(v); }
@@ -112,10 +112,10 @@ export class State extends Agent implements Bindable {
   }
 
   /**
-   * 
-   * @note `State`'s `.clear()` also causes a complete 
+   *
+   * @note `State`'s `.clear()` also causes a complete
    * notification to be sent to observers.
-   * 
+   *
    */
   public clear(): this {
     this._subject.complete();
@@ -150,7 +150,7 @@ export function state(initial: any, compare: EqualityFunc): State;
  *
  */
 export function state(initialOrCompare?: any | EqualityFunc | undefined, compare?: EqualityFunc | undefined) {
-    return new State(initialOrCompare, compare); 
+    return new State(initialOrCompare, compare);
 }
 
 

@@ -1,10 +1,82 @@
 export type KeyFunc = (obj: any) => string | number;
 export type KeyMap = {[key: string]: {item: any, index: string}};
 
-export type AdditionList = {index: string, item: any}[];
-export type DeletionList = {index: string, item: any}[];
-export type MoveList = {oldIndex: string, newIndex: string, item: any}[];
-export type ChangeMap = { additions: AdditionList, deletions: DeletionList, moves: MoveList };
+export type AdditionList = {
+  /**
+   *
+   * The index that the item was added on.
+   *
+   */
+  index: string, 
+
+  /**
+   *
+   * The added item
+   *
+   */
+  item: any
+}[];
+
+export type DeletionList = {
+  /**
+   *
+   * The index the deleted item used to be on
+   *
+   */
+  index: string,
+
+  /**
+   *
+   * The deleted item
+   *
+   */
+  item: any
+}[];
+
+export type MoveList = {
+  /**
+   *
+   * The index the item used to be on
+   *
+   */
+  oldIndex: string,
+  /**
+   *
+   * The new index of the item
+   *
+   */
+  newIndex: string,
+
+  /**
+   *
+   * The moved item
+   *
+   */
+  item: any
+}[];
+
+export type ChangeMap = {
+  /**
+   *
+   * List of items added to the list
+   *
+   */
+  additions: AdditionList,
+
+  /**
+   *
+   * List of items removed from the list
+   *
+   */
+  deletions: DeletionList,
+
+  /**
+   *
+   * List of items moved around in the list
+   *
+   */
+  moves: MoveList
+};
 
 
 export function diff(value: any, oldKeyMap: KeyMap, keyfunc: KeyFunc): {
