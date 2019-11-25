@@ -1,5 +1,6 @@
 import createRandomTag from "../util/random-tag";
 import { emission } from "../shared/emission";
+import { TrackCallback } from "../shared/types";
 
 import { map } from "../pin/map";
 import { sink } from "../pin/sink";
@@ -17,7 +18,7 @@ export interface DeepAccessor {
   initial: any;
   set: PinLike;
   get: PinLike;
-  bind(): void;
+  bind(track: TrackCallback): void;
 }
 
 
@@ -116,7 +117,7 @@ export class SimpleDeep extends Agent {
           }
         } catch(_) {}
       }),
-      bind() { return this.set.subscribe(); },
+      bind(track: TrackCallback) { return track(this.set.subscribe()); },
     }, this.state.compare);
   }
 
@@ -161,7 +162,7 @@ export class SimpleDeep extends Agent {
    */
   bind() {
     if (!this.bound) {
-      if (this.accessor) this.accessor.bind();
+      if (this.accessor) this.accessor.bind(sub => this.track(sub));
       else this.track(this.output.subscribe());
       this.bound = true;
     }

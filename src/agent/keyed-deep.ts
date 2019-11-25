@@ -12,6 +12,7 @@ import { PinLike } from "../pin/pin-like";
 
 import { SimpleDeep, DeepAccessor, DeepChildFactory } from "./simple-deep";
 import { State, EqualityFunc } from "./state";
+import { TrackCallback } from "../shared/types";
 
 
 /**
@@ -79,7 +80,7 @@ export class KeyedDeep extends SimpleDeep {
           }
         } catch (err) {}
       }),
-      bind() { return this.set.subscribe(); },
+      bind(track: TrackCallback) { return track(this.set.subscribe()); },
     }, this.state.compare);
   }
 
