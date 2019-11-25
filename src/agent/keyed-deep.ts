@@ -54,8 +54,6 @@ export class KeyedDeep extends SimpleDeep {
     let initialized = false;
     let _this = this;
 
-    this.output; // --> wire output before hand
-
     let accessor: DeepAccessor = {
       initial: (_this._keyMap[key] || {item: undefined}).item
               || (Object.values(this.value) || []).find((i: any) => this.keyfunc(i) == key),
@@ -154,6 +152,8 @@ export class KeyedDeep extends SimpleDeep {
 
   protected createOutput(label: string): PinLike {
     if (label === 'changes') {
+      this.output; // --> wire output before hand
+
       return this.state.to(map((value: any, done: (_: ChangeMap) => void) => {
         const result = diff(value, this._keyMap, this.keyfunc);
         this._keyMap = result.newKeyMap;

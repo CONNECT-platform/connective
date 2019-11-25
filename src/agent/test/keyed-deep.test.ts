@@ -309,5 +309,11 @@ describe('KeyedDeep', () => {
 
       s.value = [{id: 'jack', age: 24}].concat(s.value);
     });
+
+    it('should be possible to first subscribe on `.changes` and then on the state', () => {
+      let s = new KeyedDeep(new State([]), _ => _.id);
+      s.changes.subscribe();
+      s.subscribe();
+    });
   });
 });
