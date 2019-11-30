@@ -37,7 +37,13 @@ export class SimpleDeep extends Agent {
    */
   readonly reemit: Source;
 
-  protected state: State;
+  /**
+   * 
+   * the core state of this simple deep
+   * 
+   */
+  readonly state: State;
+
   protected accessor: DeepAccessor;
   private downPropageteKey: string;
   private bound = false;
