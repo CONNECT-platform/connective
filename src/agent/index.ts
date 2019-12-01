@@ -21,8 +21,8 @@ import { singleton } from './singleton';
 import { sampler } from './sampler';
 import { composition } from './inline-composition';
 
-import { KeyFunc, ChangeMap, AdditionList, DeletionList, MoveList } from '../util/keyed-array-diff';
-import { KeyedDeep } from './keyed-deep';
+import { KeyFunc, AdditionList, DeletionList, MoveList } from '../util/keyed-array-diff';
+import { KeyedDeep, ChangeMap } from './keyed-deep';
 import { SimpleDeep, DeepAccessor, DeepChildFactory } from './simple-deep';
 import { deep, keyed } from './deep';
 
