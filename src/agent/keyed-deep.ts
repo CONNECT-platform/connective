@@ -1,7 +1,7 @@
 import { distinctUntilKeyChanged } from "rxjs/operators";
 
 import { emission } from "../shared/emission";
-import { KeyMap, KeyFunc, ChangeMap, diff } from "../util/keyed-array-diff";
+import { KeyMap, KeyFunc, ChangeMap as _ChangeMap, diff } from "../util/keyed-array-diff";
 
 import { map } from "../pin/map";
 import { sink } from "../pin/sink";
@@ -14,6 +14,15 @@ import { SimpleDeep, DeepAccessor, DeepChildFactory } from "./simple-deep";
 import { State, EqualityFunc } from "./state";
 import { TrackCallback } from "../shared/types";
 
+
+export interface ChangeMap extends _ChangeMap {
+  /**
+   * 
+   * Whether this is the first change map being calculated for a state or not.
+   * 
+   */
+  initial: boolean;
+}
 
 /**
  *
@@ -152,11 +161,16 @@ export class KeyedDeep extends SimpleDeep {
   protected createOutput(label: string): PinLike {
     if (label === 'changes') {
       this.output; // --> wire output before hand
+      let initial = true;
 
       return this.state.to(map((value: any, done: (_: ChangeMap) => void) => {
         const result = diff(value, this._keyMap, this.keyfunc);
         this._keyMap = result.newKeyMap;
-        done(result.changes);
+
+        let changes = Object.assign({}, result.changes, { initial });
+        initial = false;
+
+        done(changes);
       }));
     }
     else return super.createOutput(label);

@@ -1,8 +1,7 @@
 import { should, expect } from 'chai'; should();
 
-import { KeyedDeep } from '../keyed-deep';
+import { KeyedDeep, ChangeMap } from '../keyed-deep';
 import { State } from '../state';
-import { ChangeMap } from '../../util/keyed-array-diff';
 
 
 describe('KeyedDeep', () => {
@@ -222,6 +221,21 @@ describe('KeyedDeep', () => {
         ]);
         done();
       });
+    });
+
+    it('should emit the initial change map with `initial` set to true and false afterwards.', (done) => {
+      let s = new KeyedDeep(new State([{id: 'john', age: 23}, {id: 'jack', age: 24}]), (_) => _.id);
+      let r = 0;
+      s.changes.subscribe((changes: ChangeMap) => {
+        if (r == 0) changes.initial.should.be.true;
+        else changes.initial.should.be.false;
+
+        r++;
+        if (r == 3) done();
+      });
+
+      s.value = [{id: 'joe', age: 47}];
+      s.value = [{id: 'jill', age: 51}];
     });
 
     it('should emit for subsequent additions to the indices of the state.', (done) => {
