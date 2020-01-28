@@ -1,3 +1,13 @@
+---
+ name: Feature request
+ about: Suggest an idea for this project
+ title: ''
+ labels: ''
+ assignees: ''
+
+  ---
+
+
 ### Why should it be added?
 Describe why do you need this feature, i.e. its cumbersome to do something that is of common-use, it is not possible to this other thing you want to do, etc.
 
