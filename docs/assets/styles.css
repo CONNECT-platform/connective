@@ -311,8 +311,8 @@ body.dark-mode #toc a { color: #424242; }
   left: 0;
   width: calc(50% - 384px);
   background: #f5f5f5;
-  transform: translateX(-110vw);
-  transition: transform .5s, background .3s;
+  transform: translateY(110vh);
+  transition: transform .3s, background .3s;
   display: flex;
   flex-direction: column;
 }
@@ -322,7 +322,7 @@ body.dark-mode #nav {
 }
 
 #nav.active {
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
 #nav .contents {
@@ -440,7 +440,11 @@ body.dark-mode #nav .search p {
   opacity: 0;
   transform: scaleX(0);
   transform-origin: left;
-  transition: opacity .5s, transform .5s;
+  transition: opacity .5s, transform .5s, background .3s;
+}
+
+body.dark-mode #nav a::before {
+  background: #6a1b9a;
 }
 
 #nav a.highlight::before {
@@ -935,6 +939,11 @@ pre[copy]::after {
   transition: all .15s;
 }
 
+pre:not([copy]) code:not(.processed),
+pre:not([copy]) code:not(.processed) * {
+  color: transparent !important;
+}
+
 body.dark-mode pre[copy]::after {
   background: #111111;
 }
@@ -946,30 +955,37 @@ pre[copy]:hover::after {
 code .line {
   cursor: pointer;
   background: transparent;
-  transition: background .15s;
+  transition: background .1s;
   position: relative;
   padding: 1px 0;
   min-width: 720px;
 }
 
 code .line span[line-counter] {
-  width: 32px;
+  width: 24px;
   margin-right: 12px;
   padding-right: 12px;
   text-align: right;
   font-size: 10px;
+  line-height: 16px;
   display: inline-block;
-  color: #616161;
-  transition: color .3s;
+  color: transparent;
+  border-right: 2px solid rgba(255, 255, 255, .015);
+  transition: border-color .1s, color .1s;
 }
 
-body.dark-mode code .line span[line-counter] {
+code .line span[line-counter].prim {
+  color: #616161;
+}
+
+body.dark-mode code .line span[line-counter].prim {
   color: #424242;
 }
 
 code .line:hover span[line-counter],
 body.dark-mode code .line:hover span[line-counter] {
-  color: #4A90E2;
+  border-color: #7187ff;
+  color: #7187ff;
 }
 
 code .line.highlight {
@@ -998,7 +1014,7 @@ body.dark-mode code .line:hover {
   font-family: 'Source Code Pro', 'Courier New', Courier, monospace;
 }
 
-.hljs.processed {
+pre:not([copy]) code.hljs {
   padding: 24px 0px;
 }
 
@@ -1007,12 +1023,12 @@ body.dark-mode .hljs {
 }
 
 .hljs-keyword {
-  color: #4A90E2;
+  color: #7187ff;
   font-weight: normal;
 }
 
 .hljs-built_in {
-  color: #B765FF;
+  color: #b388ff;
 }
 
 .hljs-subst {
@@ -1020,11 +1036,11 @@ body.dark-mode .hljs {
 }
 
 .hljs-number {
-  color: #F5A623;
+  color: #ffc400;
 }
 
 .hljs-literal {
-  color: #F5A623;
+  color: #ffc400;
 }
 
 .hljs-title {
@@ -1033,12 +1049,17 @@ body.dark-mode .hljs {
 }
 
 .hljs-attr {
-  color: #B765FF;
+  color: #ffea00;
 }
 
 .hljs-string {
-  color: #B8E986;
+  color: #69f0ae;
 }
+
+.func-arrow {
+  color: #18ffff;
+}
+
 
 .hljs-comment {
   color: #757575;

@@ -6,9 +6,10 @@ function showOverlay(overlay, time) {
     overlay.timeout = setTimeout(function(){ hideOverlay(overlay); }, time);
 }
 
-function hideOverlay(overlay) {
+function hideOverlay(overlay, options) {
   clearTimeout(overlay.timeout);
-  overlay.dispatchEvent(new CustomEvent('overlay-closed'));
+  if (!options || options.propagate !== false)
+    overlay.dispatchEvent(new CustomEvent('overlay-closed'));
   overlay.classList.remove('active');
 }
 
@@ -52,26 +53,31 @@ window.addEventListener('load', function() {
     node.innerHTML = '';
     node.classList.add('processed');
     for (var i = 0; i < lines.length; i++) {
-      var line = lines[i];
+      var line = lines[i].replace(/=\&gt\;/g, '<span class="func-arrow">=&gt;</span>');
+      var ctr = '<span line-counter ' + 
+              (((i + 1)%5==0 || (i == 0) || (i == lines.length - 1)?'class="prim"':'')) 
+              + '>' + (i + 1) + '</span>';
       if (line.trim().length > 0) {
         if (line.startsWith(marker)) {
           var content = line.substr(marker.length);
           if (content.trim().length == 0)
-            node.innerHTML += '<div class="line highlight"><span line-counter>' + (i + 1) + '</span><br></div>';
+            node.innerHTML += '<div class="line highlight">' + ctr + '<br></div>';
           else
-            node.innerHTML += '<div class="line highlight"><span line-counter>' + (i + 1) + '</span>' + line.substr(marker.length) + '</div>';
+            node.innerHTML += '<div class="line highlight">' + ctr + line.substr(marker.length) + '</div>';
         }
         else
-          node.innerHTML += '<div class="line"><span line-counter>' + (i + 1) + '</span>' + line + '</div>';
+          node.innerHTML += '<div class="line">' + ctr + line + '</div>';
       }
-      else node.innerHTML += '<div class="line"><span line-counter>' + (i + 1) + '</span><br></div>';
+      else node.innerHTML += '<div class="line">' + ctr + '<br></div>';
     }
   });
 
   new ClipboardJS('code .line', {
       text: function(trigger) {
         showOverlay(copyConfirm, 2000);
-        return trigger.textContent;
+        var clone = trigger.cloneNode(true);
+        clone.childNodes[0].remove();
+        return clone.textContent;
       }
   });
 
@@ -124,8 +130,11 @@ window.addEventListener('load', function() {
       showOverlay(copyConfirm, 2000);
       let code = '';
       let lines = trigger.parentElement.previousElementSibling.querySelector('code').childNodes;
-      for (var i = 0; i < lines.length; i++)
-        code += lines[i].textContent + '\n';
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].cloneNode(true);
+        line.childNodes[0].remove();
+        code += line.textContent + '\n';
+      }
 
       return code;
     }
@@ -390,7 +399,7 @@ window.addEventListener('load', function() {
     chatElement.addEventListener('gitter-chat-toggle', function (event) {
       if (event.detail.state)
         showOverlay(gitterOverlay);
-      else hideOverlay(gitterOverlay);
+      else hideOverlay(gitterOverlay, { propagate: false });
     });
 
     gitterOverlay.addEventListener('overlay-closed', function() {
