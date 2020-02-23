@@ -583,8 +583,8 @@ body.dark-mode #prevnext hr {
 {
   position: absolute;
   width: 12px; height: 12px; content: ' ';
-  border-color: #e0e0e0;
   border: 4px solid;
+  border-color: #e0e0e0;
   border-top: none;
   border-right: none;
 }
