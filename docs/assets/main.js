@@ -50,20 +50,21 @@ window.addEventListener('load', function() {
     var lines = node.innerHTML.split('\n');
     var marker = '<span class="hljs-comment">/*!*/</span>';
     node.innerHTML = '';
+    node.classList.add('processed');
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
       if (line.trim().length > 0) {
         if (line.startsWith(marker)) {
           var content = line.substr(marker.length);
           if (content.trim().length == 0)
-            node.innerHTML += '<div class="line highlight"><br></div>';
+            node.innerHTML += '<div class="line highlight"><span line-counter>' + (i + 1) + '</span><br></div>';
           else
-            node.innerHTML += '<div class="line highlight">' + line.substr(marker.length) + '</div>';
+            node.innerHTML += '<div class="line highlight"><span line-counter>' + (i + 1) + '</span>' + line.substr(marker.length) + '</div>';
         }
         else
-          node.innerHTML += '<div class="line">' + line + '</div>';
+          node.innerHTML += '<div class="line"><span line-counter>' + (i + 1) + '</span>' + line + '</div>';
       }
-      else node.innerHTML += '<br>';
+      else node.innerHTML += '<div class="line"><span line-counter>' + (i + 1) + '</span><br></div>';
     }
   });
 

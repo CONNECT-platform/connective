@@ -909,7 +909,8 @@ iframe.preview {
 
 span[code] {
   background: rgba(128, 128, 128, .12);
-  font-family: monospace;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 14px;
   padding: 4px;
   border-radius: 3px;
 }
@@ -922,7 +923,7 @@ pre[copy] {
 
 pre[copy]::after {
   position: absolute;
-  right: 0; top: 0; height: 48px;
+  right: 0; top: 0; height: 64px;
   content: '< click to copy';
   color: #4A90E2; border-radius: 3px;
   background: #212121;
@@ -935,7 +936,7 @@ pre[copy]::after {
 }
 
 body.dark-mode pre[copy]::after {
-  background: #000000;
+  background: #111111;
 }
 
 pre[copy]:hover::after {
@@ -948,63 +949,61 @@ code .line {
   transition: background .15s;
   position: relative;
   padding: 1px 0;
-  border-radius: 3px;
-  min-width: 736px;
+  min-width: 720px;
 }
 
-code .line:nth-child(odd) {
-  background: rgba(255, 255, 255, .015);
+code .line span[line-counter] {
+  width: 32px;
+  margin-right: 12px;
+  padding-right: 12px;
+  text-align: right;
+  font-size: 10px;
+  display: inline-block;
+  color: #616161;
+  transition: color .3s;
 }
 
-code .line:before {
-  content: ' ';
-  position: absolute;
-  left: -10px;
-  width: 2px;
-  top: 0;
-  bottom: 0;
-  border-left: 2px dotted #272727;
-  border-right: 2px dotted #272727;
-  transition: border-color .15s;
+body.dark-mode code .line span[line-counter] {
+  color: #424242;
 }
 
-body.dark-mode code .line:before {
-  border-color: #181818;
+code .line:hover span[line-counter],
+body.dark-mode code .line:hover span[line-counter] {
+  color: #4A90E2;
 }
 
 code .line.highlight {
-  background: #373944;
+  background: rgb(40, 46, 73);
   color: #ffffff;
+}
+
+body.dark-mode code .line.highlight {
+  background: rgb(28, 29, 48);
 }
 
 code .line:hover {
   background: #424242;
 }
 
-body.dark-mode code .line.highlight {
-  background: #1B1C22;
-}
-
 body.dark-mode code .line:hover {
   background: #212121;
 }
 
-code .line:hover:before,
-body.dark-mode code .line:hover:before {
-  border-color: #4A90E2;
-}
-
 .hljs {
   background: #212121;
-  color: #bdbdbd;
-  padding: 16px;
+  color: #e0e0e0;
+  padding: 24px;
   border-radius: 3px;
-  font-size: 12px;
-  font-family: 'PT Mono', 'Courier New', Courier, monospace;
+  font-size: 13px;
+  font-family: 'Source Code Pro', 'Courier New', Courier, monospace;
+}
+
+.hljs.processed {
+  padding: 24px 0px;
 }
 
 body.dark-mode .hljs {
-  background: #000000;
+  background: #111111;
 }
 
 .hljs-keyword {
@@ -1047,5 +1046,5 @@ body.dark-mode .hljs {
 }
 
 body.dark-mode .hljs-comment {
-  color: #616161;
+  color: #757575;
 }
