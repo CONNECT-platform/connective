@@ -9,7 +9,7 @@ import filter from '../filter';
 
 describe('filter()', () => {
   it('should return a `PinLike` that only passes values that match the given function.', () => {
-    let a = new Source();
+    let a = new Source<number>();
     let res: number[] = [];
     a.to(filter((n: number) => n % 2 == 0)).subscribe(x => res.push(x));
     a.send(1); a.send(2);

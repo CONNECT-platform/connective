@@ -18,7 +18,7 @@ import { PartialFlow } from './partial-flow';
  * The base class for [pins](https://connective.dev/docs/pin).
  *
  */
-export abstract class BasePin extends Tracker implements PinLike {
+export abstract class BasePin<O=unknown, I=unknown> extends Tracker implements PinLike<O, I> {
   /**
    *
    * Connects given [pin](https://connective.dev/docs/pin) to this pin.
@@ -27,7 +27,7 @@ export abstract class BasePin extends Tracker implements PinLike {
    * @param _  the pin that gets connected to this pin.
    *
    */
-  abstract connect(_: PinLike): this;
+  abstract connect<T>(_: PinLike<I, T>): this;
 
   /**
    *
@@ -36,7 +36,7 @@ export abstract class BasePin extends Tracker implements PinLike {
    * values, or to connect your CONNECTIVE flow into another observable sequence.
    *
    */
-  abstract observable: Observable<Emission>;
+  abstract observable: Observable<Emission<O>>;
 
   /**
    *
@@ -49,8 +49,8 @@ export abstract class BasePin extends Tracker implements PinLike {
    * was among the given pins, its exit pins added to the group.
    *
    */
-  to(...pins: PinLike[]) {
-    pins.forEach(pin => pin.from(this));
+  to<T>(...pins: PinLike<T, O>[]): PinLike<T, O> {
+    pins.forEach(pin => pin.from<I>(this));
     return traverseTo(...pins);
   }
 
@@ -66,7 +66,7 @@ export abstract class BasePin extends Tracker implements PinLike {
    * was among the given pins, its entry pins will be added to the group.
    *
    */
-  from(...pins: PinLike[]) {
+  from<T>(...pins: PinLike<I, T>[]): PinLike<unknown, T> {
     pins.forEach(pin => {
       if (pin instanceof Group)
         pin.pins.forEach(p => this.connect(p));
@@ -90,7 +90,7 @@ export abstract class BasePin extends Tracker implements PinLike {
    * was among the given pins, its exit pins added to the group.
    *
    */
-  serialTo(...pins: PinLike[]) {
+  serialTo<T>(...pins: PinLike<T, O>[]) {
     pins.forEach(pin => {
       if (pin instanceof PartialFlow) {
         if (pin.entries.pins.length > 0)
@@ -113,7 +113,7 @@ export abstract class BasePin extends Tracker implements PinLike {
    * was among the given pins, its entry pins will be added to the group.
    *
    */
-  serialFrom(...pins: PinLike[]) {
+  serialFrom<T>(...pins: PinLike<I, T>[]) {
     pins.forEach(pin => {
       if (pin instanceof PartialFlow) {
         if (pin.exits.pins.length > 0)
@@ -125,8 +125,8 @@ export abstract class BasePin extends Tracker implements PinLike {
     return traverseTo(...pins);
   }
 
-  subscribe(observer?: PartialObserver<any>): Subscription;
-  subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Subscription;
+  subscribe(observer?: PartialObserver<O>): Subscription;
+  subscribe(next?: (value: O) => void, error?: (error: any) => void, complete?: () => void): Subscription;
   /**
    *
    * Subscribes given function or partial observer to the observable of this pin.
@@ -146,7 +146,7 @@ export abstract class BasePin extends Tracker implements PinLike {
    *
    */
   subscribe(
-    observerOrNext?: PartialObserver<any> | ResolveCallback<any>,
+    observerOrNext?: PartialObserver<O> | ResolveCallback<O>,
     error?: ErrorCallback,
     complete?: NotifyCallback,
   ): Subscription {

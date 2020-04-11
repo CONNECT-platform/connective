@@ -33,7 +33,7 @@ const _Unset = {};
  * [read more here](https://connective.dev/docs/emission).
  *
  */
-export class Emission {
+export class Emission<T=unknown> {
   /**
    *
    * @param value the value of the emission
@@ -41,10 +41,12 @@ export class Emission {
    *
    */
   constructor(
-    readonly value: any = undefined,
+    readonly value: T,
     readonly context: ContextType = {},
   ) {}
 
+  public static from<T>(emissions: Emission<T>[]): Emission<T[]>;
+  public static from<T, V>(emission: Emission<T>[], value: V): Emission<V>;
   /**
    *
    * Will create a merged emission from given emissions.
@@ -53,9 +55,9 @@ export class Emission {
    * @param value the value to set on the forked emission (by default will be an array of the merged emissions' values).
    *
    */
-  public static from(emissions: Emission[], value: any = _Unset): Emission {
+  public static from<T, V>(emissions: Emission<T>[], value: V | typeof _Unset = _Unset) {
     return new Emission(
-      (value === _Unset)?(emissions.map(emission => emission.value)):(value),
+      (value === _Unset)?(emissions.map(emission => emission.value)):(value as V),
       emissions.reduce((ctx, emission) => {
         Object.entries(emission.context).forEach(([key, value]) => {
           if (key in ctx) {
@@ -98,12 +100,15 @@ export class Emission {
    * @param value
    *
    */
-  public fork(value: any): Emission {
+  public fork<V>(value: V) {
     return new Emission(value, this.context);
   }
 }
 
 
+export function emission(): Emission<void>;
+export function emission(value: undefined, context?: ContextType): Emission<void>;
+export function emission<T>(value: T, context?: ContextType): Emission<T>;
 /**
  *
  * Creates an emission with given value and context. You can feed this object to
@@ -117,7 +122,7 @@ export class Emission {
  * @param value
  * @param context
  */
-export function emission(value?: any, context?: ContextType) {
+export function emission<T>(value?: T, context?: ContextType) {
   return new Emission(value, context);
 }
 

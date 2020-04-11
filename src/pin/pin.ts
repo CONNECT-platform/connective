@@ -14,7 +14,7 @@ import { Connectible } from './connectible';
  * will be merged observable of all of the incoming pins' observables.
  *
  */
-export class Pin extends Connectible {
+export class Pin<O=unknown, I=O> extends Connectible<O, I> {
   /**
    *
    * Determines if this pin is locked, based on whether or not its underlying
@@ -23,7 +23,7 @@ export class Pin extends Connectible {
    * @param observable
    *
    */
-  protected isLocked(observable: Observable<Emission> | undefined) {
+  protected isLocked(observable: Observable<Emission<O>> | undefined) {
     return observable !== undefined;
   }
 
@@ -36,7 +36,7 @@ export class Pin extends Connectible {
    * @param observable
    *
    */
-  protected shouldResolve(_: PinLike[], observable: Observable<Emission> | undefined) {
+  protected shouldResolve(_: PinLike<O, I>[], observable: Observable<Emission<O>> | undefined) {
     return observable === undefined;
   }
 
@@ -49,10 +49,10 @@ export class Pin extends Connectible {
    * @param inbound
    *
    */
-  protected resolve(inbound: PinLike[]): Observable<Emission> {
+  protected resolve(inbound: PinLike<I, unknown>[]): Observable<Emission<O>> {
     return (inbound.length == 1)?
-      inbound[0].observable:
-      merge(...inbound.map(pin => pin.observable));
+      inbound[0].observable as any as Observable<Emission<O>>:
+      merge(...inbound.map(pin => pin.observable)) as any as Observable<Emission<O>>;
   }
 }
 
@@ -63,7 +63,7 @@ export class Pin extends Connectible {
  * [Checkout the docs](https://connective.dev/docs/pin) for examples and further information.
  *
  */
-export function pin() { return new Pin(); }
+export function pin<O>() { return new Pin<O>(); }
 
 
 export default pin;

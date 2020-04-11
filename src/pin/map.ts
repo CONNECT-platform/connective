@@ -8,12 +8,12 @@ import { EmissionError } from '../shared/errors/emission-error';
 import { Pipe } from './pipe';
 
 
-export type MapFuncSync = (value: any) => any;
-export type MapFuncAsync = (value: any,
-                            callback: ResolveCallback<any>,
+export type MapFuncSync<I, O> = (value: I) => O;
+export type MapFuncAsync<I, O> = (value: I,
+                            callback: ResolveCallback<O>,
                             error: ErrorCallback,
                             context: ContextType) => void;
-export type MapFunc = MapFuncSync | MapFuncAsync;
+export type MapFunc<I, O> = MapFuncSync<I, O> | MapFuncAsync<I, O>;
 
 
 /**
@@ -21,27 +21,27 @@ export type MapFunc = MapFuncSync | MapFuncAsync;
  * Represents [map](https://connective.dev/docs/map) pins.
  *
  */
-export class Map extends Pipe {
+export class Map<O=unknown, I=unknown> extends Pipe<O, I> {
   /**
    *
    * The transformation of this map pin.
    *
    */
-  readonly map: MapFunc;
+  readonly map: MapFunc<I, O>;
 
-  constructor(_func: MapFunc) {
+  constructor(_func: MapFunc<I, O>) {
     super(
       (_func.length <= 1)?
       ([_map(emission => {
         try {
-          return emission.fork((_func as MapFuncSync)(emission.value));
+          return emission.fork((_func as MapFuncSync<I, O>)(emission.value));
         } catch(error) {
           throw new EmissionError(error, emission);
         }
       })]):
       ([
         mergeMap(emission =>
-          new Observable<Emission>(subscriber => {
+          new Observable<Emission<O>>(subscriber => {
             _func(emission.value, (res: any) => {
               subscriber.next(emission.fork(res));
               subscriber.complete();
@@ -52,7 +52,7 @@ export class Map extends Pipe {
             emission.context);
           })
         ),
-        share()
+        share<Emission<O>>() as any
       ])
     );
 
@@ -70,7 +70,7 @@ export class Map extends Pipe {
  * @param map
  *
  */
-export function map(map: MapFunc) { return new Map(map); }
+export function map<I, O>(map: MapFunc<I, O>) { return new Map(map); }
 
 
 export default map;

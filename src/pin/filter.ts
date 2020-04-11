@@ -7,12 +7,12 @@ import { EmissionError } from '../shared/errors/emission-error';
 import { Pipe } from './pipe';
 
 
-export type FilterFuncSync = (value: any) => boolean;
-export type FilterFuncAsync = (value: any,
+export type FilterFuncSync<T> = (value: T) => boolean;
+export type FilterFuncAsync<T> = (value: T,
                             callback: ResolveCallback<boolean>,
                             error: ErrorCallback,
                             context: ContextType) => void;
-export type FilterFunc = FilterFuncSync | FilterFuncAsync;
+export type FilterFunc<T> = FilterFuncSync<T> | FilterFuncAsync<T>;
 
 
 /**
@@ -20,20 +20,20 @@ export type FilterFunc = FilterFuncSync | FilterFuncAsync;
  * Represents [filter](https://connective.dev/docs/filter) pins.
  *
  */
-export class Filter extends Pipe {
+export class Filter<T=unknown> extends Pipe<T, T> {
   /**
    *
    * The predicate of this filter pin.
    *
    */
-  readonly filter: FilterFunc;
+  readonly filter: FilterFunc<T>;
 
-  constructor(_func: FilterFunc) {
+  constructor(_func: FilterFunc<T>) {
     super(
       (_func.length <= 1)?
       ([_filter(emission => {
         try {
-          return (_func as FilterFuncSync)(emission.value);
+          return (_func as FilterFuncSync<T>)(emission.value);
         } catch(error) {
           throw new EmissionError(error, emission);
         }
@@ -52,7 +52,7 @@ export class Filter extends Pipe {
           })
           .pipe(_filter(_ => !!_), map(_ => emission))
         ),
-        share()
+        share() as any
       ])
     );
 
@@ -61,6 +61,8 @@ export class Filter extends Pipe {
 }
 
 
+// export function filter<T>(filter: FilterFuncSync<T>): Filter<T>;
+// export function filter<T>(filter: FilterFuncAsync<T>): Filter<T>;
 /**
  *
  * Creates a [filter](https://connective.dev/docs/filter) pin using given predicate.
@@ -70,7 +72,7 @@ export class Filter extends Pipe {
  * @param filter
  *
  */
-export function filter(filter: FilterFunc) { return new Filter(filter); }
+export function filter<T>(filter: FilterFunc<T>) { return new Filter(filter); }
 
 /**
  *

@@ -7,7 +7,7 @@ import { ContextType } from '../shared/types';
 import { Pipe } from './pipe';
 
 
-export type SinkFunc = (value: any, context: ContextType) => void;
+export type SinkFunc<T> = (value: T, context: ContextType) => void;
 
 
 /**
@@ -15,11 +15,11 @@ export type SinkFunc = (value: any, context: ContextType) => void;
  * Represents [sink](https://connective.dev/docs/sink) pins.
  *
  */
-export class Sink extends Pipe implements Bindable {
+export class Sink<T=unknown> extends Pipe<void, T> implements Bindable {
   private _bound = false;
 
-  constructor(readonly func: SinkFunc = () => {}) {
-    super([tap((emission: Emission) => func(emission.value, emission.context))]);
+  constructor(readonly func: SinkFunc<T> = () => {}) {
+    super([tap(emission => func(emission.value, emission.context))]);
   }
 
   /**
@@ -57,7 +57,7 @@ export class Sink extends Pipe implements Bindable {
  * @param func
  *
  */
-export function sink(func?: SinkFunc) { return new Sink(func); }
+export function sink<T>(func?: SinkFunc<T>) { return new Sink(func); }
 
 
 export default sink;

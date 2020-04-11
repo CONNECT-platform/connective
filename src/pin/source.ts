@@ -12,8 +12,8 @@ import { Connectible } from './connectible';
  * Represents [source](https://connective.dev/docs/source) pins.
  *
  */
-export class Source extends Connectible {
-  constructor(private _subject = new Subject<Emission>()){
+export class Source<T=unknown> extends Connectible<T, T> {
+  constructor(private _subject = new Subject<Emission<T>>()){
     super();
   }
 
@@ -26,8 +26,8 @@ export class Source extends Connectible {
    * @param context the emission context
    *
    */
-  public send(value?: any, context?: ContextType) {
-    this.emit(emission(value, context));
+  public send(value?: T, context?: ContextType) {
+    this.emit(emission(value as any, context));
   }
 
   /**
@@ -37,7 +37,7 @@ export class Source extends Connectible {
    * @param emission
    *
    */
-  public emit(emission: Emission) {
+  public emit(emission: Emission<T>) {
     this._subject.next(emission);
   }
 
@@ -72,7 +72,7 @@ export class Source extends Connectible {
    * @param inbound
    *
    */
-  protected resolve(inbound: PinLike[]) {
+  protected resolve(inbound: PinLike<T, T>[]) {
     inbound.forEach(pin => {
       this.track(pin.observable.subscribe(this._subject));
     });

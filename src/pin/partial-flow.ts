@@ -19,14 +19,14 @@ import group, { Group } from './group';
  * and some exit pins coming out of it.
  *
  */
-export abstract class PartialFlow extends Tracker implements PinLike {
+export abstract class PartialFlow<O=unknown, I=unknown> extends Tracker implements PinLike<O, I> {
   /**
    *
    * Override this to specify the entry pins of this partial flow.
    * Read more about this [here](https://connective.dev/docs/agent#implicit-connection).
    *
    */
-  abstract get entries(): Group;
+  abstract get entries(): Group<unknown, I>;
 
   /**
    *
@@ -34,7 +34,7 @@ export abstract class PartialFlow extends Tracker implements PinLike {
    * Read more about this [here](https://connective.dev/docs/agent#implicit-connection).
    *
    */
-  abstract get exits(): Group;
+  abstract get exits(): Group<O, unknown>;
 
   /**
    *
@@ -45,7 +45,7 @@ export abstract class PartialFlow extends Tracker implements PinLike {
    * was among the given pins, its entry pins will be added to the group.
    *
    */
-  from(...pins: PinLike[]): PinLike {
+  from<T>(...pins: PinLike<I, T>[]): PinLike<unknown, T> {
     return this.entries.from(...pins);
   }
 
@@ -58,7 +58,7 @@ export abstract class PartialFlow extends Tracker implements PinLike {
    * was among the given pins, its exit pins added to the group.
    *
    */
-  to(...pins: PinLike[]): PinLike {
+  to<T>(...pins: PinLike<T, O>[]): PinLike<T> {
     return this.exits.to(...pins);
   }
 
@@ -71,7 +71,7 @@ export abstract class PartialFlow extends Tracker implements PinLike {
    * was among the given pins, its entry pins will be added to the group.
    *
    */
-  serialFrom(...pins: PinLike[]): PinLike {
+  serialFrom<T>(...pins: PinLike<I, T>[]): PinLike<unknown, T> {
     return this.entries.serialFrom(...pins);
   }
 
@@ -84,16 +84,16 @@ export abstract class PartialFlow extends Tracker implements PinLike {
    * was among the given pins, its exit pins added to the group.
    *
    */
-  serialTo(...pins: PinLike[]): PinLike {
+  serialTo<T>(...pins: PinLike<T, O>[]): PinLike<T> {
     return this.exits.serialTo(...pins);
   }
 
-  get observable(): Observable<Emission> {
+  get observable(): Observable<Emission<O>> {
     return this.exits.observable;
   }
 
-  subscribe(observer?: PartialObserver<any>): Subscription;
-  subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Subscription;
+  subscribe(observer?: PartialObserver<O>): Subscription;
+  subscribe(next?: (value: O) => void, error?: (error: any) => void, complete?: () => void): Subscription;
   /**
    *
    * Subscribes to all of its exit pins. Returns a composite subscription of
@@ -101,7 +101,7 @@ export abstract class PartialFlow extends Tracker implements PinLike {
    *
    */
   subscribe(
-    _?: PartialObserver<any> | ResolveCallback<any>,
+    _?: PartialObserver<O> | ResolveCallback<O>,
     __?: ErrorCallback,
     ___?: NotifyCallback,
   ): Subscription {
@@ -110,13 +110,16 @@ export abstract class PartialFlow extends Tracker implements PinLike {
 }
 
 
-export type PartialFlowFactory = () => [Group | PinLike[], Group | PinLike[]];
+export type PartialFlowFactory<O, I> = () => [
+  Group<unknown, I> | PinLike<unknown, I>[], 
+  Group<O, unknown> | PinLike<O, unknown>[]
+];
 
 
-class InlineFlow extends PartialFlow {
-  entries: Group; exits: Group;
+class InlineFlow<O=unknown, I=unknown> extends PartialFlow<O, I> {
+  entries: Group<unknown, I>; exits: Group<O, unknown>;
 
-  constructor(readonly factory: PartialFlowFactory) {
+  constructor(readonly factory: PartialFlowFactory<O, I>) {
     super();
     let [entries, exits] = factory();
     this.entries = (entries instanceof Group)?entries:group(...entries);
@@ -135,7 +138,7 @@ class InlineFlow extends PartialFlow {
  * @param factory
  *
  */
-export function partialFlow(factory: PartialFlowFactory) { return new InlineFlow(factory); }
+export function partialFlow<O, I>(factory: PartialFlowFactory<O, I>) { return new InlineFlow(factory); }
 
 
 export default partialFlow;

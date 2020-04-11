@@ -14,11 +14,11 @@ import { UnresolvedPinObservableError } from './errors/unresolved-observable.err
  * Represents pins that you can connect other pins to.
  *
  */
-export abstract class Connectible extends BasePin {
-  private _inbound: PinLike[];
-  private _observable: Observable<Emission> | undefined;
+export abstract class Connectible<O=unknown,I=unknown> extends BasePin<O, I> {
+  private _inbound: PinLike<I, unknown>[];
+  private _observable: Observable<Emission<O>> | undefined;
   private _resolving = false;
-  private _deferred: Subject<Emission> | undefined;
+  private _deferred: Subject<Emission<O>> | undefined;
   private _deference_connected = false;
 
   constructor() {
@@ -32,7 +32,7 @@ export abstract class Connectible extends BasePin {
    * You can read more about this [here](https://connective.dev/docs/pin#subscribing-and-binding).
    *
    */
-  public connect(pin: PinLike) {
+  public connect<T>(pin: PinLike<I, T>) {
     if (this.locked) throw new PinLockedError();
     if (!this._inbound.includes(pin))
       this._inbound.push(pin);
@@ -46,7 +46,7 @@ export abstract class Connectible extends BasePin {
    * You can read more about this [here](https://connective.dev/docs/pin#subscribing-and-binding).
    *
    */
-  public get observable(): Observable<Emission> {
+  public get observable(): Observable<Emission<O>> {
     if (this.shouldResolve(this._inbound, this._observable)) {
       if (this._resolving) {
         if (!this._deferred) {
@@ -126,7 +126,7 @@ export abstract class Connectible extends BasePin {
    * @param observable
    *
    */
-  protected abstract isLocked(observable: Observable<Emission> | undefined): boolean;
+  protected abstract isLocked(observable: Observable<Emission<O>> | undefined): boolean;
 
   /**
    *
@@ -137,7 +137,7 @@ export abstract class Connectible extends BasePin {
    * @param observable
    *
    */
-  protected abstract shouldResolve(inbound: PinLike[], observable: Observable<Emission> | undefined): boolean;
+  protected abstract shouldResolve(inbound: PinLike[], observable: Observable<Emission<O>> | undefined): boolean;
 
   /**
    *
@@ -147,5 +147,5 @@ export abstract class Connectible extends BasePin {
    * @param inbound
    *
    */
-  protected abstract resolve(inbound: PinLike[]): Observable<Emission>;
+  protected abstract resolve(inbound: PinLike<I, unknown>[]): Observable<Emission<O>>;
 }

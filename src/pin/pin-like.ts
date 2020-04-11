@@ -9,7 +9,7 @@ import { Clearable } from '../shared/clearable';
  * Denotes objects behaving like a [pin](https://connective.dev/docs/pin)
  *
  */
-export interface PinLike extends Clearable {
+export interface PinLike<O=unknown, I=unknown> extends Clearable {
   /**
    *
    * Connects given pins to this pin-like. Typically, when a `PartialFlow` is
@@ -23,7 +23,7 @@ export interface PinLike extends Clearable {
    * @note these are typical behaviours of `PinLike`s, and the specific behavior of each might be different.
    *
    */
-  from(...pins: PinLike[]): PinLike;
+  from<T>(...pins: PinLike<I, T>[]): PinLike<unknown, T>;
 
   /**
    *
@@ -38,7 +38,8 @@ export interface PinLike extends Clearable {
    * @note these are typical behaviours of `PinLike`s, and the specific behavior of each might be different.
    *
    */
-  to(...pins: PinLike[]): PinLike;
+  to(pin: PinLike<O, O>): PinLike<O, O>;
+  to<T>(...pins: PinLike<T, O>[]): PinLike<T>;
 
   /**
    *
@@ -60,7 +61,7 @@ export interface PinLike extends Clearable {
    * @note these are typical behaviours of `PinLike`s, and the specific behavior of each might be different.
    *
    */
-  serialFrom(...pins: PinLike[]): PinLike;
+  serialFrom<T>(...pins: PinLike<I, T>[]): PinLike<unknown, T>;
 
   /**
    *
@@ -82,7 +83,7 @@ export interface PinLike extends Clearable {
    * @note these are typical behaviours of `PinLike`s, and the specific behavior of each might be different.
    *
    */
-  serialTo(...pins: PinLike[]): PinLike;
+  serialTo<T>(...pins: PinLike<T, O>[]): PinLike<T>;
 
   /**
    *
@@ -92,9 +93,9 @@ export interface PinLike extends Clearable {
    * [group](https://connective.dev/docs/group)).
    *
    */
-  observable: Observable<Emission>;
+  observable: Observable<Emission<O>>;
 
-  subscribe(observer?: PartialObserver<any>): Subscription;
+  subscribe(observer?: PartialObserver<O>): Subscription;
     /**
    *
    * Subscribes given function or partial observer to the observable of this pin.
@@ -113,7 +114,7 @@ export interface PinLike extends Clearable {
    * using `.untrack()`.
    *
    */
-  subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Subscription;
+  subscribe(next?: (value: O) => void, error?: (error: any) => void, complete?: () => void): Subscription;
 }
 
 

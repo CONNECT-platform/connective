@@ -15,15 +15,15 @@ import { PartialFlow } from './partial-flow';
  * Represents [groups of pins](https://connective.dev/docs/group).
  *
  */
-export class Group implements PinLike, Bindable {
+export class Group<O=unknown, I=unknown> implements PinLike<O, I>, Bindable {
   /**
    *
    * The array of all pins within the group.
    *
    */
-  readonly pins: PinLike[];
+  readonly pins: PinLike<O, I>[];
 
-  constructor(pins: PinLike[]) {
+  constructor(pins: PinLike<O, I>[]) {
     this.pins = pins;
   }
 
@@ -33,7 +33,7 @@ export class Group implements PinLike, Bindable {
    * underlying observables of their own.
    *
    */
-  get observable(): Observable<Emission> {
+  get observable(): Observable<Emission<O>> {
     throw new GroupObservableError();
   }
 
@@ -52,7 +52,7 @@ export class Group implements PinLike, Bindable {
    * was among the given pins, its entry pins will be added to the group.
    *
    */
-  from(...pins: PinLike[]): PinLike {
+  from<T>(...pins: PinLike<I, T>[]): PinLike<unknown, T> {
     pins.forEach(pin => this.pins.forEach(p => p.from(pin)));
     return traverseFrom(...pins);
   }
@@ -71,7 +71,7 @@ export class Group implements PinLike, Bindable {
    * was among the given pins, its exit pins added to the group.
    *
    */
-  to(...pins: PinLike[]): PinLike {
+  to<T>(...pins: PinLike<T, O>[]): PinLike<T, O> {
     pins.forEach(pin => this.pins.forEach(p => p.to(pin)));
     return traverseTo(...pins);
   }
@@ -91,8 +91,8 @@ export class Group implements PinLike, Bindable {
    * was among the given pins, its entry pins will be added to the group.
    *
    */
-  serialFrom(...pins: PinLike[]): PinLike {
-    (<PartialFlow[]>pins.filter(pin => pin instanceof PartialFlow)).forEach(flow => {
+  serialFrom<T>(...pins: PinLike<I, T>[]): PinLike<unknown, T> {
+    (<PartialFlow<I, T>[]>pins.filter(pin => pin instanceof PartialFlow)).forEach(flow => {
       for (let i = 0; i < Math.min(this.pins.length, flow.exits.pins.length); i++)
         this.pins[i].from(flow.exits.pins[i]);
     });
@@ -119,7 +119,7 @@ export class Group implements PinLike, Bindable {
    * was among the given pins, its exit pins added to the group.
    *
    */
-  serialTo(...pins: PinLike[]): PinLike {
+  serialTo<T>(...pins: PinLike<T, O>[]): PinLike<T> {
     (<PartialFlow[]>pins.filter(pin => pin instanceof PartialFlow)).forEach(flow => {
       for (let i = 0; i < Math.min(this.pins.length, flow.entries.pins.length); i++)
         this.pins[i].to(flow.entries.pins[i]);
@@ -155,8 +155,8 @@ export class Group implements PinLike, Bindable {
     return this;
   }
 
-  subscribe(observer?: PartialObserver<any>): Subscription;
-  subscribe(next?: (value: any) => void, error?: (error: any) => void, complete?: () => void): Subscription;
+  subscribe(observer?: PartialObserver<O>): Subscription;
+  subscribe(next?: (value: O) => void, error?: (error: any) => void, complete?: () => void): Subscription;
   /**
    *
    * Subscribes given observer (or callback functions) to all pins of the group.
@@ -165,7 +165,7 @@ export class Group implements PinLike, Bindable {
    *
    */
   subscribe(
-    _?: PartialObserver<any> | ResolveCallback<any>,
+    _?: PartialObserver<O> | ResolveCallback<O>,
     __?: ErrorCallback,
     ___?: NotifyCallback,
   ): Subscription {
@@ -184,7 +184,7 @@ export class Group implements PinLike, Bindable {
  * @param pins
  *
  */
-export function group(...pins: PinLike[]) { return new Group(pins); }
+export function group<O, I>(...pins: PinLike<O, I>[]) { return new Group(pins); }
 
 /**
  *
@@ -196,17 +196,17 @@ export function group(...pins: PinLike[]) { return new Group(pins); }
  * @param pins
  *
  */
-export function traverseTo(...pins: PinLike[]): PinLike {
+export function traverseTo<O, I>(...pins: PinLike<O, I>[]) {
   if (pins.length == 1) {
     let pin = pins[0];
 
-    if (pin instanceof PartialFlow) return pin.exits;
+    if (pin instanceof PartialFlow) return (pin as PartialFlow<O, I>).exits;
     else return pin;
   }
   else return group(...pins.reduce((all, pin) => {
     if (pin instanceof PartialFlow) return all.concat(pin.exits.pins);
     else return all.concat([pin]);
-  }, <PinLike[]>[]));
+  }, <PinLike<O, I>[]>[]));
 }
 
 /**
@@ -219,11 +219,11 @@ export function traverseTo(...pins: PinLike[]): PinLike {
  * @param pins
  *
  */
-export function traverseFrom(...pins: PinLike[]): PinLike {
+export function traverseFrom<O, I>(...pins: PinLike<O, I>[]) {
   if (pins.length == 1) {
     let pin = pins[0];
 
-    if (pin instanceof PartialFlow) return pin.entries;
+    if (pin instanceof PartialFlow) return (pin as PartialFlow<O, I>).entries;
     else return pin;
   }
   else return group(...pins.reduce((all, pin) => {

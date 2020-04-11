@@ -11,13 +11,13 @@ import { Pipe } from './pipe';
  * Represents [spread](https://connective.dev/docs/spread) pins.
  *
  */
-export class Spread extends Pipe {
+export class Spread<T> extends Pipe<T, T[] | T> {
   constructor() {
     super([
-      mergeMap(emission =>
-        (emission.value.map)?
-        <Observable<Emission>>from(emission.value.map((v: any) => emission.fork(v))):
-        of(emission)
+      mergeMap<Emission<T[] | T>, Observable<Emission<T>>>(emission =>
+        (Array.isArray(emission.value))?
+        <Observable<Emission<T>>>from(emission.value.map(v => emission.fork(v))):
+        of(emission as Emission<T>)
       )
     ])
   }
@@ -31,7 +31,7 @@ export class Spread extends Pipe {
  * [Checkout the docs](https://connective.dev/docs/spread) for examples and further information.
  *
  */
-export function spread() { return new Spread(); }
+export function spread<T>() { return new Spread<T>(); }
 
 
 export default spread;
