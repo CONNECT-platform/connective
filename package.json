@@ -47,27 +47,27 @@
   ],
   "sideEffects": false,
   "devDependencies": {
-    "@babel/core": "^7.5.4",
-    "@babel/preset-env": "^7.5.4",
-    "@types/chai": "^4.1.7",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@types/chai": "^4.2.11",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.0.7",
+    "@types/node": "^12.12.35",
     "chai": "^4.2.0",
     "express": "^4.17.1",
-    "mocha": "^6.1.4",
-    "nodemon": "^1.19.1",
-    "nunjucks": "^3.2.0",
-    "rollup": "^1.16.7",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-terser": "^5.1.1",
-    "rollup-plugin-uglify": "^6.0.2",
-    "ts-node": "^8.2.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.5.1"
+    "mocha": "^6.2.3",
+    "nodemon": "^2.0.3",
+    "nunjucks": "^3.2.1",
+    "rollup": "^1.32.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-uglify": "^6.0.4",
+    "ts-node": "^8.8.2",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "@types/lodash.isequal": "^4.5.5",
     "lodash.isequal": "^4.5.0",
-    "rxjs": "^6.5.2"
+    "rxjs": "^6.5.5"
   }
 }
