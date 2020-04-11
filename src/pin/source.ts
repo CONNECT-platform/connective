@@ -50,7 +50,7 @@ export class Source<T=unknown> extends Connectible<T, T> {
    */
   clear() {
     this._subject.complete();
-    this._subject = new Subject<any>();
+    this._subject = new Subject<Emission<T>>();
 
     return super.clear();
   }

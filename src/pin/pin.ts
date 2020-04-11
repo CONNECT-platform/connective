@@ -14,7 +14,7 @@ import { Connectible } from './connectible';
  * will be merged observable of all of the incoming pins' observables.
  *
  */
-export class Pin<O=unknown, I=O> extends Connectible<O, I> {
+export class Pin<O, I=O> extends Connectible<O, I> {
   /**
    *
    * Determines if this pin is locked, based on whether or not its underlying

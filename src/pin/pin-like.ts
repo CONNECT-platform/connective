@@ -38,7 +38,6 @@ export interface PinLike<O=unknown, I=unknown> extends Clearable {
    * @note these are typical behaviours of `PinLike`s, and the specific behavior of each might be different.
    *
    */
-  to(pin: PinLike<O, O>): PinLike<O, O>;
   to<T>(...pins: PinLike<T, O>[]): PinLike<T>;
 
   /**
