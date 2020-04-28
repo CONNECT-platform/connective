@@ -4,7 +4,7 @@ import emission from '../../shared/emission';
 
 import group from '../group';
 import { Source } from '../source';
-import { Control } from '../control';
+import { Control, control } from '../control';
 import { Pin } from '../pin';
 import { PinMap } from '../pin-map';
 
@@ -39,9 +39,9 @@ describe('Control', () => {
   });
 
   it('should aggregate incoming values.', done => {
-    let a = new Source();
-    let b = new Source();
-    group(a, b).to(new Control()).subscribe(val => {
+    let a = new Source<number>();
+    let b = new Source<number>();
+    group(a, b).to(control<number>()).subscribe(val => {
       val.sort().should.eql([1, 2]);
       done();
     });
@@ -55,7 +55,7 @@ describe('Control', () => {
     let c = new Control(pm);
     let a = new Source(); a.to(pm.get('x'));
     let b = new Source(); b.to(pm.get('y'));
-    c.subscribe(data => {
+    c.subscribe((data: any) => {
       data.x.should.equal(2);
       data.y.should.equal(3);
       done();

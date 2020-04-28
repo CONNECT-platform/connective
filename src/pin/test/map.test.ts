@@ -5,6 +5,7 @@ import emission from '../../shared/emission';
 import { Source } from '../source';
 import pin from '../pin';
 import map from '../map';
+import { ResolveCallback, ContextType } from '../../shared';
 
 
 describe('map()', () => {
@@ -20,7 +21,7 @@ describe('map()', () => {
   it('should also work with an async function.', () => {
     let a = new Source<number>();
     let res: number[] = [];
-    a.to(map((n, cb) => cb(n * 2 + 1))).subscribe(x => res.push(x));
+    a.to(map((n: number, cb: ResolveCallback<number>) => cb(n * 2 + 1))).subscribe(x => res.push(x));
     a.send(1); a.send(2);
 
     res.should.eql([3, 5]);
@@ -29,7 +30,7 @@ describe('map()', () => {
   it('should not keep the order for an async map.', done => {
     let a = new Source<number>();
     let res: number[] = [];
-    a.to(map((n, cb) => setTimeout(() => cb(n * 2 + 1), 5 - n)))
+    a.to(map((n: number, cb: ResolveCallback<number>) => setTimeout(() => cb(n * 2 + 1), 5 - n)))
      .subscribe(
       x => res.push(x),
       () => {},
@@ -63,14 +64,14 @@ describe('map()', () => {
 
   it('should share an async func.', () => {
     let a = new Source(); let r = 0;
-    a.to(map((_, done) => done(r+=1))).to(pin(), pin()).subscribe();
+    a.to(map((_: number, done: ResolveCallback<number>) => done(r+=1))).to(pin(), pin()).subscribe();
     a.send();
     r.should.equal(1);
   });
 
   it('should provide an async function with context as well.', done => {
     let a = new Source();
-    a.to(map((_, __, ___, ctx) => {
+    a.to(map((_: any, __: any, ___: any, ctx: ContextType) => {
       ctx.x.should.equal(2);
       done();
     })).subscribe();

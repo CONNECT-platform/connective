@@ -8,15 +8,15 @@ import { PinLike } from './pin-like';
 import { PinMap } from './pin-map';
 
 
-const _UNSET = {};
+class _UNSET {};
 
 /**
  *
  * Represents [control](https://connective.dev/docs/control) pins.
  *
  */
-export class Control extends Pin {
-  constructor(readonly val: any = _UNSET) { super(); }
+export class Control<T, V=unknown> extends Pin<T[] | V | void, T> {
+  constructor(readonly val: V | typeof _UNSET = _UNSET) { super(); }
 
   /**
    *
@@ -33,7 +33,7 @@ export class Control extends Pin {
    * @param inbound
    *
    */
-  protected resolve(inbound: PinLike[]): Observable<Emission> {
+  protected resolve(inbound: PinLike<T, unknown>[]): Observable<Emission<T[] | V | void>> {
     if (this.val instanceof PinMap) {
       let _entries = this.val.entries;
       if (_entries.length == 0) return of(emission());
@@ -45,18 +45,23 @@ export class Control extends Pin {
                       return _map;
                     }
                     , <{[label: string]: any}>{}))
-              ));
+              )) as any;
     }
-    else if (inbound.length == 0) return of(emission(this.val));
+    else if (inbound.length == 0) {
+      if (this.val === _UNSET) return of(emission());
+      else return of(emission(this.val as V));
+    }
     else {
       let _zipped = zip(...inbound.map(pin => pin.observable));
       if (this.val !== _UNSET)
-        return _zipped.pipe(map(emissions => Emission.from(emissions, this.val)));
+        return _zipped.pipe(map(emissions => Emission.from(emissions, this.val as V)));
       else return _zipped.pipe(map(emissions => Emission.from(emissions)));
     };
   }
 }
 
+export function control<T>(): PinLike<T[], T>;
+export function control<V, T=unknown>(v: V): PinLike<V, T>;
 /**
  *
  * Creates a [control](https://connective.dev/docs/control) pin.
@@ -71,7 +76,7 @@ export class Control extends Pin {
  * connected to all "realised" pins of the given pinmap.
  *
  */
-export function control(val?: any) { return new Control(val); }
+export function control<T, V>(val?: V) { return new Control<T, V>(val); }
 
 
 export default control;

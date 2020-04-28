@@ -62,8 +62,8 @@ export class Map<O=unknown, I=unknown> extends Pipe<O, I> {
 }
 
 
-export function map<I, O>(map: MapFuncAsync<I, O>): PinLike<O, I>;
 export function map<I, O>(map: MapFuncSync<I, O>): PinLike<O, I>;
+export function map<I, O>(map: MapFuncAsync<I, O>): PinLike<O, I>;
 /**
  *
  * Creates a [map](https://connective.dev/docs/map) pin using given transformation.
