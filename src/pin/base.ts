@@ -49,6 +49,7 @@ export abstract class BasePin<O=unknown, I=unknown> extends Tracker implements P
    * was among the given pins, its exit pins added to the group.
    *
    */
+  to<T>(pin: PinLike<T, O>): PinLike<T>;
   to<T>(...pins: PinLike<T, O>[]): PinLike<T>;
   to<T>(...pins: PinLike<T, O>[]): PinLike<T> {
     pins.forEach(pin => pin.from<I>(this));

@@ -9,27 +9,27 @@ import map from '../map';
 
 describe('map()', () => {
   it('should return a `PinLike` that maps any passed value by given function.', () => {
-    let a = new Source();
+    let a = new Source<number>();
     let res: number[] = [];
-    a.to(map((n: number) => n * 2)).subscribe(n => res.push(n));
+    a.to(map(n => n * 2)).subscribe(n => res.push(n));
     a.send(1);
     a.send(2);
     res.should.eql([2, 4]);
   });
 
   it('should also work with an async function.', () => {
-    let a = new Source();
+    let a = new Source<number>();
     let res: number[] = [];
-    a.to(map((n: number, cb: any) => cb(n * 2 + 1))).subscribe(x => res.push(x));
+    a.to(map((n, cb) => cb(n * 2 + 1))).subscribe(x => res.push(x));
     a.send(1); a.send(2);
 
     res.should.eql([3, 5]);
   });
 
   it('should not keep the order for an async map.', done => {
-    let a = new Source();
+    let a = new Source<number>();
     let res: number[] = [];
-    a.to(map((n: number, cb: any) => setTimeout(() => cb(n * 2 + 1), 5 - n)))
+    a.to(map((n, cb) => setTimeout(() => cb(n * 2 + 1), 5 - n)))
      .subscribe(
       x => res.push(x),
       () => {},
